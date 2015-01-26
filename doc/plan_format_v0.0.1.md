@@ -84,20 +84,71 @@ configuration:
     roles:
         mysql:
             mysql::default_database:
-            name: mydatabase
-            user: myuser
-            password: mypass
+                name: mydatabase
+                user: myuser
+                password: mypass
 ```
 
-This is only really from puppet over the hiera plugin and not from DOP itself at the moment.
+This is only used from puppet over the hiera plugin and not from DOP itself at the moment.
 
 ## Plan
 
 This hash contains some basic settings for the plan. Currently there is only one setting supported
 
-**max_in_flight**
+### max_in_flight
 The amount of parallel steps DOP will be executing.
+
+```yaml
+plan:
+    max_in_flight: 2
+```
 
 ## Steps
 
-TODO: Write Steo documentation
+The steps array is a list of commands that have to be executed in the correct order. Each element in the array contains a hash of settings which describe the step, the nodes involved and the command to execute.
+
+Example:
+```yaml
+steps:
+    - name: run_puppet_on_mysql
+      nodes:
+          - mysql01.example.com
+      command: ssh_run_puppet
+
+    - name: run_puppet_on_webserver
+      roles:
+          - httpd_basic
+          - https_special
+      command: ssh_run_puppet
+
+    - name: reboot_all_nodes
+      nodes: all
+      command: ssh_reboot
+
+    - name: run_puppet_in_noop_on_proxies
+      roles:
+          - haproxy
+      command:
+          plugin: ssh_puppet_run
+          arguments:
+              '--noop':
+```
+
+###name
+The name is just an identifier for the step. You should chose a name that best describes what you are doing in this step.
+
+###nodes
+
+This can either be a list of nodes or the keyword "all" which will include all nodes for the step.
+
+###roles
+This will include all the nodes with a certain role to a step.
+
+roles and nodes can be mixed, dop_common will simply merge the list of nodes. However there has to be at least one node in every step.
+
+###command
+
+The command can either be directly a plugin name if no parameters are needed or a command hash which will be passed to the plugin. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depend on the plugin in use and how it will parse the hash.
+
+For more documentation about the plugins and the variables available for configuring them, check the DOPi documentation.
+
