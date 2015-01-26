@@ -1,6 +1,8 @@
 # DopCommon
 
-TODO: Write a gem description
+This gem is part of the Deployment and Orchestration for Puppet
+or DOP for short. dop_common is a library for the parsing and
+validation of DOP plan files.
 
 ## Installation
 
@@ -19,6 +21,10 @@ Or install it yourself as:
 ## Usage
 
 TODO: Write usage instructions here
+
+## DOP Plan Format
+
+[DOP Plan Format v 0.0.1](doc/plan_format_v0.0.1.md)
 
 ## Contributing
 
