@@ -150,7 +150,13 @@ roles and nodes can be mixed, dop_common will simply merge the list of nodes. Ho
 
 ### command
 
-The command can either be directly a plugin name if no parameters are needed or a command hash which will be passed to the plugin. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depend on the plugin in use and how it will parse the hash.
+The command can either be directly a plugin name if no parameters are needed or a command hash which will be passed to the plugin. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depends on the plugin in use and how it will parse the hash.
 
 For more documentation about the plugins and the variables available for configuring them, check the DOPi documentation.
+
+
+# Examples
+
+For a complete example plan file see:
+[DOP Plan Format v 0.0.1 Example](examples/example_deploment_plan_v0.0.1.yaml)
 
