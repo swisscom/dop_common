@@ -1,55 +1,123 @@
-clouds:
+infrastructure:
   management:
     type: rhev
     endpoint: https://rhev.example.com/api/
     credentials:
       username: myuser
       password: mypass
+    networks:
+      net1:
+        id: rhevm
+        ip_pool:
+          from: 192.168.254.11
+          to: 192.168.254.245
+        ip_netmask: 255.255.255.0
+        ip_defgw: 192.168.254.254
+
   lamp:
     type: openstack
     endpoint: https://openstack.example.com/api/
     credentials:
       username: myuser
       password: mypass
+    networks:
+      net1:
+        id: management
+        ip_pool:
+          from: 192.168.253.11
+          to: 192.168.253.245
+        ip_netmask: 255.255.255.0
+        ip_defgw: 192.168.253.254
+      net2:
+        id: production
+        ip_addrs:
+          from: 192.168.1.11
+          to: 192.168.1.245
+        ip_netmask: 255.255.255.0
+        ip_defgw: 192.168.1.254
 
 nodes:
+  mgt01.example.com:
+    infrastructure: management
+    image: rhel6cloudinit
+    nics:
+      nic1:
+        int: eth0
+        network: net1
+        ip: 192.168.254.12
 
   mysql01.example.com:
-    cloud: lamp
-    image: rhel6
-    nets:
-      int: dhcp
+    infrastructure: lamp
+    image: rhel6cloudinit
     flavor: medium
+    nics:
+      nic1:
+        int: eth0
+        network: net1
+        ip: 192.168.253.25
+      nic2:
+        int: eth1
+        network: net2
+        ip: 192.168.1.25
     disks:
-      database: 30G
+      - name: rdo
+        pool: storage_pool1
+        size: 4000M
+      - name: db1
+        pool: storage_pool1
+        size: 20G
 
-  web{i}.example.com:
-    range: 1..4
-    digits: 2
-    cloud: lamp
+  web01.example.com:
+    infrastructure: lamp
     image: rhel6
-    nets:
-      int: dhcp
     flavor: small
+    nics:
+      nic1:
+        int: eth0
+        network: net1
+        ip: 192.168.253.26
+      nic2:
+        int: eth1
+        network: net2
+        ip: 192.168.1.26
+  
+  web02.example.com:
+    infrastructure: lamp
+    image: rhel6
+    flavor: medium
+    nics:
+      nic1:
+        int: eth0
+        network: net1
+        ip: 192.168.253.27
+      nic2:
+        int: eth1
+        network: net2
+        ip: 192.168.1.27
 
-  haproxy{i}.example.com:
-    range: 1..2
-    digits: 2
-    cloud: lamp
-    image: rhel6
-    nets:
-      int: dhcp
+  haproxy01.example.com:
+    infrastructure: lamp
+    image: rhel6cloudinit
     flavor: small
+    nics:
+      nic1:
+        int: eth0
+        network: net1
+        ip: 192.168.253.28
+      nic2:
+        int: eth1
+        network: net2
+        ip: 192.168.1.28
 
 configuration:
   nodes:
     mysql01.example.com:
       my_role: mysql
-    /web\d+\.example\.com/:
+    web01.example.com:
       my_role: httpd_basic
-    web04.example.com:
+    web02.example.com:
       my_role: httpd_special
-    /haproxy\d+\.example\.com/:
+    haproxy01.example.com:
       my_role: haproxy
   roles:
     mysql:
