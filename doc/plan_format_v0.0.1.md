@@ -1,14 +1,12 @@
 # DOP Plan Format v 0.0.1
 
-## DOP Plan Format
-
 The DOP Plan file consists out of series of hashes and arrays which describe system of nodes that should be created and a list of steps that need to be performed on this nodes in order.
 
-### Infrastructures
+## Infrastructures
 
 TODO: Write the documentation about the infrastructure hash
 
-### Nodes
+## Nodes
 
 The nodes hash holds the basic information about all the nodes you want to create and use. Each entry in the nodes hash is itself a hash. A single entry of this is called a node hash (singular). Each node hash starts with the node name as a key:
 
@@ -38,4 +36,68 @@ This will create a number of nodes in the given range. The string “{i}” will
 - web03.example.com
 - web04.example.com
 
+### Node Properties
 
+TODO: Write the documentation about the node properties
+
+## Configuration
+
+The configurations hash contains hashes with settings for nodes and roles
+
+### Nodes
+
+the nodes configuration hash assigns variables to an individual node or to a selected set of nodes. Here are some examples:
+
+```yaml
+configuration:
+    nodes:
+        mysql01.example.com:
+            role: mysql
+            my_var:  my_value
+       '/web\d+\.example\.com/':
+            role: httpd_basic
+       web04.example.com:
+            role: httpd_special
+       '/haproxy\d+\.example\.com/':
+            role: haproxy
+       '/.example.com/'
+            my_other_var: my_other_value
+```
+
+You can assign different variables to the same node with different regular expressions, but you can not overwrite the values this way. dop_common will throw an error if two regular expression who match the same node set the same variable. On the other hand you can overwrite a value if you set it with a specific fqdn entry.
+
+The only relevant setting here for DOP is the role variable. The name of the role variable can be configured but defaults to 'role'. If hiera is configured and activated, then dop_common will take the role specified in hiera if found. The hierarchy for the role resolution is as follows:
+
+1. Hiera
+2. fqdn match in nodes configuration in Plan file
+3. Regular expression match in nodes configuration in Plan file
+4. Default
+
+A node always needs a role. If the parser finds no value for one of the specified nodes in the plan file and if no default is set, the dop_common will throw an error.
+
+### Roles
+
+You can set variables for a specific role in this hash.
+
+```yaml
+configuration:
+    roles:
+        mysql:
+            mysql::default_database:
+            name: mydatabase
+            user: myuser
+            password: mypass
+```
+
+This is only really from puppet over the hiera plugin and not from DOP itself at the moment.
+
+## Plan
+
+This hash contains some basic settings for the plan. Currently there is only one setting supported
+
+**max_in_flight**
+The amount of parallel steps DOP will be executing.
+
+## Steps
+
+TODO: Write Steo documentation
