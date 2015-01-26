@@ -134,19 +134,21 @@ steps:
               '--noop':
 ```
 
-###name
+### name
+
 The name is just an identifier for the step. You should chose a name that best describes what you are doing in this step.
 
-###nodes
+### nodes
 
 This can either be a list of nodes or the keyword "all" which will include all nodes for the step.
 
-###roles
+### roles
+
 This will include all the nodes with a certain role to a step.
 
 roles and nodes can be mixed, dop_common will simply merge the list of nodes. However there has to be at least one node in every step.
 
-###command
+### command
 
 The command can either be directly a plugin name if no parameters are needed or a command hash which will be passed to the plugin. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depend on the plugin in use and how it will parse the hash.
 
