@@ -113,7 +113,7 @@ with following keywords:
    1. __*name*__ - disk name. It is required.
    2. __*pool*__ - the name of the storage pool the disk should be looked for
   and/or allocated from. This property is required.
-   3. __*size__ - the name size of the disk in megabytes (when the value has a
+   3. __*size*__ - the name size of the disk in megabytes (when the value has a
   suffix *M*) or gigabytes (when the value has a suffix *G*).
 
 The example bellow shows a specification for a database backend and a web node:
