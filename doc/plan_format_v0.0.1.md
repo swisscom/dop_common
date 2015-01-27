@@ -60,12 +60,12 @@ infrastructure:
 ### Network
 Network hash describes a particular network within a given infrastructure
 provider (cloud). Following are the properties of network hash:
-1. __*id*__ - network identifier string.
-2. __*ip_pool*__ - a hash of assignable IP addresses. The hash must contain
+ 1. __*id*__ - network identifier string.
+ 2. __*ip_pool*__ - a hash of assignable IP addresses. The hash must contain
 __*ip_from*__ and __*ip_to*__ keywords that specify the lower and upper bounds
 of IP addresses that can be assigned statically.
-3. __*ip_netmask*__ - a network mask in octet format.
-4. __*ip_defgw*__ - an IP address of the default gateway of the network.
+ 3. __*ip_netmask*__ - a network mask in octet format.
+ 4. __*ip_defgw*__ - an IP address of the default gateway of the network.
 
 ## Nodes
   
@@ -84,36 +84,36 @@ nodes:
 Each node configuration is described by a so-called node hash. The list bellow
 provides an overview on various node properties. Please note that property
 name is also a keyword of node hash.
-1. __*infrastructure*__ - an insfrastructure name this node is a part of. This
+ 1. __*infrastructure*__ - an insfrastructure name this node is a part of. This
 is a required property and its value must point to a valid entry in an
 infrastructure hash.
-2. __*infrastructure_properties*__ - infrastructure properties. It is of hash
+ 2. __*infrastructure_properties*__ - infrastructure properties. It is of hash
 type. This property is optional. Infrastructure properties may differ accross
 different provider types. Currently, this hash may contain __*affinity_group*__
 and __*keep_ha*__ keywords. The __*affinity_group*__ property designates what
 affinity group should be assigned to a specific node and is likely RHEV/oVIRT
 specific. The __*keep_ha*__ property is of boolean type and indicates whether
 the VM should be highly available or not.
-3. __*image*__ - image to deploy the node from (a.k.a template). This property
+ 3. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
-4. __*nics*__ - network interface cards specification. This property is required
+ 4. __*nics*__ - network interface cards specification. This property is required
 and it is of hash type. Each NIC is hashed by its name (for instance,  *nic1*,
 *nic2*, etc). Following is a list of properties of a given network interface
 card:
-  1. __*network*__ - name of the network the NIC belongs to. The network must be
+   1. __*network*__ - name of the network the NIC belongs to. The network must be
   a valid definition in an infrastructure networks hash.
-  2. __*int*__ - network interface name as identified by an operating system
+   2. __*int*__ - network interface name as identified by an operating system
   (eg., *eth0*, *eth1*, etc.).
-  3. __*ip*__ - an IP address string in case of static IP assignment or a *dhcp*
+   3. __*ip*__ - an IP address string in case of static IP assignment or a *dhcp*
   literal if the IP should be assigned by DHCP.
-5. __*disks*__ - persistent node disks. This property is optional and is of
+ 5. __*disks*__ - persistent node disks. This property is optional and is of
 array/list type. A persistant disk itself is described by a so-called disk hash
 with following keywords:
-  1. __*name*__ - disk name. It is required.
-  2. __*pool*__ - the name of the storage pool the disk should be looked for
+   1. __*name*__ - disk name. It is required.
+   2. __*pool*__ - the name of the storage pool the disk should be looked for
   and/or allocated from. This property is required.
-  3. __*size__ - the name size of the disk in megabytes (when the value has a
+   3. __*size__ - the name size of the disk in megabytes (when the value has a
   suffix *M*) or gigabytes (when the value has a suffix *G*).
 
 The example bellow shows a specification for a database backend and a web node:
