@@ -1,13 +1,18 @@
 infrastructure:
   management:
     type: rhev
-    endpoint: https://rhev.example.com/api/
+    endpoint: https://rhev.example.com/api
     credentials:
       username: myuser
       password: mypass
     networks:
-      net1:
-        id: rhevm
+      rhevm:
+        ip_pool:
+          from: 192.168.254.11
+          to: 192.168.254.245
+        ip_netmask: 255.255.255.0
+        ip_defgw: 192.168.254.254
+      production:
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
@@ -16,7 +21,7 @@ infrastructure:
 
   lamp:
     type: openstack
-    endpoint: https://openstack.example.com/api/
+    endpoint: https://openstack.example.com/api
     credentials:
       username: myuser
       password: mypass
@@ -31,7 +36,7 @@ infrastructure:
       net2:
         id: production
         ip_addrs:
-          from: 192.168.1.11
+          from: 192.168.1.101
           to: 192.168.1.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.1.254
@@ -39,6 +44,9 @@ infrastructure:
 nodes:
   mgt01.example.com:
     infrastructure: management
+    infrastructure_properties:
+      affinity_group: group1
+      keep_ha: true
     image: rhel6cloudinit
     nics:
       nic1:
@@ -48,17 +56,20 @@ nodes:
 
   mysql01.example.com:
     infrastructure: lamp
+    infrastructure_properties:
+      affinity_group: group1
+      keep_ha: true
     image: rhel6cloudinit
     flavor: medium
     nics:
       nic1:
-        int: eth0
         network: net1
+        int: eth0
         ip: 192.168.253.25
       nic2:
-        int: eth1
         network: net2
-        ip: 192.168.1.25
+        int: eth1
+        ip: 192.168.1.102
     disks:
       - name: rdo
         pool: storage_pool1
@@ -69,45 +80,54 @@ nodes:
 
   web01.example.com:
     infrastructure: lamp
+    infrastructure_properties:
+      affinity_group: group1
+      keep_ha: false
     image: rhel6
     flavor: small
     nics:
       nic1:
-        int: eth0
         network: net1
+        int: eth0
         ip: 192.168.253.26
       nic2:
-        int: eth1
         network: net2
-        ip: 192.168.1.26
+        int: eth1
+        ip: dhcp
   
   web02.example.com:
     infrastructure: lamp
+    infrastructure_properties:
+      affinity_group: group1
+      keep_ha: false
     image: rhel6
     flavor: medium
     nics:
       nic1:
-        int: eth0
         network: net1
+        int: eth0
         ip: 192.168.253.27
       nic2:
-        int: eth1
         network: net2
-        ip: 192.168.1.27
+        int: eth1
+        ip: 192.168.1.103
 
   haproxy01.example.com:
     infrastructure: lamp
+    infrastructure_properties:
+      affinity_group: group1
+      keep_ha: true
     image: rhel6cloudinit
     flavor: small
     nics:
       nic1:
-        int: eth0
         network: net1
+        int: eth0
         ip: 192.168.253.28
       nic2:
-        int: eth1
         network: net2
-        ip: 192.168.1.28
+        int: eth1
+        ip: dhcp
 
 configuration:
   nodes:
