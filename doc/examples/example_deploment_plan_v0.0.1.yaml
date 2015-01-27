@@ -7,12 +7,14 @@ infrastructure:
       password: mypass
     networks:
       rhevm:
+        id: rhevm
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.254.254
       production:
+        id: production
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
@@ -51,7 +53,7 @@ nodes:
     nics:
       nic1:
         int: eth0
-        network: net1
+        network: rhevm
         ip: 192.168.254.12
 
   mysql01.example.com:
