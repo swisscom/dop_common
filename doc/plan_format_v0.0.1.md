@@ -50,7 +50,7 @@ infrastructure:
         ip_defgw: 192.168.253.254
       net2:
         id: production
-        ip_addrs:
+        ip_pool:
           from: 192.168.1.11
           to: 192.168.1.245
         ip_netmask: 255.255.255.0
