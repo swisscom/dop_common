@@ -27,8 +27,7 @@ infrastructure:
       username: myuser
       password: mypass
     networks:
-      net1:
-        id: rhevm
+      rhevm:
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
@@ -41,15 +40,13 @@ infrastructure:
       username: myuser
       password: mypass
     networks:
-      net1:
-        id: management
+      management:
         ip_pool:
           from: 192.168.253.11
           to: 192.168.253.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.253.254
-      net2:
-        id: production
+      production:
         ip_pool:
           from: 192.168.1.11
           to: 192.168.1.245
@@ -60,12 +57,11 @@ infrastructure:
 ### Network
 Network hash describes a particular network within a given infrastructure
 provider (cloud). Following are the properties of network hash:
- 1. __*id*__ - network identifier string.
- 2. __*ip_pool*__ - a hash of assignable IP addresses. The hash must contain
+ 1. __*ip_pool*__ - a hash of assignable IP addresses. The hash must contain
 __*ip_from*__ and __*ip_to*__ keywords that specify the lower and upper bounds
 of IP addresses that can be assigned statically.
- 3. __*ip_netmask*__ - a network mask in octet format.
- 4. __*ip_defgw*__ - an IP address of the default gateway of the network.
+ 2. __*ip_netmask*__ - a network mask in octet format.
+ 3. __*ip_defgw*__ - an IP address of the default gateway of the network.
 
 ## Nodes
   
@@ -127,12 +123,10 @@ nodes:
     flavor: medium
     interfaces:
       eth0:
-        network: net1
-        int: eth0
+        network: management
         ip: 192.168.253.25
       eth1:
-        network: net2
-        int: eth1
+        network: production
         ip: 192.168.1.102
     disks:
       - name: rdo
@@ -151,10 +145,10 @@ nodes:
     flavor: small
     interfaces:
       eth0:
-        network: net1
+        network: management
         ip: 192.168.253.26
       eth1:
-        network: net2
+        network: production
         ip: dhcp
 ```
 

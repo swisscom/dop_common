@@ -7,14 +7,12 @@ infrastructure:
       password: mypass
     networks:
       rhevm:
-        id: rhevm
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.254.254
       production:
-        id: production
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
@@ -28,15 +26,13 @@ infrastructure:
       username: myuser
       password: mypass
     networks:
-      net1:
-        id: management
+      management:
         ip_pool:
           from: 192.168.253.11
           to: 192.168.253.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.253.254
-      net2:
-        id: production
+      production:
         ip_pool:
           from: 192.168.1.101
           to: 192.168.1.245
@@ -64,10 +60,10 @@ nodes:
     flavor: medium
     interfaces:
       eth0:
-        network: net1
+        network: management
         ip: 192.168.253.25
       eth1:
-        network: net2
+        network: production
         ip: 192.168.1.102
     disks:
       - name: rdo
@@ -86,10 +82,10 @@ nodes:
     flavor: small
     interfaces:
       eth0:
-        network: net1
+        network: management
         ip: 192.168.253.26
       eth1:
-        network: net2
+        network: production
         ip: dhcp
   
   web02.example.com:
@@ -101,10 +97,10 @@ nodes:
     flavor: medium
     interfaces:
       eth0:
-        network: net1
+        network: management
         ip: 192.168.253.27
       eth1:
-        network: net2
+        network: production
         ip: 192.168.1.103
 
   haproxy01.example.com:
@@ -116,10 +112,10 @@ nodes:
     flavor: small
     interfaces:
       eth0:
-        network: net1
+        network: management
         ip: 192.168.253.28
       eth1:
-        network: net2
+        network: production
         ip: dhcp
 
 configuration:
