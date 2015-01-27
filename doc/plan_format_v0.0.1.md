@@ -6,14 +6,14 @@ The DOP Plan file consists out of series of hashes and arrays which describe sys
 The infrastructure hash holds information about cloud providers. Each entry in
 an infrastracture hash describes a certain infrastructure or cloud if you want.
 It is of hash type. Following is a list of required keys:
-1. __*type*__ - is the type of the infrastructure provider. Its value must be
+ 1. __*type*__ - is the type of the infrastructure provider. Its value must be
 one of the following strings: *ovirt*, *rhev*, *openstack*, *vsphere*, *vmware*.
 Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
 *vmware*.
-2. __*endpoint*__ - is a URL that is an entry point for API calls.
-3. __*credentials*__ - credential hash. It must contain values for
+ 2. __*endpoint*__ - is a URL that is an entry point for API calls.
+ 3. __*credentials*__ - credential hash. It must contain values for
 __*username*__ and __*password*__ keys.
-4. __*networks*__ - provides networks definition hashes. Each network definition
+ 4. __*networks*__ - provides networks definition hashes. Each network definition
 is hashed by its name that can be an arbitrary string or symbol. Please refer to
 network subsection for further details.
 
