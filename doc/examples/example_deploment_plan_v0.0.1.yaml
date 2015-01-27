@@ -50,9 +50,8 @@ nodes:
       affinity_group: group1
       keep_ha: true
     image: rhel6cloudinit
-    nics:
-      nic1:
-        int: eth0
+    interfaces:
+      eth0:
         network: rhevm
         ip: 192.168.254.12
 
@@ -63,14 +62,12 @@ nodes:
       keep_ha: true
     image: rhel6cloudinit
     flavor: medium
-    nics:
-      nic1:
+    interfaces:
+      eth0:
         network: net1
-        int: eth0
         ip: 192.168.253.25
-      nic2:
+      eth1:
         network: net2
-        int: eth1
         ip: 192.168.1.102
     disks:
       - name: rdo
@@ -87,14 +84,12 @@ nodes:
       keep_ha: false
     image: rhel6
     flavor: small
-    nics:
-      nic1:
+    interfaces:
+      eth0:
         network: net1
-        int: eth0
         ip: 192.168.253.26
-      nic2:
+      eth1:
         network: net2
-        int: eth1
         ip: dhcp
   
   web02.example.com:
@@ -104,14 +99,12 @@ nodes:
       keep_ha: false
     image: rhel6
     flavor: medium
-    nics:
-      nic1:
+    interfaces:
+      eth0:
         network: net1
-        int: eth0
         ip: 192.168.253.27
-      nic2:
+      eth1:
         network: net2
-        int: eth1
         ip: 192.168.1.103
 
   haproxy01.example.com:
@@ -121,14 +114,12 @@ nodes:
       keep_ha: true
     image: rhel6cloudinit
     flavor: small
-    nics:
-      nic1:
+    interfaces:
+      eth0:
         network: net1
-        int: eth0
         ip: 192.168.253.28
-      nic2:
+      eth1:
         network: net2
-        int: eth1
         ip: dhcp
 
 configuration:

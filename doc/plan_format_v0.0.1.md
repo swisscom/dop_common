@@ -97,14 +97,13 @@ the VM should be highly available or not.
  3. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
- 4. __*nics*__ - network interface cards specification. This property is required
-and it is of hash type. Each NIC is hashed by its name (for instance,  *nic1*,
-*nic2*, etc). Following is a list of properties of a given network interface
+ 4. __*interfaces*__ - network interface cards specification. This property is
+required and it is of hash type. Each NIC is hashed by its name (for instance,
+*nic1*, *nic2*, etc). NIC name has to correspond with a name the OS recognizes
+it. Following is a list of properties of a given network interface
 card:
    1. __*network*__ - name of the network the NIC belongs to. The network must be
   a valid definition in an infrastructure networks hash.
-   2. __*int*__ - network interface name as identified by an operating system
-  (eg., *eth0*, *eth1*, etc.).
    3. __*ip*__ - an IP address string in case of static IP assignment or a *dhcp*
   literal if the IP should be assigned by DHCP.
  5. __*disks*__ - persistent node disks. This property is optional and is of
@@ -126,12 +125,12 @@ nodes:
       keep_ha: true
     image: rhel6cloudinit
     flavor: medium
-    nics:
-      nic1:
+    interfaces:
+      eth0:
         network: net1
         int: eth0
         ip: 192.168.253.25
-      nic2:
+      eth1:
         network: net2
         int: eth1
         ip: 192.168.1.102
@@ -150,14 +149,12 @@ nodes:
       keep_ha: false
     image: rhel6
     flavor: small
-    nics:
-      nic1:
+    interfaces:
+      eth0:
         network: net1
-        int: eth0
         ip: 192.168.253.26
-      nic2:
+      eth1:
         network: net2
-        int: eth1
         ip: dhcp
 ```
 
