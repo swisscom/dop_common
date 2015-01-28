@@ -27,8 +27,7 @@ infrastructure:
       username: myuser
       password: mypass
     networks:
-      net1:
-        id: rhevm
+      rhevm:
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
@@ -41,15 +40,13 @@ infrastructure:
       username: myuser
       password: mypass
     networks:
-      net1:
-        id: management
+      management:
         ip_pool:
           from: 192.168.253.11
           to: 192.168.253.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.253.254
-      net2:
-        id: production
+      production:
         ip_pool:
           from: 192.168.1.11
           to: 192.168.1.245
@@ -60,12 +57,11 @@ infrastructure:
 ### Network
 Network hash describes a particular network within a given infrastructure
 provider (cloud). Following are the properties of network hash:
- 1. __*id*__ - network identifier string.
- 2. __*ip_pool*__ - a hash of assignable IP addresses. The hash must contain
+ 1. __*ip_pool*__ - a hash of assignable IP addresses. The hash must contain
 __*ip_from*__ and __*ip_to*__ keywords that specify the lower and upper bounds
 of IP addresses that can be assigned statically.
- 3. __*ip_netmask*__ - a network mask in octet format.
- 4. __*ip_defgw*__ - an IP address of the default gateway of the network.
+ 2. __*ip_netmask*__ - a network mask in octet format.
+ 3. __*ip_defgw*__ - an IP address of the default gateway of the network.
 
 ## Nodes
   
@@ -97,14 +93,13 @@ the VM should be highly available or not.
  3. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
- 4. __*nics*__ - network interface cards specification. This property is required
-and it is of hash type. Each NIC is hashed by its name (for instance,  *nic1*,
-*nic2*, etc). Following is a list of properties of a given network interface
+ 4. __*interfaces*__ - network interface cards specification. This property is
+required and it is of hash type. Each NIC is hashed by its name (for instance,
+*nic1*, *nic2*, etc). NIC name has to correspond with a name the OS recognizes
+it. Following is a list of properties of a given network interface
 card:
    1. __*network*__ - name of the network the NIC belongs to. The network must be
   a valid definition in an infrastructure networks hash.
-   2. __*int*__ - network interface name as identified by an operating system
-  (eg., *eth0*, *eth1*, etc.).
    3. __*ip*__ - an IP address string in case of static IP assignment or a *dhcp*
   literal if the IP should be assigned by DHCP.
  5. __*disks*__ - persistent node disks. This property is optional and is of
@@ -126,14 +121,12 @@ nodes:
       keep_ha: true
     image: rhel6cloudinit
     flavor: medium
-    nics:
-      nic1:
-        network: net1
-        int: eth0
+    interfaces:
+      eth0:
+        network: management
         ip: 192.168.253.25
-      nic2:
-        network: net2
-        int: eth1
+      eth1:
+        network: production
         ip: 192.168.1.102
     disks:
       - name: rdo
@@ -150,14 +143,12 @@ nodes:
       keep_ha: false
     image: rhel6
     flavor: small
-    nics:
-      nic1:
-        network: net1
-        int: eth0
+    interfaces:
+      eth0:
+        network: management
         ip: 192.168.253.26
-      nic2:
-        network: net2
-        int: eth1
+      eth1:
+        network: production
         ip: dhcp
 ```
 

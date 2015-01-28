@@ -7,14 +7,12 @@ infrastructure:
       password: mypass
     networks:
       rhevm:
-        id: rhevm
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.254.254
       production:
-        id: production
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
@@ -28,15 +26,13 @@ infrastructure:
       username: myuser
       password: mypass
     networks:
-      net1:
-        id: management
+      management:
         ip_pool:
           from: 192.168.253.11
           to: 192.168.253.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.253.254
-      net2:
-        id: production
+      production:
         ip_pool:
           from: 192.168.1.101
           to: 192.168.1.245
@@ -50,9 +46,8 @@ nodes:
       affinity_group: group1
       keep_ha: true
     image: rhel6cloudinit
-    nics:
-      nic1:
-        int: eth0
+    interfaces:
+      eth0:
         network: rhevm
         ip: 192.168.254.12
 
@@ -63,14 +58,12 @@ nodes:
       keep_ha: true
     image: rhel6cloudinit
     flavor: medium
-    nics:
-      nic1:
-        network: net1
-        int: eth0
+    interfaces:
+      eth0:
+        network: management
         ip: 192.168.253.25
-      nic2:
-        network: net2
-        int: eth1
+      eth1:
+        network: production
         ip: 192.168.1.102
     disks:
       - name: rdo
@@ -87,14 +80,12 @@ nodes:
       keep_ha: false
     image: rhel6
     flavor: small
-    nics:
-      nic1:
-        network: net1
-        int: eth0
+    interfaces:
+      eth0:
+        network: management
         ip: 192.168.253.26
-      nic2:
-        network: net2
-        int: eth1
+      eth1:
+        network: production
         ip: dhcp
   
   web02.example.com:
@@ -104,14 +95,12 @@ nodes:
       keep_ha: false
     image: rhel6
     flavor: medium
-    nics:
-      nic1:
-        network: net1
-        int: eth0
+    interfaces:
+      eth0:
+        network: management
         ip: 192.168.253.27
-      nic2:
-        network: net2
-        int: eth1
+      eth1:
+        network: production
         ip: 192.168.1.103
 
   haproxy01.example.com:
@@ -121,14 +110,12 @@ nodes:
       keep_ha: true
     image: rhel6cloudinit
     flavor: small
-    nics:
-      nic1:
-        network: net1
-        int: eth0
+    interfaces:
+      eth0:
+        network: management
         ip: 192.168.253.28
-      nic2:
-        network: net2
-        int: eth1
+      eth1:
+        network: production
         ip: dhcp
 
 configuration:
