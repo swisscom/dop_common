@@ -200,7 +200,7 @@ This is only used from puppet over the hiera plugin and not from DOP itself at t
 This hash contains some basic settings for the plan. Currently there is only one setting supported
 
 ### max_in_flight
-The amount of parallel steps DOP will be executing.
+The amount of nodes DOP will be executing commands on in parallel.
 
 ```yaml
 plan:
