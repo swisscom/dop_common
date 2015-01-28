@@ -153,53 +153,52 @@ plan:
 
 steps:
 
-    - name: test_run
+    - name: 'Make sure we can login to all nodes'
+      nodes: all
+      command: ssh/wait_for_login
+
+    - name: 'Install Puppet'
       nodes: all
       command:
-          plugin: custom
-          exec: "sleep 2"
-          arguments: {}
-          env:
-              ENV1: foo
-              ENV2: bla
-          node_verify_cmd: /bin/false
-          dop_verify_cmd: /bin/false
-          expect_exit_code: 0
+          plugin: ssh/custom
+          verify_commands:
+              - plugin: ssh/file_exists
+                file: /usr/bin/puppet
+          exec: yum
+          arguments: 'install puppet'
+          expect_exit_codes: 0
           fail_on_warning: False
           parse_output:
               error:
-                  - '^Error: '
-              warning:
-                  - '^Warning: '
+                  - '^No package puppet available'
 
-    - name: ssh_test_run
-      nodes:
-        - mysql01.example.com
-      command:
-          plugin: ssh_custom
-          exec: "echo 'Warning: bla bla'"
-          arguments: {}
-          env:
-              ENV1: foo
-              ENV2: bla
-          node_verify_cmd: /bin/false
-          dop_verify_cmd: /bin/false
-          expect_exit_code: 255
-          fail_on_warning: False
-          parse_output:
-              error:
-                  - '^Error: '
-              warning:
-                  - '^Warning: '
-
-    - name: run_puppet
+    - name: 'Initial Puppet run to configure puppet'
       nodes: all
       command:
-          plugin: ssh_puppet_run
+          plugin: ssh/puppet_agent_run
+          verify_commands:
+              - plugin: ssh/egrep
+                file: /etc/puppet/puppet.conf
+                pattern: puppet.example.com
           arguments:
-              '--noop':
+              - '--server puppet.example.com'
+              - '--environment production'
+              - '--tags puppet::client'
 
-    - name: run_puppet2
-      nodes: all
-      command: ssh_puppet_run
+    - name: 'Configure the MySQL server'
+      nodes:
+          - mysql01.example.com
+      command: ssh/puppet_agent_run
+
+    - name: 'Configure the Webservers'
+      roles:
+          - httpd_basic
+          - httpd_special
+      command: ssh/puppet_agent_run
+
+    - name: 'Configure the HA Proxy'
+      roles:
+          - haproxy
+      command: ssh/puppet_agent_run
+
 
