@@ -142,7 +142,9 @@ steps:
 
     - name: 'Make sure we can login to all nodes'
       nodes: all
-      command: ssh/wait_for_login
+      command:
+          plugin: ssh/wait_for_login
+          plugin_timeout: 600
 
     - name: 'Install Puppet'
       nodes: all
