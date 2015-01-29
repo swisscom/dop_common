@@ -11,7 +11,8 @@ one of the following strings: *ovirt*, *rhev*, *openstack*, *vsphere*, *vmware*.
 Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
 *vmware*.
  2. __*endpoint*__ - is a URL that is an entry point for API calls.
- 3. __*credentials*__ - credential hash. It must contain values for
+ 3. __*credentials*__ - credential hash. The content of this hash depends on a
+infrastructure provider type. For instance, RHEV infrastructures must contain
 __*username*__ and __*password*__ keys.
  4. __*networks*__ - provides networks definition hashes. Each network definition
 is hashed by its name that can be an arbitrary string or symbol. Please refer to
@@ -61,7 +62,8 @@ provider (cloud). Following are the properties of network hash:
 __*ip_from*__ and __*ip_to*__ keywords that specify the lower and upper bounds
 of IP addresses that can be assigned statically.
  2. __*ip_netmask*__ - a network mask in octet format.
- 3. __*ip_defgw*__ - an IP address of the default gateway of the network.
+ 3. __*ip_defgw*__ - an IP address of the default gateway of the network. This
+is optional.
 
 ## Nodes
   
@@ -85,11 +87,14 @@ is a required property and its value must point to a valid entry in an
 infrastructure hash.
  2. __*infrastructure_properties*__ - infrastructure properties. It is of hash
 type. This property is optional. Infrastructure properties may differ accross
-different provider types. Currently, this hash may contain __*affinity_group*__
-and __*keep_ha*__ keywords. The __*affinity_group*__ property designates what
-affinity group should be assigned to a specific node and is likely RHEV/oVIRT
-specific. The __*keep_ha*__ property is of boolean type and indicates whether
-the VM should be highly available or not.
+different provider types. Currently, this hash may contain __*affinity_group*__,
+__*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords. The
+__*affinity_group*__ property designates what affinity group should be assigned
+to a specific node and is likely RHEV/oVIRT specific. The __*keep_ha*__ property
+is of boolean type and indicates whether the VM should be highly available or not.
+Properties __*datacenter*__ and __*cluster*__ allow to specify under which
+cluster in which datacenter should the node be deployed. These properties are
+specific to RHEV/oVIRT and VSphere infrastructure providers.
  3. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
@@ -141,6 +146,8 @@ nodes:
     infrastructure_properties:
       affinity_group: group1
       keep_ha: false
+	  datacenter: lab1ch
+	  cluster: clu-lab1ch
     image: rhel6
     flavor: small
     interfaces:

@@ -45,6 +45,8 @@ nodes:
     infrastructure_properties:
       affinity_group: group1
       keep_ha: true
+      datacenter: lab1ch
+      cluster: clu-lab1ch
     image: rhel6cloudinit
     interfaces:
       eth0:
