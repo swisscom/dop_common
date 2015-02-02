@@ -18,6 +18,19 @@ infrastructure:
           to: 192.168.254.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.254.254
+    affinity_groups:
+      clu-lab1ch-ag_1:
+        positive: true
+        enforce: true
+        cluster: clu-lab1ch
+      clu-lab1ch-ag_2:
+        positive: true
+        enforce: false
+        cluster: clu-lab1ch
+      clu-lab1ch-ag_3:
+        positive: false
+        enforce: true
+        cluster: clu-lab1ch
 
   lamp:
     type: openstack
@@ -43,7 +56,8 @@ nodes:
   mgt01.example.com:
     infrastructure: management
     infrastructure_properties:
-      affinity_group: group1
+      - affinity_groups: clu-lab1ch-ag_1
+      - affinity_groups: clu-lab1ch-ag_3
       keep_ha: true
       datacenter: lab1ch
       cluster: clu-lab1ch

@@ -5,18 +5,26 @@ The DOP Plan file consists out of series of hashes and arrays which describe sys
 ## Infrastructure
 The infrastructure hash holds information about cloud providers. Each entry in
 an infrastracture hash describes a certain infrastructure or cloud if you want.
-It is of hash type. Following is a list of required keys:
+It is of hash type. Following is a list of keys:
  1. __*type*__ - is the type of the infrastructure provider. Its value must be
 one of the following strings: *ovirt*, *rhev*, *openstack*, *vsphere*, *vmware*.
 Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
-*vmware*.
- 2. __*endpoint*__ - is a URL that is an entry point for API calls.
+*vmware*. This is a required key.
+ 2. __*endpoint*__ - is a URL that is an entry point for API calls. This is
+ required.
  3. __*credentials*__ - credential hash. The content of this hash depends on a
 infrastructure provider type. For instance, RHEV infrastructures must contain
-__*username*__ and __*password*__ keys.
+__*username*__ and __*password*__ keys. Credential hash specification is
+required, although its content may differ across different providers.
  4. __*networks*__ - provides networks definition hashes. Each network definition
 is hashed by its name that can be an arbitrary string or symbol. Please refer to
 network subsection for further details.
+ 5. __*affinity_groups*__ - provides affinity groups definition hashes. Each
+affinity group definition itself is a hash. Affinity groups may be provider
+specific. For instance, RHEV infrastructure must define __*name*__,
+__*cluster*__, __*positive*__ and __*enforced*__ properties. Plese note tha some
+providers may not have affinities implemented, hence this feature is optional in
+deployment plan.
 
 The following snippet is an example infrastructure configuration:
 ```yaml
@@ -34,6 +42,19 @@ infrastructure:
           to: 192.168.254.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.254.254
+    affinity_groups:
+      clu-lab1ch-ag_1:
+        positive: true
+        enforce: true
+        cluster: clu-lab1ch
+      clu-lab1ch-ag_2:
+        positive: true
+        enforce: false
+        cluster: clu-lab1ch
+      clu-lab1ch-ag_3:
+        positive: false
+        enforce: true
+        cluster: clu-lab1ch
   lamp:
     type: openstack
     endpoint: https://openstack.example.com/api/
@@ -87,14 +108,14 @@ is a required property and its value must point to a valid entry in an
 infrastructure hash.
  2. __*infrastructure_properties*__ - infrastructure properties. It is of hash
 type. This property is optional. Infrastructure properties may differ accross
-different provider types. Currently, this hash may contain __*affinity_group*__,
+different provider types. Currently, this hash may contain __*affinity_groups*__,
 __*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords. The
-__*affinity_group*__ property designates what affinity group should be assigned
-to a specific node and is likely RHEV/oVIRT specific. The __*keep_ha*__ property
-is of boolean type and indicates whether the VM should be highly available or not.
-Properties __*datacenter*__ and __*cluster*__ allow to specify under which
-cluster in which datacenter should the node be deployed. These properties are
-specific to RHEV/oVIRT and VSphere infrastructure providers.
+__*affinity_groups*__ property designates what affinity group should be assigned
+a specific node assigned to and is likely RHEV/oVIRT specific. The __*keep_ha*__
+property is of boolean type and indicates whether the VM should be highly
+available or not. Properties __*datacenter*__ and __*cluster*__ allow to specify
+under which cluster in which datacenter should the node be deployed. These
+properties are specific to RHEV/oVIRT and VSphere infrastructure providers.
  3. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
@@ -119,6 +140,18 @@ with following keywords:
 The example bellow shows a specification for a database backend and a web node:
 ```yaml
 nodes:
+  mgt01.example.com:
+    infrastructure: management
+    infrastructure_properties:
+      - affinity_groups: clu-lab1ch-ag_1
+      - affinity_groups: clu-lab1ch-ag_3
+      keep_ha: true
+      datacenter: lab1ch
+      cluster: clu-lab1ch
+    image: rhel6cloudinit
+    interfaces:
+      eth0:
+        network: dhcp
   mysql01.example.com:
     infrastructure: lamp
     infrastructure_properties:
