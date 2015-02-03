@@ -143,8 +143,9 @@ nodes:
   mgt01.example.com:
     infrastructure: management
     infrastructure_properties:
-      - affinity_groups: clu-lab1ch-ag_1
-      - affinity_groups: clu-lab1ch-ag_3
+      affinity_groups:
+	    - clu-lab1ch-ag_1
+		- clu-lab1ch-ag_3
       keep_ha: true
       datacenter: lab1ch
       cluster: clu-lab1ch
@@ -152,10 +153,10 @@ nodes:
     interfaces:
       eth0:
         network: dhcp
+  
   mysql01.example.com:
     infrastructure: lamp
     infrastructure_properties:
-      affinity_group: group1
       keep_ha: true
     image: rhel6cloudinit
     flavor: medium
@@ -177,7 +178,6 @@ nodes:
   web01.example.com:
     infrastructure: lamp
     infrastructure_properties:
-      affinity_group: group1
       keep_ha: false
 	  datacenter: lab1ch
 	  cluster: clu-lab1ch
