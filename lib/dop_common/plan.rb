@@ -88,8 +88,8 @@ module DopCommon
     end
 
     def create_steps
-      @hash[:steps].map do |name, hash|
-        ::DopCommon::Step.new(name, hash)
+      @hash[:steps].map do |hash|
+        ::DopCommon::Step.new(hash)
       end
     end
 
