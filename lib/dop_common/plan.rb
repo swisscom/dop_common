@@ -71,8 +71,11 @@ module DopCommon
 
     def create_nodes
       @hash[:nodes].map do |name, hash|
-        ::DopCommon::Node.new(name, hash)
-      end
+        node = ::DopCommon::Node.new(name.to_s, hash)
+        # check if node is part of a series and
+        # if true inflate it
+        node.inflatable? ? node.inflate : node
+      end.flatten
     end
 
     def steps_valid?
@@ -89,7 +92,6 @@ module DopCommon
         ::DopCommon::Step.new(name, hash)
       end
     end
-
 
   end
 end
