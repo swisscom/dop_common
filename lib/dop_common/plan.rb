@@ -81,8 +81,8 @@ module DopCommon
     def steps_valid?
       @hash[:steps] or
         raise PlanParsingError, 'Plan: steps hash is missing'
-      @hash[:steps].class == Hash or
-        raise PlanParsingError, 'Plan: steps key has not a hash as value'
+      @hash[:steps].class == Array or
+        raise PlanParsingError, 'Plan: steps key has not a array as value'
       @hash[:steps].any? or
         raise PlanParsingError, 'Plan: steps hash is empty'
     end
