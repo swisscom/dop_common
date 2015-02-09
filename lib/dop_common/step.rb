@@ -17,6 +17,10 @@ module DopCommon
       @nodes ||= nodes_valid? ? parse_nodes : []
     end
 
+    def roles
+      @roles ||= roles_valid? ? parse_roles : []
+    end
+
     private
 
     def nodes_valid?
@@ -34,6 +38,25 @@ module DopCommon
       case @hash[:nodes]
         when String then [ @hash[:nodes] ]
         when Array then @hash[:nodes]
+        else []
+      end
+    end
+
+    def roles_valid?
+      return false if @hash[:roles].nil? # roless is optional
+      @hash[:roles].class == Array || @hash[:roles].class == String or
+        raise PlanParsingError, "Step #{@name}: The value for roless has to be a string or an array"
+      if @hash[:roles].class == Array
+        @hash[:roles].all?{|n| n.class == String} or
+          raise PlanParsingError, "Step #{@name}: The roless array must only contain strings"
+      end
+      true
+    end
+
+    def parse_roles
+      case @hash[:roles]
+        when String then [ @hash[:roles] ]
+        when Array then @hash[:roles]
         else []
       end
     end
