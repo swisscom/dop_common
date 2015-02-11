@@ -63,5 +63,20 @@ describe DopCommon::Step do
     end
   end
 
+  describe '#command' do
+    it 'returns the command object if a command hash is specified' do
+      step = DopCommon::Step.new({:name => 'foo', :command => {:plugin => 'dummy'}})
+      expect(step.command).to be_an_instance_of DopCommon::Command
+    end
+    it 'throws an exception if the command is not specified' do
+      step = DopCommon::Step.new({:name => 'foo'})
+      expect{step.command}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'throws an exception if the value for command is something other than a String or a Hash' do
+      step = DopCommon::Step.new({:name => 'foo', :command => 1})
+      expect{step.command}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
 end
 

@@ -21,6 +21,10 @@ module DopCommon
       @roles ||= roles_valid? ? parse_roles : []
     end
 
+    def command
+      @command ||= command_valid? ? create_command : nil
+    end
+
     private
 
     def nodes_valid?
@@ -45,10 +49,10 @@ module DopCommon
     def roles_valid?
       return false if @hash[:roles].nil? # roless is optional
       @hash[:roles].class == Array || @hash[:roles].class == String or
-        raise PlanParsingError, "Step #{@name}: The value for roless has to be a string or an array"
+        raise PlanParsingError, "Step #{@name}: The value for roles has to be a string or an array"
       if @hash[:roles].class == Array
         @hash[:roles].all?{|n| n.class == String} or
-          raise PlanParsingError, "Step #{@name}: The roless array must only contain strings"
+          raise PlanParsingError, "Step #{@name}: The roles array must only contain strings"
       end
       true
     end
@@ -59,6 +63,17 @@ module DopCommon
         when Array then @hash[:roles]
         else []
       end
+    end
+
+    def command_valid?
+      @hash[:command] or
+        raise PlanParsingError, "Step #{@name}: A command key has to be defined"
+      @hash[:command].class == Hash || @hash[:command].class == String or
+        raise PlanParsingError, "Step #{@name}: The value for command has to be a string or a hash"
+    end
+
+    def create_command
+      @command = ::DopCommon::Command.new(@hash[:command])
     end
 
   end
