@@ -19,6 +19,10 @@ module DopCommon
       @plugin_timeout ||= plugin_timeout_valid? ? @hash[:plugin_timeout] : DEFAULT_PLUGIN_TIMEOUT
     end
 
+    def verify_commands
+      @verify_commands ||= verify_commands_valid? ? create_verify_commands : []
+    end
+
   private
 
     def plugin_valid?
@@ -51,6 +55,20 @@ module DopCommon
       return false if @hash[:plugin_timeout].nil? # plugin_timeout is optional
       @hash[:plugin_timeout].class == Fixnum or
         raise PlanParsingError, "The value for 'plugin_timeout' has to be a number"
+    end
+
+    def verify_commands_valid?
+      return false if @hash[:verify_commands].nil?
+      [Array, Hash, String].include? @hash[:verify_commands].class or
+        raise PlanParsingError, "The value for 'verify_commands' has to be a String, Hash or an Array"
+    end
+
+    def create_verify_commands
+      case @hash[:verify_commands]
+        when String, Hash then [ ::DopCommon::Command.new(@hash[:verify_commands]) ]
+        when Array then @hash[:verify_commands].map {|c| ::DopCommon::Command.new(c)}
+        else []
+      end
     end
 
   end
