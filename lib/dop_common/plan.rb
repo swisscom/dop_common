@@ -2,6 +2,7 @@
 #
 #
 require 'yaml'
+require 'active_support/core_ext/hash/indifferent_access'
 
 module DopCommon
   class PlanParsingError < StandardError
@@ -12,7 +13,7 @@ module DopCommon
     DEFAULT_MAX_IN_FLIGHT = 3
 
     def initialize(hash)
-      @hash = hash
+      @hash = hash.kind_of?(Hash) ? ActiveSupport::HashWithIndifferentAccess.new(hash) : hash
     end
 
     def max_in_flight
@@ -39,7 +40,7 @@ module DopCommon
 
     def max_in_flight_valid?
       return false if @hash[:max_in_flight].nil? # max_in_flight is optional
-      @hash[:max_in_flight].class == Fixnum or
+      @hash[:max_in_flight].kind_of?(Fixnum) or
         raise PlanParsingError, 'Plan: max_in_flight has to be a number'
       @hash[:max_in_flight] > 0 or
         raise PlanParsingError, 'Plan: max_in_flight has to be greater than one'
@@ -48,7 +49,7 @@ module DopCommon
     def infrastructures_valid?
       @hash[:infrastructures] or
         raise PlanParsingError, 'Plan: infrastructures hash is missing'
-      @hash[:infrastructures].class == Hash or
+      @hash[:infrastructures].kind_of?(Hash) or
         raise PlanParsingError, 'Plan: infrastructures key has not a hash as value'
       @hash[:infrastructures].any? or
         raise PlanParsingError, 'Plan: infrastructures hash is empty'
@@ -63,7 +64,7 @@ module DopCommon
     def nodes_valid?
       @hash[:nodes] or
         raise PlanParsingError, 'Plan: nodes hash is missing'
-      @hash[:nodes].class == Hash or
+      @hash[:nodes].kind_of?(Hash) or
         raise PlanParsingError, 'Plan: nodes key has not a hash as value'
       @hash[:nodes].any? or
         raise PlanParsingError, 'Plan: nodes hash is empty'
@@ -81,7 +82,7 @@ module DopCommon
     def steps_valid?
       @hash[:steps] or
         raise PlanParsingError, 'Plan: steps hash is missing'
-      @hash[:steps].class == Array or
+      @hash[:steps].kind_of? Array or
         raise PlanParsingError, 'Plan: steps key has not a array as value'
       @hash[:steps].any? or
         raise PlanParsingError, 'Plan: steps hash is empty'

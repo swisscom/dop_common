@@ -1,11 +1,13 @@
 #
 # DOP common step hash parser
 #
+require 'active_support/core_ext/hash/indifferent_access'
+
 module DopCommon
   class Step
 
     def initialize(hash)
-      @hash = hash
+      @hash = hash.kind_of?(Hash) ? ActiveSupport::HashWithIndifferentAccess.new(hash) : hash
     end
 
     def name
@@ -29,10 +31,10 @@ module DopCommon
 
     def nodes_valid?
       return false if @hash[:nodes].nil? # nodes is optional
-      @hash[:nodes].class == Array || @hash[:nodes].class == String or
+      @hash[:nodes].kind_of?(Array) || @hash[:nodes].kind_of?(String) or
         raise PlanParsingError, "Step #{@name}: The value for nodes has to be a string or an array"
-      if @hash[:nodes].class == Array
-        @hash[:nodes].all?{|n| n.class == String} or
+      if @hash[:nodes].kind_of?(Array)
+        @hash[:nodes].all?{|n| n.kind_of?(String)} or
           raise PlanParsingError, "Step #{@name}: The nodes array must only contain strings"
       end
       true
@@ -40,6 +42,7 @@ module DopCommon
 
     def parse_nodes
       case @hash[:nodes]
+        when 'all', 'All', 'ALL' then @hash[:nodes]
         when String then [ @hash[:nodes] ]
         when Array then @hash[:nodes]
         else []
@@ -48,10 +51,10 @@ module DopCommon
 
     def roles_valid?
       return false if @hash[:roles].nil? # roless is optional
-      @hash[:roles].class == Array || @hash[:roles].class == String or
+      @hash[:roles].kind_of?(Array) || @hash[:roles].kind_of?(String) or
         raise PlanParsingError, "Step #{@name}: The value for roles has to be a string or an array"
-      if @hash[:roles].class == Array
-        @hash[:roles].all?{|n| n.class == String} or
+      if @hash[:roles].kind_of?(Array)
+        @hash[:roles].all?{|n| n.kind_of?(String)} or
           raise PlanParsingError, "Step #{@name}: The roles array must only contain strings"
       end
       true
@@ -59,6 +62,7 @@ module DopCommon
 
     def parse_roles
       case @hash[:roles]
+        when 'all', 'All', 'ALL' then @hash[:roles]
         when String then [ @hash[:roles] ]
         when Array then @hash[:roles]
         else []
@@ -68,7 +72,7 @@ module DopCommon
     def command_valid?
       @hash[:command] or
         raise PlanParsingError, "Step #{@name}: A command key has to be defined"
-      @hash[:command].class == Hash || @hash[:command].class == String or
+      @hash[:command].kind_of?(Hash) || @hash[:command].kind_of?(String) or
         raise PlanParsingError, "Step #{@name}: The value for command has to be a string or a hash"
     end
 

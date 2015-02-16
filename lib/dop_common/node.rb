@@ -1,6 +1,8 @@
 #
 # DOP common node hash parser
 #
+require 'active_support/core_ext/hash/indifferent_access'
+
 module DopCommon
   class Node
 
@@ -10,7 +12,7 @@ module DopCommon
 
     def initialize(name, hash)
       @name = name
-      @hash = hash
+      @hash = hash.kind_of?(Hash) ? ActiveSupport::HashWithIndifferentAccess.new(hash) : hash
     end
 
     def digits
@@ -45,7 +47,7 @@ module DopCommon
 
     def digits_valid?
       return false if @hash[:digits].nil? # max_in_flight is optional
-      @hash[:digits].class == Fixnum or
+      @hash[:digits].kind_of?(Fixnum) or
         raise PlanParsingError, "Node #{@name}: 'digits' has to be a number"
       @hash[:digits] > 0 or
         raise PlanParsingError, "Node #{@name}: 'digits' has to be greater than zero"
