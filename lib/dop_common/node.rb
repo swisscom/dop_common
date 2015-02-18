@@ -1,10 +1,10 @@
 #
 # DOP common node hash parser
 #
-require 'active_support/core_ext/hash/indifferent_access'
 
 module DopCommon
   class Node
+    include Validator
 
     attr_reader :name
 
@@ -12,7 +12,12 @@ module DopCommon
 
     def initialize(name, hash)
       @name = name
-      @hash = hash.kind_of?(Hash) ? ActiveSupport::HashWithIndifferentAccess.new(hash) : hash
+      @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]
+    end
+
+    def validate
+      log_validation_method('digits_valid?')
+      log_validation_method('range_valid?')
     end
 
     def digits
@@ -46,7 +51,7 @@ module DopCommon
   private
 
     def digits_valid?
-      return false if @hash[:digits].nil? # max_in_flight is optional
+      return false if @hash[:digits].nil? # digits is optional
       @hash[:digits].kind_of?(Fixnum) or
         raise PlanParsingError, "Node #{@name}: 'digits' has to be a number"
       @hash[:digits] > 0 or
@@ -54,6 +59,12 @@ module DopCommon
     end
 
     def range_valid?
+      if inflatable?
+        @hash[:range] or
+          raise PlanParsingError, "Node #{@name}: 'range' has to be specified if the node is inflatable"
+      else
+        return false # range is only needed if inflatable
+      end
       @hash[:range].class == String or
         raise PlanParsingError, "Node #{@name}: 'range' has to be a string"
       range_array = @hash[:range].scan(/\d+/)

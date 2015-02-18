@@ -2,18 +2,28 @@
 #
 #
 require 'yaml'
-require 'active_support/core_ext/hash/indifferent_access'
 
 module DopCommon
   class PlanParsingError < StandardError
   end
 
   class Plan
+    include Validator
 
     DEFAULT_MAX_IN_FLIGHT = 3
 
     def initialize(hash)
-      @hash = hash.kind_of?(Hash) ? ActiveSupport::HashWithIndifferentAccess.new(hash) : hash
+      @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]
+    end
+
+    def validate
+      log_validation_method('max_in_flight_valid?')
+      log_validation_method('infrastructures_valid?')
+      log_validation_method('nodes_valid?')
+      log_validation_method('steps_valid?')
+      try_validate_obj("Plan: Can't validate the infrastructures part because of a previous error"){infrastructures}
+      try_validate_obj("Plan: Can't validate the nodes part because of a previous error"){nodes}
+      try_validate_obj("Plan: Can't validate the steps part because of a previous error"){steps}
     end
 
     def max_in_flight
@@ -28,7 +38,7 @@ module DopCommon
 
     def nodes
       @nodes ||= nodes_valid? ?
-        create_nodes : nil
+        inflate_nodes : nil
     end
 
     def steps
@@ -70,11 +80,14 @@ module DopCommon
         raise PlanParsingError, 'Plan: nodes hash is empty'
     end
 
-    def create_nodes
-      @hash[:nodes].map do |name, hash|
-        node = ::DopCommon::Node.new(name.to_s, hash)
-        # check if node is part of a series and
-        # if true inflate it
+    def parsed_nodes
+      @parsed_nodes ||= @hash[:nodes].map do |name, hash|
+        ::DopCommon::Node.new(name.to_s, hash)
+      end
+    end
+
+    def inflate_nodes
+      parsed_nodes.map do |node|
         node.inflatable? ? node.inflate : node
       end.flatten
     end

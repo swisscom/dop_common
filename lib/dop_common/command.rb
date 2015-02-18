@@ -1,17 +1,32 @@
 #
 # DOP Common command hash parser
 #
-require 'active_support/core_ext/hash/indifferent_access'
 
 module DopCommon
   class Command
+    include Validator
 
     DEFAULT_PLUGIN_TIMEOUT = 300
 
     attr_reader :hash
 
     def initialize(hash)
-      @hash = hash.kind_of?(Hash) ? ActiveSupport::HashWithIndifferentAccess.new(hash) : hash
+      @hash = hash.kind_of?(Hash) ? Hash[hash.map{|k,v| [k.to_sym, v]}] : hash
+    end
+
+    def validate
+      log_validation_method('plugin_valid?')
+      if @hash.kind_of?(Hash)
+        log_validation_method('plugin_timeout_valid?')
+        log_validation_method('verify_commands_valid?')
+        r_plugin = @plugin || 'unknown' # name may not be set because of a previous error
+        try_validate_obj("Command #{r_plugin}: Can't validate the verify_commands part because of a previous error"){verify_commands}
+      end
+    end
+
+    # Add the plugin specific validator
+    def extended_validator=(obj)
+      @extended_validator = obj if obj.respond_to?(:validate)
     end
 
     def plugin
@@ -50,7 +65,7 @@ module DopCommon
     def parse_plugin
       case @hash
         when String then @hash
-        when Hash, ActiveSupport::HashWithIndifferentAccess then @hash[:plugin]
+        when Hash   then @hash[:plugin]
       end
     end
 
@@ -62,13 +77,13 @@ module DopCommon
 
     def verify_commands_valid?
       return false if @hash[:verify_commands].nil?
-      [Array, Hash, ActiveSupport::HashWithIndifferentAccess, String].include? @hash[:verify_commands].class or
+      [Array, Hash, String].include? @hash[:verify_commands].class or
         raise PlanParsingError, "The value for 'verify_commands' has to be a String, Hash or an Array"
     end
 
     def create_verify_commands
       case @hash[:verify_commands]
-        when String, Hash, ActiveSupport::HashWithIndifferentAccess then [ ::DopCommon::Command.new(@hash[:verify_commands]) ]
+        when String, Hash then [ ::DopCommon::Command.new(@hash[:verify_commands]) ]
         when Array then @hash[:verify_commands].map {|c| ::DopCommon::Command.new(c)}
         else []
       end

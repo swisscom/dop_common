@@ -1,18 +1,27 @@
 #
 # DOP common step hash parser
 #
-require 'active_support/core_ext/hash/indifferent_access'
 
 module DopCommon
   class Step
+    include Validator
 
     def initialize(hash)
-      @hash = hash.kind_of?(Hash) ? ActiveSupport::HashWithIndifferentAccess.new(hash) : hash
+      @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]
     end
 
     def name
       @name ||= @hash[:name] or
         raise PlanParsingError, "Every step needs to have a 'name' key defined"
+    end
+
+    def validate
+      log_validation_method('name')
+      log_validation_method('nodes_valid?')
+      log_validation_method('roles_valid?')
+      log_validation_method('command_valid?')
+      r_name = @name || 'unknown' # name may not be set because of a previous error
+      try_validate_obj("Step #{r_name}: Can't validate the command part because of a previous error"){command}
     end
 
     def nodes
