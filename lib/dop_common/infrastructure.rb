@@ -7,7 +7,15 @@ module DopCommon
 
     def initialize(name, hash)
       @name = name
-      @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]
+      @hash = hash.kind_of?(Hash) ? Hash[hash.map{|k,v| [k.to_sym, v]}] : hash
+    end
+
+    def validate
+      true
+    end
+
+    def valid?
+      true
     end
 
   end
