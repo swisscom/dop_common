@@ -31,17 +31,17 @@ describe DopCommon::Node do
 
   describe '#digits' do
     it 'will return the correct number for digits' do
-      node = DopCommon::Node.new('mynode.example.com', {})
+      node = DopCommon::Node.new('mynode{i}.example.com', {})
       expect(node.digits).to be DopCommon::Node::DEFAULT_DIGITS
-      node = DopCommon::Node.new('mynode.example.com', {:digits => 10})
+      node = DopCommon::Node.new('mynode{i}.example.com', {:digits => 10})
       expect(node.digits).to be 10
     end
     it 'will throw an exception if it is lower than 1' do
-      node = DopCommon::Node.new('mynode.example.com', {:digits => -1})
+      node = DopCommon::Node.new('mynode{i}.example.com', {:digits => -1})
       expect{node.digits}.to raise_error DopCommon::PlanParsingError
     end
     it 'will throw an exception if is not a number' do
-      node = DopCommon::Node.new('mynode.example.com', {:digits => 'foo'})
+      node = DopCommon::Node.new('mynode{i}.example.com', {:digits => 'foo'})
       expect{node.digits}.to raise_error DopCommon::PlanParsingError
     end
   end
