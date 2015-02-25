@@ -70,12 +70,14 @@ module DopCommon
     end
 
     def plugin_timeout_valid?
+      return false unless @hash.kind_of?(Hash)
       return false if @hash[:plugin_timeout].nil? # plugin_timeout is optional
       @hash[:plugin_timeout].kind_of?(Fixnum) or
         raise PlanParsingError, "The value for 'plugin_timeout' has to be a number"
     end
 
     def verify_commands_valid?
+      return false unless @hash.kind_of?(Hash)
       return false if @hash[:verify_commands].nil?
       [Array, Hash, String].include? @hash[:verify_commands].class or
         raise PlanParsingError, "The value for 'verify_commands' has to be a String, Hash or an Array"
