@@ -64,16 +64,16 @@ module DopCommon
     end
 
     def infrastructures_valid?
-      @hash[:infrastructures] or
+      @hash[:infrastructure] or
         raise PlanParsingError, 'Plan: infrastructures hash is missing'
-      @hash[:infrastructures].kind_of?(Hash) or
+      @hash[:infrastructure].kind_of?(Hash) or
         raise PlanParsingError, 'Plan: infrastructures key has not a hash as value'
-      @hash[:infrastructures].any? or
+      @hash[:infrastructure].any? or
         raise PlanParsingError, 'Plan: infrastructures hash is empty'
     end
 
     def create_infrastructures
-      @hash[:infrastructures].map do |name, hash|
+      @hash[:infrastructure].map do |name, hash|
         ::DopCommon::Infrastructure.new(name, hash)
       end
     end
