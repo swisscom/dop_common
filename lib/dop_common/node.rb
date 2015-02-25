@@ -51,6 +51,7 @@ module DopCommon
   private
 
     def digits_valid?
+      return false unless inflatable?
       return false if @hash[:digits].nil? # digits is optional
       @hash[:digits].kind_of?(Fixnum) or
         raise PlanParsingError, "Node #{@name}: 'digits' has to be a number"
