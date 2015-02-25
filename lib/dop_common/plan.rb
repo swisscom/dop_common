@@ -21,6 +21,7 @@ module DopCommon
       log_validation_method('infrastructures_valid?')
       log_validation_method('nodes_valid?')
       log_validation_method('steps_valid?')
+      log_validation_method('configuration_valid?')
       try_validate_obj("Plan: Can't validate the infrastructures part because of a previous error"){infrastructures}
       try_validate_obj("Plan: Can't validate the nodes part because of a previous error"){nodes}
       try_validate_obj("Plan: Can't validate the steps part because of a previous error"){steps}
@@ -44,6 +45,12 @@ module DopCommon
     def steps
       @steps ||= steps_valid? ?
         create_steps : nil
+    end
+
+    def configuration
+      @configuration ||= configuration_valid? ?
+        DopCommon::Configuration.new(@hash[:configuration]) : 
+        DopCommon::Configuration.new({})
     end
 
   private
@@ -105,6 +112,12 @@ module DopCommon
       @hash[:steps].map do |hash|
         ::DopCommon::Step.new(hash)
       end
+    end
+
+    def configuration_valid?
+      return false if @hash[:configuration].nil? # configuration hash is optional
+      @hash[:configuration].kind_of? Hash or
+        raise PlanParsingError, 'Plan: configuration key has not a hash as value'
     end
 
   end
