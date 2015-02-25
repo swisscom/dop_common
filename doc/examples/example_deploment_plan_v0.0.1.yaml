@@ -1,155 +1,155 @@
 infrastructure:
-  management:
-    type: rhev
-    endpoint: https://rhev.example.com/api
-    credentials:
-      username: myuser
-      password: mypass
-    networks:
-      rhevm:
-        ip_pool:
-          from: 192.168.254.11
-          to: 192.168.254.245
-        ip_netmask: 255.255.255.0
-        ip_defgw: 192.168.254.254
-      production:
-        ip_pool:
-          from: 192.168.254.11
-          to: 192.168.254.245
-        ip_netmask: 255.255.255.0
-        ip_defgw: 192.168.254.254
-    affinity_groups:
-      clu-lab1ch-ag_1:
-        positive: true
-        enforce: true
-        cluster: clu-lab1ch
-      clu-lab1ch-ag_2:
-        positive: true
-        enforce: false
-        cluster: clu-lab1ch
-      clu-lab1ch-ag_3:
-        positive: false
-        enforce: true
-        cluster: clu-lab1ch
+    management:
+        type: rhev
+        endpoint: https://rhev.example.com/api
+        credentials:
+            username: myuser
+            password: mypass
+        networks:
+            rhevm:
+                ip_pool:
+                    from: 192.168.254.11
+                    to: 192.168.254.245
+                ip_netmask: 255.255.255.0
+                ip_defgw: 192.168.254.254
+            production:
+                ip_pool:
+                    from: 192.168.254.11
+                    to: 192.168.254.245
+                ip_netmask: 255.255.255.0
+                ip_defgw: 192.168.254.254
+        affinity_groups:
+            clu-lab1ch-ag_1:
+                positive: true
+                enforce: true
+                cluster: clu-lab1ch
+            clu-lab1ch-ag_2:
+                positive: true
+                enforce: false
+                cluster: clu-lab1ch
+            clu-lab1ch-ag_3:
+                positive: false
+                enforce: true
+                cluster: clu-lab1ch
 
-  lamp:
-    type: openstack
-    endpoint: https://openstack.example.com/api
-    credentials:
-      username: myuser
-      password: mypass
-    networks:
-      management:
-        ip_pool:
-          from: 192.168.253.11
-          to: 192.168.253.245
-        ip_netmask: 255.255.255.0
-        ip_defgw: 192.168.253.254
-      production:
-        ip_pool:
-          from: 192.168.1.101
-          to: 192.168.1.245
-        ip_netmask: 255.255.255.0
-        ip_defgw: 192.168.1.254
+    lamp:
+        type: openstack
+        endpoint: https://openstack.example.com/api
+        credentials:
+            username: myuser
+            password: mypass
+        networks:
+            management:
+                ip_pool:
+                    from: 192.168.253.11
+                    to: 192.168.253.245
+                ip_netmask: 255.255.255.0
+                ip_defgw: 192.168.253.254
+            production:
+                ip_pool:
+                    from: 192.168.1.101
+                    to: 192.168.1.245
+                ip_netmask: 255.255.255.0
+                ip_defgw: 192.168.1.254
 
 nodes:
-  mgt01.example.com:
-    infrastructure: management
-    infrastructure_properties:
-      affinity_groups:
-        - clu-lab1ch-ag_1
-        - clu-lab1ch-ag_3
-      keep_ha: true
-      datacenter: lab1ch
-      cluster: clu-lab1ch
-    image: rhel6cloudinit
-    interfaces:
-      eth0:
-        network: rhevm
-        ip: 192.168.254.12
+    mgt01.example.com:
+        infrastructure: management
+        infrastructure_properties:
+            affinity_groups:
+                - clu-lab1ch-ag_1
+                - clu-lab1ch-ag_3
+            keep_ha: true
+        datacenter: lab1ch
+        cluster: clu-lab1ch
+        image: rhel6cloudinit
+        interfaces:
+            eth0:
+                network: rhevm
+                ip: 192.168.254.12
 
-  mysql01.example.com:
-    infrastructure: lamp
-    infrastructure_properties:
-      keep_ha: true
-    image: rhel6cloudinit
-    flavor: medium
-    interfaces:
-      eth0:
-        network: management
-        ip: 192.168.253.25
-      eth1:
-        network: production
-        ip: 192.168.1.102
-    disks:
-      - name: rdo
-        pool: storage_pool1
-        size: 4000M
-      - name: db1
-        pool: storage_pool1
-        size: 20G
+    mysql01.example.com:
+        infrastructure: lamp
+        infrastructure_properties:
+            keep_ha: true
+        image: rhel6cloudinit
+        flavor: medium
+        interfaces:
+            eth0:
+                network: management
+                ip: 192.168.253.25
+            eth1:
+                network: production
+                ip: 192.168.1.102
+        disks:
+            - name: rdo
+              pool: storage_pool1
+              size: 4000M
+            - name: db1
+              pool: storage_pool1
+              size: 20G
 
-  web01.example.com:
-    infrastructure: lamp
-    infrastructure_properties:
-      keep_ha: false
-    image: rhel6
-    flavor: small
-    interfaces:
-      eth0:
-        network: management
-        ip: 192.168.253.26
-      eth1:
-        network: production
-        ip: dhcp
+    web01.example.com:
+        infrastructure: lamp
+        infrastructure_properties:
+            keep_ha: false
+        image: rhel6
+        flavor: small
+        interfaces:
+            eth0:
+                network: management
+                ip: 192.168.253.26
+            eth1:
+                network: production
+                ip: dhcp
   
-  web02.example.com:
-    infrastructure: lamp
-    infrastructure_properties:
-      keep_ha: false
-    image: rhel6
-    flavor: medium
-    interfaces:
-      eth0:
-        network: management
-        ip: 192.168.253.27
-      eth1:
-        network: production
-        ip: 192.168.1.103
+    web02.example.com:
+        infrastructure: lamp
+        infrastructure_properties:
+            keep_ha: false
+        image: rhel6
+        flavor: medium
+        interfaces:
+            eth0:
+                network: management
+                ip: 192.168.253.27
+            eth1:
+                network: production
+                ip: 192.168.1.103
 
-  haproxy01.example.com:
-    infrastructure: lamp
-    infrastructure_properties:
-      keep_ha: true
-    image: rhel6cloudinit
-    flavor: small
-    interfaces:
-      eth0:
-        network: management
-        ip: 192.168.253.28
-      eth1:
-        network: production
-        ip: dhcp
+    haproxy01.example.com:
+        infrastructure: lamp
+        infrastructure_properties:
+            keep_ha: true
+        image: rhel6cloudinit
+        flavor: small
+        interfaces:
+            eth0:
+                network: management
+                ip: 192.168.253.28
+            eth1:
+                network: production
+                ip: dhcp
 
 configuration:
-  nodes:
-    mysql01.example.com:
-      my_role: mysql
-    web01.example.com:
-      my_role: httpd_basic
-    web02.example.com:
-      my_role: httpd_special
-    haproxy01.example.com:
-      my_role: haproxy
-  roles:
-    mysql:
-      mysql::default_database:
-         name: mydatabase
-         user: myuser
-         password: mypass
+    hosts:
+        mysql01.example.com:
+            my_role: mysql
+        web01.example.com:
+            my_role: httpd_basic
+        web02.example.com:
+            my_role: httpd_special
+        haproxy01.example.com:
+            my_role: haproxy
+    roles:
+        mysql:
+            mysql::default_database:
+                name: mydatabase
+                user: myuser
+                password: mypass
 
 plan:
-  max_in_flight: 2
+    max_in_flight: 2
 
 steps:
 
@@ -179,7 +179,7 @@ steps:
       command:
           plugin: ssh/puppet_agent_run
           verify_commands:
-              - plugin: ssh/egrep
+              - plugin: ssh/file_contains
                 file: /etc/puppet/puppet.conf
                 pattern: puppet.example.com
           arguments:
