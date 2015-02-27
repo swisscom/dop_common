@@ -53,6 +53,10 @@ module DopCommon
         DopCommon::Configuration.new({})
     end
 
+    def find_node(name)
+      nodes.find{|node| node.name == name}
+    end
+
   private
 
     def max_in_flight_valid?

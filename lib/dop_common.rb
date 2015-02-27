@@ -7,6 +7,7 @@ require 'dop_common/node'
 require 'dop_common/step'
 require 'dop_common/configuration'
 require 'dop_common/command'
+require 'dop_common/plan_cache'
 
 module DopCommon
   # Your code goes here...

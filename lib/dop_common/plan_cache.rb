@@ -16,18 +16,14 @@ module DopCommon
       FileUtils.mkdir_p(@plan_cache_dir) unless File.directory?(@plan_cache_dir)
     end
 
-    def add_plan_file(plan_file)
+    def add(plan_file)
       hash = YAML.load_file(plan_file)
-      add_plan_hash(hash)
-    end
-
-    def add_from_hash(hash)
-      id   = get_id(hash)
+      id   = get_id(plan_file)
       raise StandardError, 'Plan was already added. Remove to readd the plan' if id_exists?(id)
 
       plan = DopCommon::Plan.new(hash)
       raise StandardError, 'Plan not valid; did not add' unless plan.valid?
-      raise StandardError, 'Some Nodes already exist. Did not add' unless node_duplicates?(plan)
+      raise StandardError, 'Some Nodes already exist. Did not add' if node_duplicates?(plan)
 
       save_yaml(hash, id) # This may be removed once DOPv fully uses dop_common as parser
       save(plan, id)
@@ -43,7 +39,10 @@ module DopCommon
 
     def remove(id)
       raise StandardError, 'Plan id does not exist' unless id_exists?(id)
-      FileUtils.rm(File.join(@plan_cache_dir, id + '*' ))
+      Dir[File.join(@plan_cache_dir, id + '*' )].each do |file|
+        DopCommon.log.debug("Removing file from cache: #{file}")
+        FileUtils.rm(file)
+      end
       DopCommon.log.info("Plan with id #{id} was removed")
       id
     end
@@ -70,7 +69,14 @@ module DopCommon
     def node_duplicates?(plan)
       list.any? do |id|
         get(id).nodes.any? do |cached_node|
-          plan.nodes.any? {|node| node.name == cached_node.name}
+          plan.nodes.any? do |node|
+            if node.name == cached_node.name
+              DopCommon.log.error("Node #{node.name} already exists in plan #{id}")
+              true
+            else
+              false
+            end
+          end
         end
       end
     end
@@ -84,8 +90,8 @@ module DopCommon
       File.join(@plan_cache_dir, id + '_plan.yaml')
     end
 
-    def get_id(hash)
-      Digest::SHA2.hexdigest(hash)
+    def get_id(plan_file)
+      Digest::SHA2.file(plan_file).hexdigest
     end
 
   end
