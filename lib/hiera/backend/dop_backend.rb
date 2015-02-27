@@ -25,10 +25,10 @@ class Hiera
       def find_plan(node_name)
         begin
           plan_id = @plan_cache.list.find do |id|
-            Hiera.debug("Checking plan #{id} for node")
+            Hiera.debug("Checking plan #{id} for node #{node_name}")
             @plan_cache.get(id).find_node(node_name)
           end
-          Hiera.debug("Node found in plan #{id}")
+          Hiera.debug("Node found in plan #{plan_id}")
           @plan_cache.get(plan_id)
         rescue StandardError => e
           nil
