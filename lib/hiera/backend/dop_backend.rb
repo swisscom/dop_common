@@ -15,7 +15,8 @@ class Hiera
           require 'dop_common'
         end
 
-        @plan_cache_dir = Config[:dop][:plan_cache_dir] || '/var/lib/dop/plans'
+        @plan_cache_dir ||= Config[:dop] && Config[:dop][:plan_cache_dir]
+        @plan_cache_dir ||= '/var/lib/dop/plans'
 
         @plan_cache = DopCommon::PlanCache.new(@plan_cache_dir)
         Hiera.debug('DOP Plan Cache Loaded')
@@ -24,8 +25,10 @@ class Hiera
       def find_plan(node_name)
         begin
           plan_id = @plan_cache.list.find do |id|
+            Hiera.debug("Checking plan #{id} for node")
             @plan_cache.get(id).find_node(node_name)
           end
+          Hiera.debug("Node found in plan #{id}")
           @plan_cache.get(plan_id)
         rescue StandardError => e
           nil
