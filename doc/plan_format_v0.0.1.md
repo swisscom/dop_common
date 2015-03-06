@@ -115,7 +115,7 @@ __*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords.
    2.  __*keep_ha*__ property is of boolean type and indicates whether the VM
    should be highly available or not. By default, instances are set as highly
    available. If the provider also supports a migration priorities they are set
-   to high by default.
+   to low by default.
    3. __*datacenter*__ and __*cluster*__ allow to specify under which cluster in
    which datacenter should the node be deployed. These properties are specific
    to RHEV/oVIRT and VSphere infrastructure providers.
