@@ -67,6 +67,12 @@ nodes:
             eth0:
                 network: rhevm
                 ip: 192.168.254.12
+                cloudinit: true
+        credentials:
+            root_ssh_keys:
+                - key1
+                - key2
+
 
     mysql01.example.com:
         infrastructure: lamp
@@ -78,6 +84,7 @@ nodes:
             eth0:
                 network: management
                 ip: 192.168.253.25
+                cloudinit: true
             eth1:
                 network: production
                 ip: 192.168.1.102
@@ -88,6 +95,8 @@ nodes:
             - name: db1
               pool: storage_pool1
               size: 20G
+        credentials:
+            root_password: a_password
 
     web01.example.com:
         infrastructure: lamp
@@ -99,6 +108,7 @@ nodes:
             eth0:
                 network: management
                 ip: 192.168.253.26
+                cloudinit: true
             eth1:
                 network: production
                 ip: dhcp
@@ -113,6 +123,7 @@ nodes:
             eth0:
                 network: management
                 ip: 192.168.253.27
+                cloudinit: true
             eth1:
                 network: production
                 ip: 192.168.1.103
@@ -127,6 +138,7 @@ nodes:
             eth0:
                 network: management
                 ip: 192.168.253.28
+                cloudinit: true
             eth1:
                 network: production
                 ip: dhcp

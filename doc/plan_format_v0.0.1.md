@@ -109,33 +109,50 @@ infrastructure hash.
  2. __*infrastructure_properties*__ - infrastructure properties. It is of hash
 type. This property is optional. Infrastructure properties may differ accross
 different provider types. Currently, this hash may contain __*affinity_groups*__,
-__*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords. The
-__*affinity_groups*__ property designates what affinity group should be assigned
-a specific node assigned to and is likely RHEV/oVIRT specific. The __*keep_ha*__
-property is of boolean type and indicates whether the VM should be highly
-available or not. Properties __*datacenter*__ and __*cluster*__ allow to specify
-under which cluster in which datacenter should the node be deployed. These
-properties are specific to RHEV/oVIRT and VSphere infrastructure providers.
+__*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords.
+   1.  __*affinity_groups*__ property designates what affinity group should be
+   assigned a specific node assigned to and is likely RHEV/oVIRT specific.
+   2.  __*keep_ha*__ property is of boolean type and indicates whether the VM
+   should be highly available or not. By default, instances are set as highly
+   available. If the provider also supports a migration priorities they are set
+   to high by default.
+   3. __*datacenter*__ and __*cluster*__ allow to specify under which cluster in
+   which datacenter should the node be deployed. These properties are specific
+   to RHEV/oVIRT and VSphere infrastructure providers.
  3. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
  4. __*interfaces*__ - network interface cards specification. This property is
 required and it is of hash type. Each NIC is hashed by its name (for instance,
-*nic1*, *nic2*, etc). NIC name has to correspond with a name the OS recognizes
-it. Following is a list of properties of a given network interface
+*eth0*, *eth1*, etc). NIC name has to correspond with a name the OS recognizes
+it. Please note that NICs are indexed in the OS in the order they were defined
+in the plan. Following is a list of properties of a given network interface
 card:
    1. __*network*__ - name of the network the NIC belongs to. The network must be
-  a valid definition in an infrastructure networks hash.
-   3. __*ip*__ - an IP address string in case of static IP assignment or a *dhcp*
-  literal if the IP should be assigned by DHCP.
- 5. __*disks*__ - persistent node disks. This property is optional and is of
-array/list type. A persistant disk itself is described by a so-called disk hash
-with following keywords:
+   a valid definition in an infrastructure networks hash. This definition is
+   required.
+   2. __*ip*__ - an optional property that defines an IP address in case of
+   static IP assignment or a *dhcp* literal if the IP should be assigned by DHCP.
+   3. __*cloudinit*__ - an optional boolean flag that indicates to use cloud
+   init for a given interface. Please note that only one network interface
+   should be flagged to use cloud init in any given node. Should more than one
+   interface be flagged to use cloud init, the last one shall be taken into
+   consideration and passed to cloud init for further configuration. 
+ 5. __*disks*__ - an optional property to list additional disks that should
+ persist accross deployments. It is of array type. A persistant disk itself
+ is described by a so-called disk hash with following keywords:
    1. __*name*__ - disk name. It is required.
    2. __*pool*__ - the name of the storage pool the disk should be looked for
   and/or allocated from. This property is required.
    3. __*size*__ - the name size of the disk in megabytes (when the value has a
   suffix *M*) or gigabytes (when the value has a suffix *G*).
+ 6. __*credentials*__ - an optional property to define credentials for root
+ user. This information is passed to cloud init. Following data can be
+ specified:
+   1. __*root_password*__ - super user password that is set for cloud init
+   phase,
+   2. __*root_ssh_keys*__ - an array of OpenSSH public keys that are recorded
+   into `/root/.ssh/authorized_keys` by cloud init.
 
 The example bellow shows a specification for a database backend and a web node:
 ```yaml
@@ -153,6 +170,12 @@ nodes:
     interfaces:
       eth0:
         network: dhcp
+		cloudinit: true
+	credentials:
+	  root_password: a_password
+	  root_ssh_keys:
+	    - OpenSSH key 1
+		- OpenSSH key 2
   
   mysql01.example.com:
     infrastructure: lamp
@@ -164,6 +187,7 @@ nodes:
       eth0:
         network: management
         ip: 192.168.253.25
+		cloudinit: true
       eth1:
         network: production
         ip: 192.168.1.102
