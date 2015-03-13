@@ -99,14 +99,24 @@ nodes:
     ...
 ```
 
+>> __Important__: The node name must be unique for each deployment. Please keep
+>> this in mind when combining several deployments into a single deployment file.
+
 ### Node Properties
 Each node configuration is described by a so-called node hash. The list bellow
 provides an overview on various node properties. Please note that property
 name is also a keyword of node hash.
- 1. __*infrastructure*__ - an insfrastructure name this node is a part of. This
+ 1. __*fqdn*__ - an optional fully qualified domainname that is used to generate
+ the hostname of the guest. If not defined, the hostname is implicitly derived
+ from the node name itself (for instance, in case of `mgt01.example.com`, the
+ hostname definition would match the node name, i.e. `mgt01.example.com`).
+ |Important|
+ ----------
+
+ 2. __*infrastructure*__ - an insfrastructure name this node is a part of. This
 is a required property and its value must point to a valid entry in an
 infrastructure hash.
- 2. __*infrastructure_properties*__ - infrastructure properties. It is of hash
+ 3. __*infrastructure_properties*__ - infrastructure properties. It is of hash
 type. This property is optional. Infrastructure properties may differ accross
 different provider types. Currently, this hash may contain __*affinity_groups*__,
 __*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords.
@@ -119,10 +129,10 @@ __*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords.
    3. __*datacenter*__ and __*cluster*__ allow to specify under which cluster in
    which datacenter should the node be deployed. These properties are specific
    to RHEV/oVIRT and VSphere infrastructure providers.
- 3. __*image*__ - image to deploy the node from (a.k.a template). This property
+ 4. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
- 4. __*interfaces*__ - network interface cards specification. This property is
+ 5. __*interfaces*__ - network interface cards specification. This property is
 required and it is of hash type. Each NIC is hashed by its name (for instance,
 *eth0*, *eth1*, etc). NIC name has to correspond with a name the OS recognizes
 it. Please note that NICs are indexed in the OS in the order they were defined
@@ -138,7 +148,7 @@ card:
    should be flagged to use cloud init in any given node. Should more than one
    interface be flagged to use cloud init, the last one shall be taken into
    consideration and passed to cloud init for further configuration. 
- 5. __*disks*__ - an optional property to list additional disks that should
+ 6. __*disks*__ - an optional property to list additional disks that should
  persist accross deployments. It is of array type. A persistant disk itself
  is described by a so-called disk hash with following keywords:
    1. __*name*__ - disk name. It is required.
@@ -146,7 +156,7 @@ card:
   and/or allocated from. This property is required.
    3. __*size*__ - the name size of the disk in megabytes (when the value has a
   suffix *M*) or gigabytes (when the value has a suffix *G*).
- 6. __*credentials*__ - an optional property to define credentials for root
+ 7. __*credentials*__ - an optional property to define credentials for root
  user. This information is passed to cloud init. Following data can be
  specified:
    1. __*root_password*__ - super user password that is set for cloud init
@@ -177,6 +187,25 @@ nodes:
 	    - OpenSSH key 1
 		- OpenSSH key 2
   
+    mssql01_mgt01:
+        fqdn: mssql01.example.com
+        infrastructure: management
+        infrastructure_properties:
+            keep_ha: true
+        image: win12r1_64
+        flavor: large
+        interfaces:
+            eth0:
+                network: rhevm
+                ip: 192.168.254.13
+                cloudinit: true
+        disks:
+            - name: db1
+              pool: storage_pool3
+              size: 256G
+        credentials:
+            root_password: a_password
+
   mysql01.example.com:
     infrastructure: lamp
     infrastructure_properties:

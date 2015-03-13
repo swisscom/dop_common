@@ -73,6 +73,24 @@ nodes:
                 - key1
                 - key2
 
+    mssql01_mgt01:
+        fqdn: mssql01.example.com
+        infrastructure: management
+        infrastructure_properties:
+            keep_ha: true
+        image: win12r1_64
+        flavor: large
+        interfaces:
+            eth0:
+                network: rhevm
+                ip: 192.168.254.13
+                cloudinit: true
+        disks:
+            - name: db1
+              pool: storage_pool3
+              size: 256G
+        credentials:
+            root_password: a_password
 
     mysql01.example.com:
         infrastructure: lamp
