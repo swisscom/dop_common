@@ -99,7 +99,7 @@ nodes:
     ...
 ```
 
-__Important__ |  The node name must be unique for each deployment. Please keep this in mind when combining several deployments into a single deployment file.
+NOTE: The node name must be unique for each deployment. Please keep this in mind when combining several deployments into a single deployment file.
 
 ### Node Properties
 Each node configuration is described by a so-called node hash. The list bellow
