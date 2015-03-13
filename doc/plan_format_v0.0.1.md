@@ -99,8 +99,7 @@ nodes:
     ...
 ```
 
->> __Important__: The node name must be unique for each deployment. Please keep
->> this in mind when combining several deployments into a single deployment file.
+__Important__ |  The node name must be unique for each deployment. Please keep this in mind when combining several deployments into a single deployment file.
 
 ### Node Properties
 Each node configuration is described by a so-called node hash. The list bellow
@@ -110,9 +109,6 @@ name is also a keyword of node hash.
  the hostname of the guest. If not defined, the hostname is implicitly derived
  from the node name itself (for instance, in case of `mgt01.example.com`, the
  hostname definition would match the node name, i.e. `mgt01.example.com`).
- |Important|
- ----------
-
  2. __*infrastructure*__ - an insfrastructure name this node is a part of. This
 is a required property and its value must point to a valid entry in an
 infrastructure hash.
