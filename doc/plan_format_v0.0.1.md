@@ -140,11 +140,9 @@ card:
    required.
    2. __*ip*__ - an optional property that defines an IP address in case of
    static IP assignment or a *dhcp* literal if the IP should be assigned by DHCP.
-   3. __*cloudinit*__ - an optional boolean flag that indicates to use cloud
-   init for a given interface. Please note that only one network interface
-   should be flagged to use cloud init in any given node. Should more than one
-   interface be flagged to use cloud init, the last one shall be taken into
-   consideration and passed to cloud init for further configuration. 
+
+ __IMPORTANT:__ If more than one interface has an __*ip*__ defined, the last one
+ is considered by cloud init.
  6. __*disks*__ - an optional property to list additional disks that should
  persist accross deployments. It is of array type. A persistant disk itself
  is described by a so-called disk hash with following keywords:
