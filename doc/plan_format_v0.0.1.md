@@ -1,6 +1,8 @@
 # DOP Plan Format v 0.0.1
 
-The DOP Plan file consists out of series of hashes and arrays which describe system of nodes that should be created and a list of steps that need to be performed on this nodes in order.
+The DOP Plan file consists out of series of hashes and arrays which describe
+system of nodes that should be created and a list of steps that need to be
+performed on this nodes in order.
 
 ## Infrastructure
 The infrastructure hash holds information about cloud providers. Each entry in
@@ -140,9 +142,17 @@ card:
    required.
    2. __*ip*__ - an optional property that defines an IP address in case of
    static IP assignment or a *dhcp* literal if the IP should be assigned by DHCP.
+   3. __*set_gateway*__ - an optional boolean property that defines, whether a
+   gateway should be defined for a given interface during guest customization.
+   It is `true` by default.
 
- __IMPORTANT:__ If more than one interface has an __*ip*__ defined, the last one
- is considered by cloud init.
+ __IMPORTANT:__ The current implementation of cloud-init in *fog* and its
+ underlying library *rbovirt* does not support DHCP nor multiple NIC
+ configurations, hence the cloud-init is applied by DOPv onto the first
+ interface which has a static IP in its definition. Please note that there is
+ another bug in *rbovirt* that prevents statically defined interface from
+ being configured if one of the parameters netmask or gateway is undefined.
+
  6. __*disks*__ - an optional property to list additional disks that should
  persist accross deployments. It is of array type. A persistant disk itself
  is described by a so-called disk hash with following keywords:
@@ -175,7 +185,6 @@ nodes:
     interfaces:
       eth0:
         network: dhcp
-		cloudinit: true
 	credentials:
 	  root_password: a_password
 	  root_ssh_keys:
@@ -193,7 +202,6 @@ nodes:
             eth0:
                 network: rhevm
                 ip: 192.168.254.13
-                cloudinit: true
         disks:
             - name: db1
               pool: storage_pool3
@@ -211,10 +219,10 @@ nodes:
       eth0:
         network: management
         ip: 192.168.253.25
-		cloudinit: true
       eth1:
         network: production
         ip: 192.168.1.102
+		set_gateway: false
     disks:
       - name: rdo
         pool: storage_pool1

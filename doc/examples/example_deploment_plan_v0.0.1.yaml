@@ -67,7 +67,6 @@ nodes:
             eth0:
                 network: rhevm
                 ip: 192.168.254.12
-                cloudinit: true
         credentials:
             root_ssh_keys:
                 - key1
@@ -84,7 +83,6 @@ nodes:
             eth0:
                 network: rhevm
                 ip: 192.168.254.13
-                cloudinit: true
         disks:
             - name: db1
               pool: storage_pool3
@@ -102,10 +100,10 @@ nodes:
             eth0:
                 network: management
                 ip: 192.168.253.25
-                cloudinit: true
             eth1:
                 network: production
                 ip: 192.168.1.102
+                set_gateway: false
         disks:
             - name: rdo
               pool: storage_pool1
@@ -126,7 +124,6 @@ nodes:
             eth0:
                 network: management
                 ip: 192.168.253.26
-                cloudinit: true
             eth1:
                 network: production
                 ip: dhcp
@@ -141,10 +138,10 @@ nodes:
             eth0:
                 network: management
                 ip: 192.168.253.27
-                cloudinit: true
             eth1:
                 network: production
                 ip: 192.168.1.103
+                set_gateway: false
 
     haproxy01.example.com:
         infrastructure: lamp
@@ -156,7 +153,6 @@ nodes:
             eth0:
                 network: management
                 ip: 192.168.253.28
-                cloudinit: true
             eth1:
                 network: production
                 ip: dhcp
