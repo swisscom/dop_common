@@ -16,8 +16,11 @@ Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
  required.
  3. __*credentials*__ - credential hash. The content of this hash depends on a
 infrastructure provider type. For instance, RHEV infrastructures must contain
-__*username*__ and __*password*__ keys. Credential hash specification is
-required, although its content may differ across different providers.
+__*username*__ and __*password*__. VSphere-based infrastructures also require a
+key, specified by __*provider_apikey*__. OpenStack-based infrastructure must
+have __*username*__ and __*provider_apikey*__ sepcified. Credential hash
+specification is required, although its content - as one might have noticed -
+may differ across different providers.
  4. __*networks*__ - provides networks definition hashes. Each network definition
 is hashed by its name that can be an arbitrary string or symbol. Please refer to
 network subsection for further details.
@@ -62,7 +65,7 @@ infrastructure:
     endpoint: https://openstack.example.com/api/
     credentials:
       username: myuser
-      password: mypass
+	  provider_apikey: myapikey
     networks:
       management:
         ip_pool:
@@ -168,6 +171,27 @@ card:
    phase,
    2. __*root_ssh_keys*__ - an array of OpenSSH public keys that are recorded
    into `/root/.ssh/authorized_keys` by cloud init.
+ 9. __*cores*__ - an optional integer that sets the number of cores for a given
+ node. It is `2` by default.
+ 10. __*memory*__ - an optional string of numbers followed by one of `M`/`m`
+ (mega) or `G`/`g` (giga) character. It is used to set the amount of
+ provisioned memory. The default is `4G`.
+ 11. __*storage*__ - an optional string of numbers followed by one of `M`/`m`
+ (mega) or `G`/`g` (giga) character. It is used to set the amount of
+ provisioned *root* disk space. Please note that some infrastructure providers
+ disregard this value, especially when the node is provisioned from a template.
+ The default value is `10G`.
+ 12. __*flavor*__ - an optional argument that specifies how to set the amount of
+ CPU cores, memory and to specify the size of the *root* disk. Please consult
+ [OpenStack
+ flavors](http://docs.openstack.org/openstack-ops/content/flavors.html) for
+ their definition. In case the infrastructure does not support flavors feature,
+ it is emulated.
+
+ __IMPORTANT:__ Use of __*flavor*__ always overrides the values explicitly set
+ by either of __*cores*__, __*memory*__ or __*storage*__ properties.
+
+ __
 
 The example bellow shows a specification for a database backend and a web node:
 ```yaml

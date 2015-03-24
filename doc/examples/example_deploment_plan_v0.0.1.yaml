@@ -38,6 +38,7 @@ infrastructure:
         credentials:
             username: myuser
             password: mypass
+            provider_apikey: A4532FAA....
         networks:
             management:
                 ip_pool:
@@ -78,7 +79,9 @@ nodes:
         infrastructure_properties:
             keep_ha: true
         image: win12r1_64
-        flavor: large
+        cores: 6
+        memory: 64G
+        storage: 128G
         interfaces:
             eth0:
                 network: rhevm
