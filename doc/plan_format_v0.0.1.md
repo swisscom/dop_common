@@ -221,7 +221,9 @@ nodes:
         infrastructure_properties:
             keep_ha: true
         image: win12r1_64
-        flavor: large
+		cores: 6
+		memory: 64G
+		storage: 128G
         interfaces:
             eth0:
                 network: rhevm
