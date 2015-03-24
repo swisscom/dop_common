@@ -122,6 +122,7 @@ nodes:
         infrastructure_properties:
             keep_ha: false
         image: rhel6
+        full_clone: false
         flavor: small
         interfaces:
             eth0:
@@ -136,6 +137,7 @@ nodes:
         infrastructure_properties:
             keep_ha: false
         image: rhel6
+        full_clone: false
         flavor: medium
         interfaces:
             eth0:

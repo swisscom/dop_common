@@ -134,7 +134,13 @@ __*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords.
  4. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
- 5. __*interfaces*__ - network interface cards specification. This property is
+ 5. __*full_clone*__ - an optional boolean property that instructs OVirt/RHEV:
+   1. To provision a node from a template as a full independent clone if set to
+   `true`
+   2. To provision a node from a template as thin (dependent) clone if set to
+   false or unset.
+ The default is to provision a fully independent clone.
+ 6. __*interfaces*__ - network interface cards specification. This property is
 required and it is of hash type. Each NIC is hashed by its name (for instance,
 *eth0*, *eth1*, etc). NIC name has to correspond with a name the OS recognizes
 it. Please note that NICs are indexed in the OS in the order they were defined
@@ -156,7 +162,7 @@ card:
  another bug in *rbovirt* that prevents statically defined interface from
  being configured if one of the parameters netmask or gateway is undefined.
 
- 6. __*disks*__ - an optional property to list additional disks that should
+ 7. __*disks*__ - an optional property to list additional disks that should
  persist accross deployments. It is of array type. A persistant disk itself
  is described by a so-called disk hash with following keywords:
    1. __*name*__ - disk name. It is required.
@@ -164,7 +170,7 @@ card:
   and/or allocated from. This property is required.
    3. __*size*__ - the name size of the disk in megabytes (when the value has a
   suffix *M*) or gigabytes (when the value has a suffix *G*).
- 7. __*credentials*__ - an optional property to define credentials for root
+ 8. __*credentials*__ - an optional property to define credentials for root
  user. This information is passed to cloud init. Following data can be
  specified:
    1. __*root_password*__ - super user password that is set for cloud init
