@@ -15,8 +15,8 @@ Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
  2. __*endpoint*__ - is a URL that is an entry point for API calls. This is
  required.
  3. __*credentials*__ - credential hash. The content of this hash depends on a
-infrastructure provider type. For instance, RHEV infrastructures must contain
-__*username*__ and __*password*__. VSphere-based infrastructures also require a
+infrastructure provider type. For instance, RHEV infrastructure must contain
+__*username*__ and __*password*__. VSphere-based infrastructure also require a
 key, specified by __*provider_apikey*__. OpenStack-based infrastructure must
 have __*username*__ and __*provider_apikey*__ sepcified. Credential hash
 specification is required, although its content - as one might have noticed -
@@ -65,7 +65,7 @@ infrastructure:
     endpoint: https://openstack.example.com/api/
     credentials:
       username: myuser
-	  provider_apikey: myapikey
+    provider_apikey: myapikey
     networks:
       management:
         ip_pool:
@@ -92,12 +92,12 @@ of IP addresses that can be assigned statically.
 is optional.
 
 ## Nodes
-  
+
 The nodes hash holds the basic information about all the nodes you want to
 create and use. Each entry in the nodes hash is itself a hash. A single entry of
 this is called a node hash (singular). Each node hash starts with the node name
 as a key:
-    
+
 ```yaml
 nodes:
     mysql01.example.com:
@@ -206,8 +206,8 @@ nodes:
     infrastructure: management
     infrastructure_properties:
       affinity_groups:
-	    - clu-lab1ch-ag_1
-		- clu-lab1ch-ag_3
+        - clu-lab1ch-ag_1
+        - clu-lab1ch-ag_3
       keep_ha: true
       datacenter: lab1ch
       cluster: clu-lab1ch
@@ -215,31 +215,31 @@ nodes:
     interfaces:
       eth0:
         network: dhcp
-	credentials:
-	  root_password: a_password
-	  root_ssh_keys:
-	    - OpenSSH key 1
-		- OpenSSH key 2
-  
+  credentials:
+    root_password: a_password
+    root_ssh_keys:
+      - OpenSSH key 1
+      - OpenSSH key 2
+
     mssql01_mgt01:
-        fqdn: mssql01.example.com
-        infrastructure: management
-        infrastructure_properties:
-            keep_ha: true
-        image: win12r1_64
-		cores: 6
-		memory: 64G
-		storage: 128G
-        interfaces:
-            eth0:
-                network: rhevm
-                ip: 192.168.254.13
-        disks:
-            - name: db1
-              pool: storage_pool3
-              size: 256G
-        credentials:
-            root_password: a_password
+      fqdn: mssql01.example.com
+      infrastructure: management
+      infrastructure_properties:
+        keep_ha: true
+      image: win12r1_64
+    cores: 6
+    memory: 64G
+    storage: 128G
+      interfaces:
+        eth0:
+          network: rhevm
+          ip: 192.168.254.13
+      disks:
+        - name: db1
+          pool: storage_pool3
+          size: 256G
+      credentials:
+        root_password: a_password
 
   mysql01.example.com:
     infrastructure: lamp
@@ -254,7 +254,7 @@ nodes:
       eth1:
         network: production
         ip: 192.168.1.102
-		set_gateway: false
+    set_gateway: false
     disks:
       - name: rdo
         pool: storage_pool1
@@ -267,8 +267,8 @@ nodes:
     infrastructure: lamp
     infrastructure_properties:
       keep_ha: false
-	  datacenter: lab1ch
-	  cluster: clu-lab1ch
+    datacenter: lab1ch
+    cluster: clu-lab1ch
     image: rhel6
     flavor: small
     interfaces:
@@ -291,12 +291,12 @@ the nodes configuration hash assigns variables to an individual node or to a sel
 
 ```yaml
 configuration:
-    nodes:
-        mysql01.example.com:
-            role: mysql
-            my_var:  my_value
-       web04.example.com:
-            role: httpd_special
+  nodes:
+    mysql01.example.com:
+      role: mysql
+      my_var:  my_value
+    web04.example.com:
+      role: httpd_special
 ```
 
 The only relevant setting here for DOP is the role variable. The name of the role variable can be configured but defaults to 'role'. If hiera is configured and activated, then dop_common will take the role specified in hiera if found. The hierarchy for the role resolution is as follows:
@@ -313,12 +313,12 @@ You can set variables for a specific role in this hash.
 
 ```yaml
 configuration:
-    roles:
-        mysql:
-            mysql::default_database:
-                name: mydatabase
-                user: myuser
-                password: mypass
+  roles:
+    mysql:
+      mysql::default_database:
+        name: mydatabase
+        user: myuser
+        password: mypass
 ```
 
 This is only used from puppet over the hiera plugin and not from DOP itself at the moment.
@@ -332,7 +332,7 @@ The amount of nodes DOP will be executing commands on in parallel.
 
 ```yaml
 plan:
-    max_in_flight: 2
+  max_in_flight: 2
 ```
 
 ## Steps
@@ -342,28 +342,28 @@ The steps array is a list of commands that have to be executed in the correct or
 Example:
 ```yaml
 steps:
-    - name: run_puppet_on_mysql
-      nodes:
-          - mysql01.example.com
-      command: ssh_run_puppet
+  - name: run_puppet_on_mysql
+    nodes:
+      - mysql01.example.com
+    command: ssh_run_puppet
 
-    - name: run_puppet_on_webserver
-      roles:
-          - httpd_basic
-          - https_special
-      command: ssh_run_puppet
+  - name: run_puppet_on_webserver
+    roles:
+      - httpd_basic
+      - https_special
+    command: ssh_run_puppet
 
-    - name: reboot_all_nodes
-      nodes: all
-      command: ssh_reboot
+  - name: reboot_all_nodes
+    nodes: all
+    command: ssh_reboot
 
-    - name: run_puppet_in_noop_on_proxies
-      roles:
-          - haproxy
-      command:
-          plugin: ssh_puppet_run
-          arguments:
-              '--noop':
+  - name: run_puppet_in_noop_on_proxies
+    roles:
+      - haproxy
+    command:
+      plugin: ssh_puppet_run
+      arguments:
+        '--noop':
 ```
 
 ### name
@@ -391,4 +391,3 @@ For more documentation about the plugins and the variables available for configu
 
 For a complete example plan file see:
 [DOP Plan Format v 0.0.1 Example](examples/example_deploment_plan_v0.0.1.yaml)
-
