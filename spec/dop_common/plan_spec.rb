@@ -25,18 +25,18 @@ describe DopCommon::Plan do
     end
   end
 
-  describe '#infrastructure' do
-    it 'will throw and exception if the infrastructure key is not defined' do
+  describe '#infrastructures' do
+    it 'will throw and exception if the infrastructures key is not defined' do
       plan = DopCommon::Plan.new({})
-      expect{plan.infrastructure}.to raise_error DopCommon::PlanParsingError
+      expect{plan.infrastructures}.to raise_error DopCommon::PlanParsingError
     end
-    it 'will throw and exception if the infrastructure value is not a Hash' do
-      plan = DopCommon::Plan.new({:infrastructure => 'foo'})
-      expect{plan.infrastructure}.to raise_error DopCommon::PlanParsingError
+    it 'will throw and exception if the infrastructures value is not a Hash' do
+      plan = DopCommon::Plan.new({:infrastructures => 'foo'})
+      expect{plan.infrastructures}.to raise_error DopCommon::PlanParsingError
     end
-    it 'will throw and exception if the infrastructure hash is empty' do
-      plan = DopCommon::Plan.new({:infrastructure => {}})
-      expect{plan.infrastructure}.to raise_error DopCommon::PlanParsingError
+    it 'will throw and exception if the infrastructures hash is empty' do
+      plan = DopCommon::Plan.new({:infrastructures => {}})
+      expect{plan.infrastructures}.to raise_error DopCommon::PlanParsingError
     end
   end
 

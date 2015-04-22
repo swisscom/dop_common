@@ -18,11 +18,11 @@ module DopCommon
 
     def validate
       log_validation_method('max_in_flight_valid?')
-      log_validation_method('infrastructure_valid?')
+      log_validation_method('infrastructures_valid?')
       log_validation_method('nodes_valid?')
       log_validation_method('steps_valid?')
       log_validation_method('configuration_valid?')
-      try_validate_obj("Plan: Can't validate the infrastructure part because of a previous error"){infrastructure}
+      try_validate_obj("Plan: Can't validate the infrastructures part because of a previous error"){infrastructures}
       try_validate_obj("Plan: Can't validate the nodes part because of a previous error"){nodes}
       try_validate_obj("Plan: Can't validate the steps part because of a previous error"){steps}
     end
@@ -32,9 +32,9 @@ module DopCommon
         @hash[:max_in_flight] : DEFAULT_MAX_IN_FLIGHT
     end
 
-    def infrastructure
-      @infrastructure ||= infrastructure_valid? ?
-        create_infrastructure : nil
+    def infrastructures
+      @infrastructures ||= infrastructures_valid? ?
+        create_infrastructures : nil
     end
 
     def nodes
@@ -67,17 +67,17 @@ module DopCommon
         raise PlanParsingError, 'Plan: max_in_flight has to be greater than one'
     end
 
-    def infrastructure_valid?
-      @hash[:infrastructure] or
-        raise PlanParsingError, 'Plan: infrastructure hash is missing'
-      @hash[:infrastructure].kind_of?(Hash) or
-        raise PlanParsingError, 'Plan: infrastructure key has not a hash as value'
-      @hash[:infrastructure].any? or
-        raise PlanParsingError, 'Plan: infrastructure hash is empty'
+    def infrastructures_valid?
+      @hash[:infrastructures] or
+        raise PlanParsingError, 'Plan: infrastructures hash is missing'
+      @hash[:infrastructures].kind_of?(Hash) or
+        raise PlanParsingError, 'Plan: infrastructures key has not a hash as value'
+      @hash[:infrastructures].any? or
+        raise PlanParsingError, 'Plan: infrastructures hash is empty'
     end
 
-    def create_infrastructure
-      @hash[:infrastructure].map do |name, hash|
+    def create_infrastructures
+      @hash[:infrastructures].map do |name, hash|
         ::DopCommon::Infrastructure.new(name, hash)
       end
     end

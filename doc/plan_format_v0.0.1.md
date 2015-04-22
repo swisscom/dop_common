@@ -4,9 +4,9 @@ The DOP Plan file consists out of series of hashes and arrays which describe
 system of nodes that should be created and a list of steps that need to be
 performed on this nodes in order.
 
-## Infrastructure
-The infrastructure hash holds information about cloud providers. Each entry in
-an infrastracture hash describes a certain infrastructure or cloud if you want.
+## Infrastructures
+The infrastructures hash holds information about cloud providers. Each entry in
+an infrastructures hash describes a certain infrastructures or cloud if you want.
 It is of hash type. Following is a list of keys:
  1. __*type*__ - is the type of the infrastructure provider. Its value must be
 one of the following strings: *ovirt*, *rhev*, *openstack*, *vsphere*, *vmware*.
@@ -31,9 +31,9 @@ __*cluster*__, __*positive*__ and __*enforced*__ properties. Plese note tha some
 providers may not have affinities implemented, hence this feature is optional in
 deployment plan.
 
-The following snippet is an example infrastructure configuration:
+The following snippet is an example infrastructures configuration:
 ```yaml
-infrastructure:
+infrastructures:
   management:
     type: rhev
     endpoint: https://rhev.example.com/api/
@@ -115,9 +115,9 @@ name is also a keyword of node hash.
  the hostname of the guest. If not defined, the hostname is implicitly derived
  from the node name itself (for instance, in case of `mgt01.example.com`, the
  hostname definition would match the node name, i.e. `mgt01.example.com`).
- 2. __*infrastructure*__ - an insfrastructure name this node is a part of. This
+ 2. __*infrastructure*__ - an infrastructure name this node is a part of. This
 is a required property and its value must point to a valid entry in an
-infrastructure hash.
+infrastructures hash.
  3. __*infrastructure_properties*__ - infrastructure properties. It is of hash
 type. This property is optional. Infrastructure properties may differ accross
 different provider types. Currently, this hash may contain __*affinity_groups*__,
@@ -147,7 +147,7 @@ it. Please note that NICs are indexed in the OS in the order they were defined
 in the plan. Following is a list of properties of a given network interface
 card:
    1. __*network*__ - name of the network the NIC belongs to. The network must be
-   a valid definition in an infrastructure networks hash. This definition is
+   a valid definition in an infrastructures' networks hash. This definition is
    required.
    2. __*ip*__ - an optional property that defines an IP address in case of
    static IP assignment or a *dhcp* literal if the IP should be assigned by DHCP.

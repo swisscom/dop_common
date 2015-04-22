@@ -1,4 +1,4 @@
-infrastructure:
+infrastructures:
     management:
         type: rhev
         endpoint: https://rhev.example.com/api
@@ -131,7 +131,7 @@ nodes:
             eth1:
                 network: production
                 ip: dhcp
-  
+
     web02.example.com:
         infrastructure: lamp
         infrastructure_properties:
@@ -233,5 +233,3 @@ steps:
       roles:
           - haproxy
       command: ssh/puppet_agent_run
-
-
