@@ -173,10 +173,17 @@ card:
  8. __*credentials*__ - an optional property to define credentials for root
  user. This information is passed to cloud init. Following data can be
  specified:
-   1. __*root_password*__ - super user password that is set for cloud init
+   * __*root_password*__ - super user password that is set for cloud init
    phase,
-   2. __*root_ssh_keys*__ - an array of OpenSSH public keys that are recorded
+   * __*root_ssh_keys*__ - an array of OpenSSH public keys that are recorded
    into `/root/.ssh/authorized_keys` by cloud init.
+   * __*administrator_fullname*__ - an optional property that specifies the full
+   name of the administrator user for VSphere-based windows-guests
+   customization. It defaults to `Administrator`, 
+   * __*administrator_password*__ - an optional property that specifies the
+   password of the administrator user for VSphere-based windows-guests
+   customization. it defaults to an empty password which in turn leads to an
+   automatic logon upon windows guest startup, 
  9. __*cores*__ - an optional integer that sets the number of cores for a given
  node. It is `2` by default.
  10. __*memory*__ - an optional string of numbers followed by one of `M`/`m`
@@ -187,17 +194,36 @@ card:
  provisioned *root* disk space. Please note that some infrastructure providers
  disregard this value, especially when the node is provisioned from a template.
  The default value is `10G`.
- 12. __*flavor*__ - an optional argument that specifies how to set the amount of
+ 12. __*flavor*__ - an optional property that specifies how to set the amount of
  CPU cores, memory and to specify the size of the *root* disk. Please consult
  [OpenStack
  flavors](http://docs.openstack.org/openstack-ops/content/flavors.html) for
  their definition. In case the infrastructure does not support flavors feature,
  it is emulated.
-
+ 
  __IMPORTANT:__ Use of __*flavor*__ always overrides the values explicitly set
  by either of __*cores*__, __*memory*__ or __*storage*__ properties.
+ 
+ 13. __*timezone*__ - an optional property that specifies the timezone of the
+ guest operating system. Please make sure that:
+   * for VSphere-based windows guests customization [following values are
+   used](https://www.vmware.com/support/developer/windowstoolkit/wintk40u1/html/New-OSCustomizationSpec.html),
+   * for Linux guests, use values specified in a __`TZ`__ column of the [list of
+   tz databaze time zones](http://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
- __
+ __IMPORTANT:__ As this property is optional, its default value is infrastructure
+ provider specific. Some providers (RHEV/oVIRT) do not require this property to
+ be set during customization, while others (VSphere) do. The rule of the thumb
+ is tha in case the provider requires the time zone to be specified, it defaults
+ to GMT.
+
+ 14. __*product_id*__ - an optional, VSphere-based windows-only guest customization
+ property that specifies a serial number. Its default value is
+ undefined which leaves the guest OS in an evaluation/trial mode.
+
+ 15. __*organization_name*__ - a required, VSphere-based windows-only guest 
+ customization property that specifies the organization name of the
+ administrator user.
 
 The example bellow shows a specification for a database backend and a web node:
 ```yaml
@@ -262,6 +288,32 @@ nodes:
       - name: db1
         pool: storage_pool1
         size: 20G
+
+  mssql01.example.com:
+    infrastructure: vsphere
+    infrastructure_properties:
+      keep_ha: true
+    image: w12r2
+    flavor: medium
+    interfaces:
+      eth0:
+        network: management
+        ip: 192.168.253.33
+      eth1:
+        network: production
+        ip: 192.168.1.109
+    set_gateway: false
+    disks:
+      - name: rdo
+        pool: storage_pool3
+        size: 4000M
+      - name: db1
+        pool: storage_pool3
+        size: 20G
+    credentials:
+	  administrator_password: ASecurePassw0rd
+	timezone: 100
+	organization_name: Acme
 
   web01.example.com:
     infrastructure: lamp
