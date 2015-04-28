@@ -131,6 +131,12 @@ __*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords.
    3. __*datacenter*__ and __*cluster*__ allow to specify under which cluster in
    which datacenter should the node be deployed. These properties are specific
    to RHEV/oVIRT and VSphere infrastructure providers.
+   4. __*default_pool*__ property specifies the default data storage which is
+   used when deploying a guest from the template. It is also used for persistent
+   disks that do not specify an explicit __*pool*__. This attribute is optional.
+   5. __*dest_folder*__ property defines a destination folder into which the
+   given guest shall be deployed. This folder must exist before the deployment
+   of the guest. This is propery is optional and VSphere-specific.
  4. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
@@ -166,8 +172,9 @@ card:
  persist accross deployments. It is of array type. A persistant disk itself
  is described by a so-called disk hash with following keywords:
    1. __*name*__ - disk name. It is required.
-   2. __*pool*__ - the name of the storage pool the disk should be looked for
-  and/or allocated from. This property is required.
+   2. __*pool*__ - the name of the storage pool that should be used as a backing
+   store for a disk. This property is required unless  the __*default_pool*__ is
+   specified in __*infrastructure_properties*__.
    3. __*size*__ - the name size of the disk in megabytes (when the value has a
   suffix *M*) or gigabytes (when the value has a suffix *G*).
  8. __*credentials*__ - an optional property to define credentials for root
@@ -237,6 +244,7 @@ nodes:
       keep_ha: true
       datacenter: lab1ch
       cluster: clu-lab1ch
+      default_pool: ssd_pool1
     image: rhel6cloudinit
     interfaces:
       eth0:
