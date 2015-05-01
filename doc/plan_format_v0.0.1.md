@@ -160,6 +160,8 @@ card:
    3. __*set_gateway*__ - an optional boolean property that defines, whether a
    gateway should be defined for a given interface during guest customization.
    It is `true` by default.
+   4. __*virtual_switch*__ - an optional (currently VSphere-specific) property
+   that specifies which distributed virtual switch should be used.
 
  __IMPORTANT:__ The current implementation of cloud-init in *fog* and its
  underlying library *rbovirt* does not support DHCP nor multiple NIC
