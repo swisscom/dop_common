@@ -13,7 +13,9 @@ module DopCommon
     DEFAULT_MAX_IN_FLIGHT = 3
 
     def initialize(hash)
+      # fix hash key names (convert them to symbols)
       @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]
+      @hash[:plan] = Hash[@hash[:plan].map{|k,v| [k.to_sym, v]}] if @hash[:plan]
     end
 
     def validate
