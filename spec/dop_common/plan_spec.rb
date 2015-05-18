@@ -25,6 +25,21 @@ describe DopCommon::Plan do
     end
   end
 
+  describe '#ssh_root_pass' do
+    it 'will return nil is ssh_root_pass is not defined' do
+      plan = DopCommon::Plan.new({})
+      expect(plan.ssh_root_pass).to be nil
+    end
+    it 'will return the correct value if ssh_root_pass is defined' do
+      plan = DopCommon::Plan.new({:ssh_root_pass => 'mypass'})
+      expect(plan.ssh_root_pass).to eq 'mypass'
+    end
+    it 'will throw and exception if the value is not a String' do
+      plan = DopCommon::Plan.new({:ssh_root_pass => 2})
+      expect{plan.ssh_root_pass}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
   describe '#infrastructures' do
     it 'will throw and exception if the infrastructures key is not defined' do
       plan = DopCommon::Plan.new({})

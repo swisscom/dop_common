@@ -18,6 +18,7 @@ module DopCommon
 
     def validate
       log_validation_method('max_in_flight_valid?')
+      log_validation_method('ssh_root_pass_valid?')
       log_validation_method('infrastructures_valid?')
       log_validation_method('nodes_valid?')
       log_validation_method('steps_valid?')
@@ -30,6 +31,11 @@ module DopCommon
     def max_in_flight
       @max_in_flight ||= max_in_flight_valid? ?
         @hash[:max_in_flight] : DEFAULT_MAX_IN_FLIGHT
+    end
+
+    def ssh_root_pass
+      @ssh_root_pass ||= ssh_root_pass_valid? ?
+        @hash[:ssh_root_pass] : nil
     end
 
     def infrastructures
@@ -65,6 +71,12 @@ module DopCommon
         raise PlanParsingError, 'Plan: max_in_flight has to be a number'
       @hash[:max_in_flight] > 0 or
         raise PlanParsingError, 'Plan: max_in_flight has to be greater than one'
+    end
+
+    def ssh_root_pass_valid?
+      return false if @hash[:ssh_root_pass].nil? # ssh_root_pass is optional
+      @hash[:ssh_root_pass].kind_of?(String) or
+        raise PlanParsingError, 'Plan: ssh_root_pass has to be a string'
     end
 
     def infrastructures_valid?

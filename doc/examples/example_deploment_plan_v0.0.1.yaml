@@ -170,10 +170,12 @@ configuration:
             my_role: httpd_basic
         web02.example.com:
             my_role: httpd_special
+            ssh_root_pass: mypass
         haproxy01.example.com:
             my_role: haproxy
     roles:
         mysql:
+            ssh_root_pass: mypass
             mysql::default_database:
                 name: mydatabase
                 user: myuser
@@ -181,6 +183,7 @@ configuration:
 
 plan:
     max_in_flight: 2
+    ssh_root_pass: mypass
 
 steps:
 

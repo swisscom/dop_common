@@ -396,6 +396,13 @@ The amount of nodes DOP will be executing commands on in parallel.
 plan:
   max_in_flight: 2
 ```
+### ssh_root_pass
+The default password the ssh plugin will use to login on remote hosts if password login is enabled and sshpass is installed. This value can be overwritten via Hiera. DOPi will always try to lookup the variable over Hiera first and use this default if it finds nothing.
+
+```yaml
+plan:
+  ssh_root_pass: mypass
+```
 
 ## Steps
 
