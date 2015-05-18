@@ -12,15 +12,15 @@ describe DopCommon::Plan do
       expect(plan.max_in_flight).to be DopCommon::Plan::DEFAULT_MAX_IN_FLIGHT
     end
     it 'will return the correct value if max_in_flight is defined' do
-      plan = DopCommon::Plan.new({:max_in_flight => 10})
+      plan = DopCommon::Plan.new({:plan => {:max_in_flight => 10}})
       expect(plan.max_in_flight).to be 10
     end
     it 'will throw and exception if the value is not a Fixnum' do
-      plan = DopCommon::Plan.new({:max_in_flight => 'foo'})
+      plan = DopCommon::Plan.new({:plan => {:max_in_flight => 'foo'}})
       expect{plan.max_in_flight}.to raise_error DopCommon::PlanParsingError
     end
     it 'will throw and exception if the value is < 1' do
-      plan = DopCommon::Plan.new({:max_in_flight => -1})
+      plan = DopCommon::Plan.new({:plan => {:max_in_flight => -1}})
       expect{plan.max_in_flight}.to raise_error DopCommon::PlanParsingError
     end
   end
@@ -31,11 +31,11 @@ describe DopCommon::Plan do
       expect(plan.ssh_root_pass).to be nil
     end
     it 'will return the correct value if ssh_root_pass is defined' do
-      plan = DopCommon::Plan.new({:ssh_root_pass => 'mypass'})
+      plan = DopCommon::Plan.new({:plan => {:ssh_root_pass => 'mypass'}})
       expect(plan.ssh_root_pass).to eq 'mypass'
     end
     it 'will throw and exception if the value is not a String' do
-      plan = DopCommon::Plan.new({:ssh_root_pass => 2})
+      plan = DopCommon::Plan.new({:plan => {:ssh_root_pass => 2}})
       expect{plan.ssh_root_pass}.to raise_error DopCommon::PlanParsingError
     end
   end
