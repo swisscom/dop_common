@@ -449,6 +449,10 @@ This will include all the nodes with a certain role to a step.
 
 roles and nodes can be mixed, dop_common will simply merge the list of nodes. However there has to be at least one node in every step.
 
+### canary_host
+
+If this flag is set to true DOPi will randomly choose one host and apply the step in a first round only to this host and only run the others in parallel, once this step succeeded. This flag is set to fals by default.
+
 ### command
 
 The command can either be directly a plugin name if no parameters are needed or a command hash which will be passed to the plugin. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depends on the plugin in use and how it will parse the hash.
