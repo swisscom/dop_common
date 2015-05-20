@@ -19,6 +19,7 @@ module DopCommon
       log_validation_method('name')
       log_validation_method('nodes_valid?')
       log_validation_method('roles_valid?')
+      log_validation_method('canary_host_valid?')
       log_validation_method('command_valid?')
       r_name = @name || 'unknown' # name may not be set because of a previous error
       try_validate_obj("Step #{r_name}: Can't validate the command part because of a previous error"){command}
@@ -30,6 +31,10 @@ module DopCommon
 
     def roles
       @roles ||= roles_valid? ? parse_roles : []
+    end
+
+    def canary_host
+      @canary_host ||= canary_host_valid? ? @hash[:canary_host] : false
     end
 
     def command
@@ -76,6 +81,12 @@ module DopCommon
         when Array then @hash[:roles]
         else []
       end
+    end
+
+    def canary_host_valid?
+      return false if @hash[:canary_host].nil?
+      @hash[:canary_host].kind_of?(TrueClass) or @hash[:canary_host].kind_of?(FalseClass) or
+        raise PlanParsingError, "Step #{@name}: The value for canary_host must be boolean"
     end
 
     def command_valid?

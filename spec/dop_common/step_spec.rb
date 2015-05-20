@@ -63,6 +63,23 @@ describe DopCommon::Step do
     end
   end
 
+  describe '#canary_host' do
+    it 'returns false if the key is missing' do
+      step = DopCommon::Step.new({})
+      expect(step.canary_host).to eq false
+    end
+    it 'returns the correct result if the key is set' do
+      step = DopCommon::Step.new({:canary_host => true})
+      expect(step.canary_host).to eq true
+      step = DopCommon::Step.new({:canary_host => false})
+      expect(step.canary_host).to eq false
+    end
+    it 'throws an exception if the value is not a boolean' do
+      step = DopCommon::Step.new({:canary_host => 'foo'})
+      expect{step.canary_host}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
   describe '#command' do
     it 'returns the command object if a command hash is specified' do
       step = DopCommon::Step.new({:name => 'foo', :command => {:plugin => 'dummy'}})
