@@ -17,8 +17,8 @@ Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
  3. __*credentials*__ - credential hash. The content of this hash depends on a
 infrastructure provider type. For instance, RHEV infrastructure must contain
 __*username*__ and __*password*__. VSphere-based infrastructure also require a
-key, specified by __*provider_apikey*__. OpenStack-based infrastructure must
-have __*username*__ and __*provider_apikey*__ sepcified. Credential hash
+key, specified by __*provider_pubkey_hash*__. OpenStack-based infrastructure must
+have __*username*__ and __*provider_pubkey_hash*__ sepcified. Credential hash
 specification is required, although its content - as one might have noticed -
 may differ across different providers.
  4. __*networks*__ - provides networks definition hashes. Each network definition
@@ -65,7 +65,7 @@ infrastructures:
     endpoint: https://openstack.example.com/api/
     credentials:
       username: myuser
-    provider_apikey: myapikey
+    provider_pubkey_hash: myapikey
     networks:
       management:
         ip_pool:

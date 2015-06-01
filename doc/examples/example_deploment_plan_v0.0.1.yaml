@@ -38,7 +38,7 @@ infrastructures:
         credentials:
             username: myuser
             password: mypass
-            provider_apikey: A4532FAA....
+            provider_pubkey_hash: A4532FAA....
         networks:
             management:
                 ip_pool:
