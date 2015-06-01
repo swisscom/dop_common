@@ -7,17 +7,14 @@
 module DopCommon
   module Validator
 
-    def validity
-      @validity ||= true
-    end
-
     def valid?
+      @validity = true
       validate
-      validity
+      @validity
     end
 
     def set_not_valid
-      validity = false
+      @validity = false
     end
 
     def log_validation_method(method, error_klass = PlanParsingError)
