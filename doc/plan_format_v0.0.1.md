@@ -9,7 +9,8 @@ The infrastructures hash holds information about cloud providers. Each entry in
 an infrastructures hash describes a certain infrastructures or cloud if you want.
 It is of hash type. Following is a list of keys:
  1. __*type*__ - is the type of the infrastructure provider. Its value must be
-one of the following strings: *ovirt*, *rhev*, *openstack*, *vsphere*, *vmware*.
+one of the following strings: *baremetal*, *ovirt*, *rhev*, *openstack*,
+*vsphere*, *vmware*.
 Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
 *vmware*. This is a required key.
  2. __*endpoint*__ - is a URL that is an entry point for API calls. This is
