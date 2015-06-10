@@ -92,6 +92,10 @@ of IP addresses that can be assigned statically.
  3. __*ip_defgw*__ - an IP address of the default gateway of the network. This
 is optional.
 
+__IMPORTANT__: Please note that network names must refer to sub network names or
+their identifiers in case [OpenStack](http://www.openstack.org/) cloud software
+is used.
+
 ## Nodes
 
 The nodes hash holds the basic information about all the nodes you want to
