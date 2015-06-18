@@ -184,6 +184,17 @@ card:
    specified in __*infrastructure_properties*__.
    3. __*size*__ - the name size of the disk in megabytes (when the value has a
   suffix *M*) or gigabytes (when the value has a suffix *G*).
+   4. __*thin*__ - an optional boolean flag that indicates whether disk will be
+   created as thin provisioned. Its default  value is *true*, meaning the
+   disks are thin-provisioned by default. Please use *false* as the value if
+   you need to thick provision a disk.
+ 
+ __IMPORTANT:__ Currently, the selection of provisioning type is honored only
+ by the RHEVm/OVirt provider. Please also note that a thick-provisioned disk
+ is of *raw* rather than *cow* type when thick provisioning is used. As a
+ consequence, it is not possible to create a snapshot of such a disk
+ OVirt/RHEVm.
+
  8. __*credentials*__ - an optional property to define credentials for root
  user. This information is passed to cloud init. Following data can be
  specified:
