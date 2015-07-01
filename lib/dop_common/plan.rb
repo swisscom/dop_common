@@ -30,6 +30,11 @@ module DopCommon
       try_validate_obj("Plan: Can't validate the steps part because of a previous error"){steps}
     end
 
+    def name
+      @name ||= name_valid? ?
+        @hash[:name] : Digest::SHA2.hexdigest(@hash.to_s)
+    end
+
     def max_in_flight
       @max_in_flight ||= max_in_flight_valid? ?
         @hash[:plan][:max_in_flight] : DEFAULT_MAX_IN_FLIGHT
@@ -66,6 +71,14 @@ module DopCommon
     end
 
   private
+
+    def name_valid?
+      return false if @hash[:name].nil?
+      @hash[:name].kind_of?(String) or
+        raise PlanParsingError, 'The plan name has to be a String'
+      @hash[:name][/^\w+$/,0] or
+        raise PlanParsingError, 'The plan name may only contain letters, numbers and underscores'
+    end
 
     def max_in_flight_valid?
       return false if @hash[:plan].nil? # plan hash is optional

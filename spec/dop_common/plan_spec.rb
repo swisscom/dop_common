@@ -6,6 +6,25 @@ describe DopCommon::Plan do
     DopCommon.log.level = ::Logger::ERROR
   end
 
+  describe '#name' do
+    it 'will return a hash if no name is defined' do
+      plan = DopCommon::Plan.new({})
+      expect(plan.name).to eq '44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a'
+    end
+    it 'will return the correct value if name is defined' do
+      plan = DopCommon::Plan.new({:name => 'myplan'})
+      expect(plan.name).to eq 'myplan'
+    end
+    it 'will throw and exception if the value is not a String' do
+      plan = DopCommon::Plan.new({:name => 2})
+      expect{plan.name}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will throw and exception if the value contais illegal chars' do
+      plan = DopCommon::Plan.new({:name => 'my-plan'})
+      expect{plan.name}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
   describe '#max_in_flight' do
     it 'will return the default value if max_in_flight is not defined' do
       plan = DopCommon::Plan.new({})

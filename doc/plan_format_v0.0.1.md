@@ -4,6 +4,19 @@ The DOP Plan file consists out of series of hashes and arrays which describe
 system of nodes that should be created and a list of steps that need to be
 performed on this nodes in order.
 
+## Global settings
+
+Settings that influence the whole plan
+
+### name
+
+The name of the plan. Make sure this name is unique among all your plan you try
+to add on the same node. DOP will use this name as filename to store the plan data.
+The name may only contain letters, numbers and underscores.
+
+If no name is given, DOP will calculate the SHA2 of the plan content and use this
+as a name (you will not be able to update such a plan).
+
 ## Infrastructures
 The infrastructures hash holds information about cloud providers. Each entry in
 an infrastructures hash describes a certain infrastructures or cloud if you want.
