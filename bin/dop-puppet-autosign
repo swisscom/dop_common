@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+#
+# DOP COMMON Puppet autosign policy tool
+#
+require 'dop_common'
+require 'optparse'
+require 'yaml'
+
+options = {}
+option_parser = OptionParser.new do |opts|
+  opts.banner  = "Usage: dop-puppet-autosign [options] certname"
+
+  options[:verbosity] = 'WARN'
+  opts.on("-v", "--verbosity VERBOSITY", "Set the verbosity level. Default is warn") do |v|
+    options[:verbosity] = v
+  end
+
+  options[:plan_cache] = '/var/lib/dop/plans'
+  opts.on("-p", "--plan_cache PLAN_CACHE_DIR", "Set the dop plan cache dir. Default is #{options[:plan_cache]}") do |p|
+    options[:plan_cache] = p
+  end
+
+  opts.on( '-v', '--version', 'Show version of dop_common' ) do
+    puts DopCommon::VERSION
+    exit
+  end
+
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+    exit
+  end
+
+end
+
+begin option_parser.parse!
+rescue OptionParser::InvalidOption => e
+  puts e
+  puts
+  puts option_parser
+  exit(-1)
+end
+
+node_name = ARGV[0]
+
+if node_name.nil?
+  puts option_parser
+  exit(-1)
+end
+
+DopCommon.logger = Logger.new(STDERR)
+DopCommon.log.level = ::Logger.const_get(options[:verbosity].upcase)
+
+plan_cache = DopCommon::PlanCache.new(options[:plan_cache])
+plan_cache.list.each do |plan_name|
+  DopCommon.log.debug("Checking plan #{plan_name} for node")
+  if plan_cache.get(plan_name).find_node(node_name)
+    DopCommon.log.debug("Found node #{node_name} in plan #{plan_name}")
+    exit(0)
+  end
+end
+exit(1)
