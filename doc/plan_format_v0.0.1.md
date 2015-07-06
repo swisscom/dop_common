@@ -17,6 +17,19 @@ The name may only contain letters, numbers and underscores.
 If no name is given, DOP will calculate the SHA2 of the plan content and use this
 as a name (you will not be able to update such a plan).
 
+### max_in_flight
+
+The amount of nodes DOP will be executing commands on in parallel.
+
+There are also two special values:
+
+- The value "0" will disable thread spawning for debug purposes.
+- The value "-1" will spawn as many threads as there are nodes.
+
+### ssh_root_pass
+
+The default password the ssh plugin will use to login on remote hosts if password login is enabled and sshpass is installed. This value can be overwritten via Hiera. DOPi will always try to lookup the variable over Hiera first and use this default if it finds nothing.
+
 ## Infrastructures
 The infrastructures hash holds information about cloud providers. Each entry in
 an infrastructures hash describes a certain infrastructures or cloud if you want.
@@ -413,25 +426,6 @@ configuration:
 ```
 
 This is only used from puppet over the hiera plugin and not from DOP itself at the moment.
-
-## Plan
-
-This hash contains some basic settings for the plan. Currently there is only one setting supported
-
-### max_in_flight
-The amount of nodes DOP will be executing commands on in parallel.
-
-```yaml
-plan:
-  max_in_flight: 2
-```
-### ssh_root_pass
-The default password the ssh plugin will use to login on remote hosts if password login is enabled and sshpass is installed. This value can be overwritten via Hiera. DOPi will always try to lookup the variable over Hiera first and use this default if it finds nothing.
-
-```yaml
-plan:
-  ssh_root_pass: mypass
-```
 
 ## Steps
 
