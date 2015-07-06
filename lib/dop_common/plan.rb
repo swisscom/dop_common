@@ -9,8 +9,7 @@ module DopCommon
 
   class Plan
     include Validator
-
-    DEFAULT_MAX_IN_FLIGHT = 3
+    include SharedOptions
 
     def initialize(hash)
       # fix hash key names (convert them to symbols)
@@ -19,8 +18,7 @@ module DopCommon
     end
 
     def validate
-      log_validation_method('max_in_flight_valid?')
-      log_validation_method('ssh_root_pass_valid?')
+      valitdate_shared_options
       log_validation_method('infrastructures_valid?')
       log_validation_method('nodes_valid?')
       log_validation_method('steps_valid?')
@@ -33,16 +31,6 @@ module DopCommon
     def name
       @name ||= name_valid? ?
         @hash[:name] : Digest::SHA2.hexdigest(@hash.to_s)
-    end
-
-    def max_in_flight
-      @max_in_flight ||= max_in_flight_valid? ?
-        @hash[:max_in_flight] : DEFAULT_MAX_IN_FLIGHT
-    end
-
-    def ssh_root_pass
-      @ssh_root_pass ||= ssh_root_pass_valid? ?
-        @hash[:ssh_root_pass] : nil
     end
 
     def infrastructures
@@ -78,36 +66,6 @@ module DopCommon
         raise PlanParsingError, 'The plan name has to be a String'
       @hash[:name][/^\w+$/,0] or
         raise PlanParsingError, 'The plan name may only contain letters, numbers and underscores'
-    end
-
-    def max_in_flight_valid?
-      ### START DEPRICATED KEY PARSING plan => max_in_flight
-      if @hash[:max_in_flight].nil?
-        return false if @hash[:plan].nil? # plan hash is optional
-        return false if @hash[:plan][:max_in_flight].nil? # max_in_flight is optional
-        @hash[:max_in_flight] = @hash[:plan][:max_in_flight]
-        DopCommon.log.warn('The max_in_flight key under "plan" in depricated. Please set max_in_flight as a global key')
-      end
-      ### END DEPRICATED KEY PARSING
-      return false if @hash[:max_in_flight].nil? # max_in_flight is optional
-      @hash[:max_in_flight].kind_of?(Fixnum) or
-        raise PlanParsingError, 'Plan: max_in_flight has to be a number'
-      @hash[:max_in_flight] >= -1 or
-        raise PlanParsingError, 'Plan: max_in_flight has to be greater than -1'
-    end
-
-    def ssh_root_pass_valid?
-      ### START DEPRICATED KEY PARSING plan => max_root_pass
-      if @hash[:ssh_root_pass].nil? # ssh_root_pass is optional
-        return false if @hash[:plan].nil? # plan hash is optional
-        return false if @hash[:plan][:ssh_root_pass].nil? # ssh_root_pass is optional
-        @hash[:ssh_root_pass] = @hash[:plan][:ssh_root_pass]
-        DopCommon.log.warn('The ssh_root_pass key under "plan" in depricated. Please set ssh_root_pass as a global key')
-      end
-      ### END DEPRICATED KEY PARSING
-      return false if @hash[:ssh_root_pass].nil? # ssh_root_pass is optional
-      @hash[:ssh_root_pass].kind_of?(String) or
-        raise PlanParsingError, 'Plan: ssh_root_pass has to be a string'
     end
 
     def infrastructures_valid?

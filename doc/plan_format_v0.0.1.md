@@ -28,9 +28,19 @@ There are also two special values:
 - The value "0" will disable thread spawning for debug purposes.
 - The value "-1" will spawn as many threads as there are nodes.
 
+This option can be overwritten on step level
+
 ### ssh_root_pass (optional)
 
 The default password the ssh plugin will use to login on remote hosts if password login is enabled and sshpass is installed. This value can be overwritten via Hiera. DOPi will always try to lookup the variable over Hiera first and use this default if it finds nothing.
+
+### canary_host (optional)
+
+`default: false`
+
+If this flag is set to true DOPi will randomly choose one host and apply the step in a first round only to this host and only run the others in parallel, once this step succeeded.
+
+This option can be overwritten on step level
 
 ## Infrastructures
 The infrastructures hash holds information about cloud providers. Each entry in
@@ -473,10 +483,6 @@ This can either be a list of nodes or the keyword "all" which will include all n
 This will include all the nodes with a certain role to a step.
 
 roles and nodes can be mixed, dop_common will simply merge the list of nodes. However there has to be at least one node in every step.
-
-### canary_host
-
-If this flag is set to true DOPi will randomly choose one host and apply the step in a first round only to this host and only run the others in parallel, once this step succeeded. This flag is set to fals by default.
 
 ### command
 

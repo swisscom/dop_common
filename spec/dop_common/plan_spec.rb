@@ -25,64 +25,6 @@ describe DopCommon::Plan do
     end
   end
 
-  describe '#max_in_flight' do
-    it 'will return the default value if max_in_flight is not defined' do
-      plan = DopCommon::Plan.new({})
-      expect(plan.max_in_flight).to be DopCommon::Plan::DEFAULT_MAX_IN_FLIGHT
-    end
-    it 'will return the correct value if max_in_flight is defined' do
-      plan = DopCommon::Plan.new({:max_in_flight => 10})
-      expect(plan.max_in_flight).to be 10
-    end
-    it 'will throw and exception if the value is not a Fixnum' do
-      plan = DopCommon::Plan.new({:max_in_flight => 'foo'})
-      expect{plan.max_in_flight}.to raise_error DopCommon::PlanParsingError
-    end
-    it 'will throw and exception if the value is < -1' do
-      plan = DopCommon::Plan.new({:max_in_flight => -2})
-      expect{plan.max_in_flight}.to raise_error DopCommon::PlanParsingError
-    end
-    ### START DEPRICATED KEY PARSING plan => max_in_flight
-    it 'will return the correct value if max_in_flight is defined' do
-      plan = DopCommon::Plan.new({:plan => {:max_in_flight => 10}})
-      expect(plan.max_in_flight).to be 10
-    end
-    it 'will throw and exception if the value is not a Fixnum' do
-      plan = DopCommon::Plan.new({:plan => {:max_in_flight => 'foo'}})
-      expect{plan.max_in_flight}.to raise_error DopCommon::PlanParsingError
-    end
-    it 'will throw and exception if the value is < -1' do
-      plan = DopCommon::Plan.new(:plan => {:max_in_flight => -2})
-      expect{plan.max_in_flight}.to raise_error DopCommon::PlanParsingError
-    end
-    ### END DEPRICATED KEY PARSING
-  end
-
-  describe '#ssh_root_pass' do
-    it 'will return nil is ssh_root_pass is not defined' do
-      plan = DopCommon::Plan.new({})
-      expect(plan.ssh_root_pass).to be nil
-    end
-    it 'will return the correct value if ssh_root_pass is defined' do
-      plan = DopCommon::Plan.new({:ssh_root_pass => 'mypass'})
-      expect(plan.ssh_root_pass).to eq 'mypass'
-    end
-    it 'will throw and exception if the value is not a String' do
-      plan = DopCommon::Plan.new({:ssh_root_pass => 2})
-      expect{plan.ssh_root_pass}.to raise_error DopCommon::PlanParsingError
-    end
-    ### START DEPRICATED KEY PARSING plan => ssh_root_pass
-    it 'will return the correct value if ssh_root_pass is defined' do
-      plan = DopCommon::Plan.new({:plan => {:ssh_root_pass => 'mypass'}})
-      expect(plan.ssh_root_pass).to eq 'mypass'
-    end
-    it 'will throw and exception if the value is not a String' do
-      plan = DopCommon::Plan.new({:plan => {:ssh_root_pass => 2}})
-      expect{plan.ssh_root_pass}.to raise_error DopCommon::PlanParsingError
-    end
-    ### END DEPRICATED KEY PARSING
-  end
-
   describe '#infrastructures' do
     it 'will throw and exception if the infrastructures key is not defined' do
       plan = DopCommon::Plan.new({})
