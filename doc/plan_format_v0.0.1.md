@@ -8,7 +8,7 @@ performed on this nodes in order.
 
 Settings that influence the whole plan
 
-### name
+### name (optional)
 
 The name of the plan. Make sure this name is unique among all your plan you try
 to add on the same node. DOP will use this name as filename to store the plan data.
@@ -17,7 +17,9 @@ The name may only contain letters, numbers and underscores.
 If no name is given, DOP will calculate the SHA2 of the plan content and use this
 as a name (you will not be able to update such a plan).
 
-### max_in_flight
+### max_in_flight (optional)
+
+`default: 3`
 
 The amount of nodes DOP will be executing commands on in parallel.
 
@@ -26,7 +28,7 @@ There are also two special values:
 - The value "0" will disable thread spawning for debug purposes.
 - The value "-1" will spawn as many threads as there are nodes.
 
-### ssh_root_pass
+### ssh_root_pass (optional)
 
 The default password the ssh plugin will use to login on remote hosts if password login is enabled and sshpass is installed. This value can be overwritten via Hiera. DOPi will always try to lookup the variable over Hiera first and use this default if it finds nothing.
 
