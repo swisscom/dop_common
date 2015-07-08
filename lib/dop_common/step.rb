@@ -30,8 +30,16 @@ module DopCommon
       @nodes ||= nodes_valid? ? parse_pattern_list(:nodes) : []
     end
 
+    def nodes_exclude
+      @nodes_exclude ||= nodes_exclude_valid? ? parse_pattern_list(:nodes_exclude) : []
+    end
+
     def roles
       @roles ||= roles_valid? ? parse_pattern_list(:roles) : []
+    end
+
+    def roles_exclude
+      @roles_exclude ||= roles_exclude_valid? ? parse_pattern_list(:roles_exclude) : []
     end
 
     def command
@@ -56,8 +64,16 @@ module DopCommon
       pattern_list_valid?(:nodes)
     end
 
+    def nodes_exclude_valid?
+      pattern_list_valid?(:nodes_exclude)
+    end
+
     def roles_valid?
       pattern_list_valid?(:roles)
+    end
+
+    def roles_exclude_valid?
+      pattern_list_valid?(:roles_exclude)
     end
 
     def pattern_list_valid?(pattern)
