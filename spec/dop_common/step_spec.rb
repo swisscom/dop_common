@@ -38,6 +38,10 @@ describe DopCommon::Step do
       step = DopCommon::Step.new({:name => 'foo', :nodes => ['foo', 1]})
       expect{step.nodes}.to raise_error DopCommon::PlanParsingError
     end
+    it 'throws an exception if the array contains an invalid regexp' do
+      step = DopCommon::Step.new({:name => 'foo', :nodes => ['/][/']})
+      expect{step.nodes}.to raise_error DopCommon::PlanParsingError
+    end
   end
 
   describe '#roles' do
@@ -59,6 +63,10 @@ describe DopCommon::Step do
     end
     it 'throws an exception if the array contains something other than a string' do
       step = DopCommon::Step.new({:name => 'foo', :roles => ['foo', 1]})
+      expect{step.roles}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'throws an exception if the array contains an invalid regexp' do
+      step = DopCommon::Step.new({:name => 'foo', :roles => ['/][/']})
       expect{step.roles}.to raise_error DopCommon::PlanParsingError
     end
   end

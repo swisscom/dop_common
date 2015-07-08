@@ -27,11 +27,11 @@ module DopCommon
     end
 
     def nodes
-      @nodes ||= nodes_valid? ? parse_nodes : []
+      @nodes ||= pattern_list_valid?(:nodes) ? parse_pattern_list(:nodes) : []
     end
 
     def roles
-      @roles ||= roles_valid? ? parse_roles : []
+      @roles ||= pattern_list_valid?(:roles) ? parse_pattern_list(:roles) : []
     end
 
     def command
@@ -40,44 +40,29 @@ module DopCommon
 
     private
 
-    def nodes_valid?
-      return false if @hash[:nodes].nil? # nodes is optional
-      @hash[:nodes].kind_of?(Array) || @hash[:nodes].kind_of?(String) or
-        raise PlanParsingError, "Step #{@name}: The value for nodes has to be a string or an array"
-      if @hash[:nodes].kind_of?(Array)
-        @hash[:nodes].all?{|n| n.kind_of?(String)} or
-          raise PlanParsingError, "Step #{@name}: The nodes array must only contain strings"
+   def parse_pattern_list(pattern)
+      case @hash[pattern]
+      when 'all', 'All', 'ALL' then @hash[pattern]
+      else [ @hash[pattern] ].flatten.compact
+      end
+    end
+
+    def pattern_list_valid?(pattern)
+      return false if @hash[pattern].nil? # roless is optional
+      @hash[pattern].kind_of?(Array) || @hash[pattern].kind_of?(String) or
+        raise PlanParsingError, "Step #{@name}: The value for '#{pattern}' has to be a string or an array"
+      if @hash[pattern].kind_of?(Array)
+        @hash[pattern].each do |entry|
+          entry.kind_of?(String) or
+            raise PlanParsingError, "Step #{@name}: The '#{pattern}' array must only contain strings"
+          regexp = entry[/^\/(.*)\/$/, 1]
+          begin RegExp.new(regexp) if regexp
+          rescue
+            raise PlanParsingError, "The pattern #{entry} in '#{pattern}' is not a valid regular expression"
+          end
+        end
       end
       true
-    end
-
-    def parse_nodes
-      case @hash[:nodes]
-        when 'all', 'All', 'ALL' then @hash[:nodes]
-        when String then [ @hash[:nodes] ]
-        when Array then @hash[:nodes]
-        else []
-      end
-    end
-
-    def roles_valid?
-      return false if @hash[:roles].nil? # roless is optional
-      @hash[:roles].kind_of?(Array) || @hash[:roles].kind_of?(String) or
-        raise PlanParsingError, "Step #{@name}: The value for roles has to be a string or an array"
-      if @hash[:roles].kind_of?(Array)
-        @hash[:roles].all?{|n| n.kind_of?(String)} or
-          raise PlanParsingError, "Step #{@name}: The roles array must only contain strings"
-      end
-      true
-    end
-
-    def parse_roles
-      case @hash[:roles]
-        when 'all', 'All', 'ALL' then @hash[:roles]
-        when String then [ @hash[:roles] ]
-        when Array then @hash[:roles]
-        else []
-      end
     end
 
     def command_valid?
