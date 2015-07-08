@@ -476,13 +476,25 @@ The name is just an identifier for the step. You should chose a name that best d
 
 ### nodes
 
-This can either be a list of nodes or the keyword "all" which will include all nodes for the step.
+This can either be one or a list of nodes and/or Regex patterns or the keyword "all" which will include all nodes for the step.
+
+If an entry starts and ends with a '/' DOPi will interpret the string as a regular expression.
 
 ### roles
 
 This will include all the nodes with a certain role to a step.
 
 roles and nodes can be mixed, dop_common will simply merge the list of nodes. However there has to be at least one node in every step.
+
+If an entry starts and ends with a '/' DOPi will interpret the string as a regular expression.
+
+### nodes_exclude
+
+A list of nodes to exclude from the list that gets assembled from nodes and roles. This can also contain Regex patterns like nodes and roles.
+
+### roles_exclude
+
+Works exactly like nodes_exclude but excludes roles.
 
 ### command
 
