@@ -42,8 +42,13 @@ module DopCommon
 
     def parse_pattern_list(pattern)
       case @hash[pattern]
-      when 'all', 'All', 'ALL' then @hash[pattern]
-      else [ @hash[pattern] ].flatten.compact
+      when 'all', 'All', 'ALL', :all then :all
+      else
+        pattern_array = [ @hash[pattern] ].flatten.compact
+        pattern_array.map do |entry|
+          regexp = entry[/^\/(.*)\/$/, 1]
+          regexp ? Regexp.new(regexp) : entry
+        end
       end
     end
 
