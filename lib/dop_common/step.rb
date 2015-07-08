@@ -27,24 +27,32 @@ module DopCommon
     end
 
     def nodes
-      @nodes ||= pattern_list_valid?(:nodes) ? parse_pattern_list(:nodes) : []
+      @nodes ||= nodes_valid? ? parse_pattern_list(:nodes) : []
     end
 
     def roles
-      @roles ||= pattern_list_valid?(:roles) ? parse_pattern_list(:roles) : []
+      @roles ||= roles_valid? ? parse_pattern_list(:roles) : []
     end
 
     def command
       @command ||= command_valid? ? create_command : nil
     end
 
-    private
+  private
 
-   def parse_pattern_list(pattern)
+    def parse_pattern_list(pattern)
       case @hash[pattern]
       when 'all', 'All', 'ALL' then @hash[pattern]
       else [ @hash[pattern] ].flatten.compact
       end
+    end
+
+    def nodes_valid?
+      pattern_list_valid?(:nodes)
+    end
+
+    def roles_valid?
+      pattern_list_valid?(:roles)
     end
 
     def pattern_list_valid?(pattern)
@@ -56,7 +64,7 @@ module DopCommon
           entry.kind_of?(String) or
             raise PlanParsingError, "Step #{@name}: The '#{pattern}' array must only contain strings"
           regexp = entry[/^\/(.*)\/$/, 1]
-          begin RegExp.new(regexp) if regexp
+          begin Regexp.new(regexp) if regexp
           rescue
             raise PlanParsingError, "The pattern #{entry} in '#{pattern}' is not a valid regular expression"
           end
