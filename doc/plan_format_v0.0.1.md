@@ -480,6 +480,48 @@ This can either be one or a list of nodes and/or Regex patterns or the keyword "
 
 If an entry starts and ends with a '/' DOPi will interpret the string as a regular expression.
 
+### nodes_by_config
+
+Include nodes to a step by specific configuration values which are resolved over hiera.
+
+Example:
+```yaml
+
+configuration:
+  nodes:
+    'mysql01.example.com':
+      'my_alias': 'database_01'
+
+steps:
+  - name: 'include by config'
+    nodes_by_config:
+      'my_alias': 'database_01'
+    command: ssh_run_puppet
+
+```
+
+If the value of the config variable is an array it will check each value in that array. You can also use pattern here like with node
+
+Example:
+```yaml
+
+configuration:
+  nodes:
+    'mysql01.example.com':
+      'my_alias':
+        - 'database_01'
+        - 'some_other_alias'
+
+steps:
+  - name: 'include by config'
+    nodes_by_config:
+      my_alias:
+        - '/^linux/'
+        - 'database_01'
+    command: ssh_run_puppet
+
+```
+
 ### roles
 
 This will include all the nodes with a certain role to a step.
@@ -488,13 +530,20 @@ roles and nodes can be mixed, dop_common will simply merge the list of nodes. Ho
 
 If an entry starts and ends with a '/' DOPi will interpret the string as a regular expression.
 
-### nodes_exclude
+roles is basically just a special case for nodes_by_config with the roles variable. But it will do some additional checks and you can also set
+a default value for the role on DOPi.
+
+### exclude_nodes
 
 A list of nodes to exclude from the list that gets assembled from nodes and roles. This can also contain Regex patterns like nodes and roles.
 
-### roles_exclude
+### exclude_nodes_by_config
 
-Works exactly like nodes_exclude but excludes roles.
+Exclude nodes based on config values and matching patterns.
+
+### exclude_roles
+
+Works exactly like exclude_nodes but excludes roles.
 
 ### command
 

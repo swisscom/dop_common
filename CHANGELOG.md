@@ -2,6 +2,9 @@
 All notable changes to dop_common will be documented in this file.
 
 ## [Unreleased]
+### Added
+- node_by_config and exclude patterns (also for node and role) parsing
+
 ### Changed
 - max_in_flight and ssh_root_pass are now global keys and no longer under 'plan'.
   The old location will still work, but dop_common will show a deprecation warning.
