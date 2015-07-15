@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [Unreleased]
+## [0.0.15] - 2015-07-15
 ### Added
 - node_by_config and exclude patterns (also for node and role) parsing
 
