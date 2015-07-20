@@ -44,7 +44,7 @@ This option can be overwritten on step level
 
 ## Infrastructures
 The infrastructures hash holds information about cloud providers. Each entry in
-an infrastructures hash describes a certain infrastructures or cloud if you want.
+an infrastructures hash describes a certain infrastructure or cloud if you want.
 It is of hash type. Following is a list of keys:
  1. __*type*__ - is the type of the infrastructure provider. Its value must be
 one of the following strings: *baremetal*, *ovirt*, *rhev*, *openstack*,
@@ -53,13 +53,16 @@ Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
 *vmware*. This is a required key.
  2. __*endpoint*__ - is a URL that is an entry point for API calls. This is
  required.
- 3. __*credentials*__ - credential hash. The content of this hash depends on a
-infrastructure provider type. For instance, RHEV infrastructure must contain
-__*username*__ and __*password*__. VSphere-based infrastructure also require a
-key, specified by __*provider_pubkey_hash*__. OpenStack-based infrastructure must
-have __*username*__ and __*provider_pubkey_hash*__ sepcified. Credential hash
-specification is required, although its content - as one might have noticed -
-may differ across different providers.
+ 3. __*credentials*__ - A credential hash. It consists of:
+    1. __*username*__ - Specifies the user name that is used to
+	log in.
+	2. __*password*__ - A password that is used to log in. In OpenStack-based
+	infrastructures a password might be called __apikey__. Please use its value
+	for the  __*password*__.
+    3. __*provider_pubkey_hash*__ - An optional property that might be used in
+	VSphere-based infrastructures. Its value should be a fingerprint of the API
+	endpoint's public key. DOPv is able to fetch the key and validate it
+	automatically if this option is omitted. 
  4. __*networks*__ - provides networks definition hashes. Each network definition
 is hashed by its name that can be an arbitrary string or symbol. Please refer to
 network subsection for further details.
@@ -147,7 +150,7 @@ infrastructures:
 
 ### Network
 Network hash describes a particular network within a given infrastructure
-provider (cloud). Following are the properties of network hash:
+provider (cloud). Following are the properties of a network hash:
  1. __*ip_pool*__ - a hash of assignable IP addresses. The hash must contain
 __*ip_from*__ and __*ip_to*__ keywords that specify the lower and upper bounds
 of IP addresses that can be assigned statically.
@@ -155,9 +158,9 @@ of IP addresses that can be assigned statically.
  3. __*ip_defgw*__ - an IP address of the default gateway of the network. This
 is optional.
 
-__IMPORTANT__: Please note that network names must refer to sub network names or
-their identifiers in case [OpenStack](http://www.openstack.org/) cloud software
-is used.
+__IMPORTANT__: Please note that network names must refer to sub-network names or
+their identifiers in case of [OpenStack](http://www.openstack.org/) based
+infrastructures.
 
 ## Nodes
 
