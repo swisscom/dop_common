@@ -80,12 +80,18 @@ infrastructures:
       username: myuser
       password: mypass
     networks:
-      rhevm:
+      management:
         ip_pool:
           from: 192.168.254.11
           to: 192.168.254.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.254.254
+	  production:
+        ip_pool:
+          from: 192.168.1.11
+          to: 192.168.1.245
+        ip_netmask: 255.255.255.0
+        ip_defgw: 192.168.1.254
     affinity_groups:
       clu-lab1ch-ag_1:
         positive: true
@@ -104,20 +110,39 @@ infrastructures:
     endpoint: https://openstack.example.com/api/
     credentials:
       username: myuser
-    provider_pubkey_hash: myapikey
     networks:
-      management:
+      management-subnet:
         ip_pool:
           from: 192.168.253.11
           to: 192.168.253.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.253.254
+      production-subnet:
+        ip_pool:
+          from: 192.168.2.11
+          to: 192.168.2.245
+        ip_netmask: 255.255.255.0
+        ip_defgw: 192.168.2.254
+  db:
+    type: vsphere
+    endpoint: https://vsphere.example.com/api/
+    credentials:
+      username: myuser
+      password: mypass
+	  provider_pubkey_hash: e32af...
+    networks:
+      management:
+        ip_pool:
+          from: 192.168.252.11
+          to: 192.168.252.245
+        ip_netmask: 255.255.255.0
+        ip_defgw: 192.168.252.254
       production:
         ip_pool:
-          from: 192.168.1.11
-          to: 192.168.1.245
+          from: 192.168.3.11
+          to: 192.168.3.245
         ip_netmask: 255.255.255.0
-        ip_defgw: 192.168.1.254
+        ip_defgw: 192.168.3.254
 ```
 
 ### Network
@@ -180,6 +205,8 @@ __*keep_ha*__, __*datacenter*__ and __*cluster*__ keywords.
    5. __*dest_folder*__ property defines a destination folder into which the
    given guest shall be deployed. This folder must exist before the deployment
    of the guest. This is propery is optional and VSphere-specific.
+   6. __*tenant*__ property specifies the name of the tenant for OpenStack
+   infrastructures.
  4. __*image*__ - image to deploy the node from (a.k.a template). This property
 is of string type and it is required. An image must be registered within
 provider.
@@ -198,6 +225,10 @@ card:
    1. __*network*__ - name of the network the NIC belongs to. The network must be
    a valid definition in an infrastructures' networks hash. This definition is
    required.
+
+   __IMPORTANT:__ For OpenStack provider, the network name must point to a valid
+   subnet rather than a network name.
+
    2. __*ip*__ - an optional property that defines an IP address in case of
    static IP assignment or a *dhcp* literal if the IP should be assigned by DHCP.
    3. __*set_gateway*__ - an optional boolean property that defines, whether a
@@ -206,12 +237,16 @@ card:
    4. __*virtual_switch*__ - an optional (currently VSphere-specific) property
    that specifies which distributed virtual switch should be used.
 
- __IMPORTANT:__ The current implementation of cloud-init in *fog* and its
- underlying library *rbovirt* does not support DHCP nor multiple NIC
- configurations, hence the cloud-init is applied by DOPv onto the first
- interface which has a static IP in its definition. Please note that there is
- another bug in *rbovirt* that prevents statically defined interface from
- being configured if one of the parameters netmask or gateway is undefined.
+   __IMPORTANT:__ The current implementation of cloud-init in *fog* and its
+   underlying library *rbovirt* does not support DHCP nor multiple NIC
+   configurations, hence the cloud-init is applied by DOPv onto the first
+   interface which has a static IP in its definition. Please note that there is
+   another bug in *rbovirt* that prevents statically defined interface from
+   being configured if one of the parameters netmask or gateway is undefined.
+
+   5. __*floating_network*__ - an optional OpenStack specific property. It is
+   the name of the network that within the __floating__ IP is created and
+   associated with the given interface.
 
  7. __*disks*__ - an optional property to list additional disks that should
  persist accross deployments. It is of array type. A persistant disk itself
@@ -297,76 +332,82 @@ nodes:
       affinity_groups:
         - clu-lab1ch-ag_1
         - clu-lab1ch-ag_3
-      keep_ha: true
+      keep_ha: false
       datacenter: lab1ch
       cluster: clu-lab1ch
       default_pool: ssd_pool1
+      full_clone: false
     image: rhel6cloudinit
     interfaces:
       eth0:
-        network: dhcp
-  credentials:
-    root_password: a_password
-    root_ssh_keys:
-      - OpenSSH key 1
-      - OpenSSH key 2
+        network: management
+		  ip: dhcp
+    credentials:
+      root_password: a_password
+      root_ssh_keys:
+        - OpenSSH key 1
+        - OpenSSH key 2
 
-    mssql01_mgt01:
-      fqdn: mssql01.example.com
-      infrastructure: management
-      infrastructure_properties:
-        keep_ha: true
-      image: win12r1_64
+  mssql01_mgt01:
+    fqdn: mssql01.example.com
+    infrastructure: management
+    infrastructure_properties:
+      datacenter: lab1ch
+      cluster: clu-lab1ch
+      keep_ha: true
+    image: win12r1_64
     cores: 6
     memory: 64G
     storage: 128G
-      interfaces:
-        eth0:
-          network: rhevm
-          ip: 192.168.254.13
-      disks:
-        - name: db1
-          pool: storage_pool3
-          size: 256G
-      credentials:
-        root_password: a_password
+    interfaces:
+      eth0:
+        network: management
+        ip: 192.168.254.13
+    disks:
+      - name: db1
+        pool: storage_pool3
+        size: 256G
+		thin: false
+    credentials:
+      root_password: a_password
 
   mysql01.example.com:
     infrastructure: lamp
     infrastructure_properties:
-      keep_ha: true
+      tenant: lamp01
     image: rhel6cloudinit
     flavor: medium
     interfaces:
       eth0:
-        network: management
+        network: management-subnet
         ip: 192.168.253.25
       eth1:
-        network: production
-        ip: 192.168.1.102
-    set_gateway: false
+        network: production-subnet
+        ip: 192.168.2.102
+		floating_network: ext-net0
     disks:
       - name: rdo
         pool: storage_pool1
         size: 4000M
       - name: db1
-        pool: storage_pool1
         size: 20G
 
   mssql01.example.com:
-    infrastructure: vsphere
+    infrastructure: db
     infrastructure_properties:
-      keep_ha: true
+      dest_folder: sql
+	  datacenter: dc01
+      cluster: cl01
     image: w12r2
     flavor: medium
     interfaces:
       eth0:
         network: management
-        ip: 192.168.253.33
+        ip: 192.168.252.33
+		set_gateway: false
       eth1:
-        network: production
-        ip: 192.168.1.109
-    set_gateway: false
+        network: db
+        ip: 192.168.3.109
     disks:
       - name: rdo
         pool: storage_pool3
@@ -382,18 +423,19 @@ nodes:
   web01.example.com:
     infrastructure: lamp
     infrastructure_properties:
-      keep_ha: false
+      tenant: lamp01
     datacenter: lab1ch
     cluster: clu-lab1ch
     image: rhel6
     flavor: small
     interfaces:
       eth0:
-        network: management
+        network: management-subnet
         ip: 192.168.253.26
       eth1:
-        network: production
+        network: production-subnet
         ip: dhcp
+		floating_network: ext-net0
 ```
 
 
