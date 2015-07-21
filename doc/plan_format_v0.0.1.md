@@ -219,7 +219,7 @@ a property name is actually a keyword of node hash.
    6. __*tenant*__ property specifies the name of the tenant for OpenStack
    infrastructures. It is required for OpenStack infrastructures.
 
- __IMPORTANT__: *Infrastructure properties may differ accross different
+ __IMPORTANT__: *Infrastructure properties may differ across different
  provider types.*
 
  __NOTE__: *This property is not required for baremetal infrastructures.*
@@ -258,19 +258,21 @@ a property name is actually a keyword of node hash.
 
    2. __*ip*__ - a property that defines an IP address in case of static IP
    assignment or a *dhcp* literal if the IP should be assigned by DHCP.
-   3. __*set_gateway*__ - an optional boolean property that defines, whether a
-   gateway should be defined for a given interface during guest customization.
-   It is `true` by default.
-   4. __*virtual_switch*__ - an optional (currently VSphere-specific) property
-   that specifies which distributed virtual switch should be used.
 
-      __IMPORTANT:__ The current implementation of cloud-init in *fog* and its
+	  __IMPORTANT:__ The current implementation of cloud-init in *fog* and its
 	  underlying library *rbovirt* does not support DHCP nor multiple NIC
 	  configurations, hence the cloud-init is applied by DOPv onto the first
 	  interface which has a static IP in its definition. Please note that there
 	  is another bug in *rbovirt* that prevents statically defined interface
 	  from being configured if one of the parameters netmask or gateway is
 	  undefined.
+
+   3. __*set_gateway*__ - an optional boolean property that defines, whether a
+   gateway should be defined for a given interface during guest customization.
+   It is `true` by default.
+
+   4. __*virtual_switch*__ - an optional (currently VSphere-specific) property
+   that specifies which distributed virtual switch should be used.
 
    5. __*floating_network*__ - an optional OpenStack specific property. It is
    the name of the network that within the __floating__ IP is created and
@@ -293,7 +295,7 @@ a property name is actually a keyword of node hash.
  __IMPORTANT:__ *Currently, the selection of provisioning type is honored only
  by RHEVm/OVirt provider. Please also note that a thick-provisioned disk
  within OVirt/RHEVm is of __raw__ rather than __cow__ type. As a consequence, it
- is not possible to create a snapshot of such a disk.
+ is not possible to create a snapshot of such a disk.*
 
  __NOTE__: *This property is not required for baremetal infrastructures.*
 
