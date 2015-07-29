@@ -76,4 +76,28 @@ describe DopCommon::Plan do
     end
   end
 
+  describe '#credentials' do
+    it 'will return an empty Hash of credentials if nothing is specified' do
+      plan = DopCommon::Plan.new({})
+      expect(plan.credentials).to eq({})
+    end
+    it 'will return a Hash of credentials if correctly specified' do
+      plan = DopCommon::Plan.new({:credentials => {'test' => {
+        :type     => :username_password,
+        :username => 'a',
+        :password => 'b'
+      }}})
+      expect(plan.credentials.key?('test')).to be true
+      expect(plan.credentials['test']).to be_a ::DopCommon::Credential
+    end
+    it 'will raise an exception if the the key is not valid' do
+      plan = DopCommon::Plan.new({:credentials => {2 => {}}})
+      expect{plan.credentials}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an exception if the value is not a hash' do
+      plan = DopCommon::Plan.new({:credentials => {'test' => 2}})
+      expect{plan.credentials}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
 end

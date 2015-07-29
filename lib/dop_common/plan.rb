@@ -23,9 +23,11 @@ module DopCommon
       log_validation_method('nodes_valid?')
       log_validation_method('steps_valid?')
       log_validation_method('configuration_valid?')
+      log_validation_method('credentials_valid?')
       try_validate_obj("Plan: Can't validate the infrastructures part because of a previous error"){infrastructures}
       try_validate_obj("Plan: Can't validate the nodes part because of a previous error"){nodes}
       try_validate_obj("Plan: Can't validate the steps part because of a previous error"){steps}
+      try_validate_obj("Plan: Can't validate the credentials part because of a previous error"){credentials}
     end
 
     def name
@@ -52,6 +54,11 @@ module DopCommon
       @configuration ||= configuration_valid? ?
         DopCommon::Configuration.new(@hash[:configuration]) :
         DopCommon::Configuration.new({})
+    end
+
+    def credentials
+      @credentials ||= credentials_valid? ?
+        create_credentials : {}
     end
 
     def find_node(name)
@@ -122,7 +129,23 @@ module DopCommon
     def configuration_valid?
       return false if @hash[:configuration].nil? # configuration hash is optional
       @hash[:configuration].kind_of? Hash or
-        raise PlanParsingError, 'Plan: configuration key has not a hash as value'
+        raise PlanParsingError, "Plan: 'configuration' key has not a hash as value"
+    end
+
+    def credentials_valid?
+      return false if @hash[:credentials].nil? # credentials hash is optional
+      @hash[:credentials].kind_of? Hash or
+        raise PlanParsingError, "Plan: 'credentials' key has not a hash as value"
+      @hash[:credentials].keys.all?{|k| k.kind_of?(String) or k.kind_of?(Symbol)} or
+        raise PlanParsingError, "Plan: all keys in the 'credentials' hash have to be strings or symbols"
+      @hash[:credentials].values.all?{|v| v.kind_of?(Hash)} or
+        raise PlanParsingError, "Plan: all values in the 'credentials' hash have to be hashes"
+    end
+
+    def create_credentials
+      Hash[@hash[:credentials].map do |name, hash|
+        [name, ::DopCommon::Credential.new(name, hash)]
+      end]
     end
 
   end
