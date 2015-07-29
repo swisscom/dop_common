@@ -34,6 +34,11 @@ module DopCommon
             x.validate
             set_not_valid unless x.valid?
           end
+        elsif obj.kind_of?(Hash)
+          obj.each_value do |x|
+            x.validate
+            set_not_valid unless x.valid?
+          end
         else
           obj.validate
           set_not_valid unless obj.valid?
