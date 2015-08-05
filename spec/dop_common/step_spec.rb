@@ -91,5 +91,83 @@ describe DopCommon::Step do
     end
   end
 
+  describe '#set_plugin_defaults' do
+    it 'returns an Array if correctly specified (normal plugin string)' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => [{ :plugin => 'ssh/custom', :credentials => 'my_cred'}]})
+      expect(step.set_plugin_defaults).to eq([{:plugins => ['ssh/custom'], :credentials => 'my_cred'}])
+    end
+    it 'returns an Array if correctly specified (plugins :all)' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => [{ :plugins => :all, :credentials => 'my_cred'}]})
+      expect(step.set_plugin_defaults).to eq([{:plugins => :all, :credentials => 'my_cred'}])
+    end
+    it 'returns an Array if correctly specified (plugins array)' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => [{ :plugins => ['ssh/custom', 'ssh/something'], :credentials => 'my_cred'}]})
+      expect(step.set_plugin_defaults).to eq([{:plugins => ['ssh/custom', 'ssh/something'], :credentials => 'my_cred'}])
+    end
+    it 'returns an Array if correctly specified (plugins array)' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => [{ :plugins => '/^ssh/', :credentials => 'my_cred'}]})
+      expect(step.set_plugin_defaults).to eq([{:plugins => [Regexp.new('^ssh')], :credentials => 'my_cred'}])
+    end
+    it 'returns an empty Array if the key is missing' do
+      step = DopCommon::Step.new({:name => 'foo'})
+      expect(step.set_plugin_defaults).to eq([])
+    end
+    it 'throws an exception if the value is something other than an array' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => 1})
+      expect{step.set_plugin_defaults}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'throws an exception if an entry is not a hash' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => [1]})
+      expect{step.set_plugin_defaults}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'throws an exception if no plugins key is present' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => {}})
+      expect{step.set_plugin_defaults}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'throws an exception if the plugins value is not valid' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => {:plugins => 1}})
+      expect{step.set_plugin_defaults}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'throws an exception if the plugins value is an invalid Regexp' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => {:plugins => '/][/'}})
+      expect{step.set_plugin_defaults}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'throws an exception if one of the keys is not a string or symbol' do
+      step = DopCommon::Step.new({:name => 'foo', :set_plugin_defaults => {:plugins => 'ssh/custom', 1 => 2}})
+      expect{step.set_plugin_defaults}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
+  describe '#delete_plugin_defaults' do
+    it 'returns an Array if correctly specified (normal plugin string)' do
+      step = DopCommon::Step.new({:name => 'foo', :delete_plugin_defaults => [{:plugin => 'ssh/custom', :delete_keys => ['credentials']}]})
+      expect(step.delete_plugin_defaults).to eq([{:plugins => ['ssh/custom'], :delete_keys => ['credentials']}])
+    end
+    it 'returns an Array if correctly specified (singular)' do
+      step = DopCommon::Step.new({:name => 'foo', :delete_plugin_defaults => [{:plugin => 'ssh/custom', :delete_key => 'credentials'}]})
+      expect(step.delete_plugin_defaults).to eq([{:plugins => ['ssh/custom'], :delete_keys => ['credentials']}])
+    end
+    it 'returns an Array if correctly specified (delete all for plugin)' do
+      step = DopCommon::Step.new({:name => 'foo', :delete_plugin_defaults => [{:plugin => 'ssh/custom', :delete_keys => :all}]})
+      expect(step.delete_plugin_defaults).to eq([{:plugins => ['ssh/custom'], :delete_keys => :all}])
+    end
+    it 'returns :all if correctly specified (delete all)' do
+      step = DopCommon::Step.new({:name => 'foo', :delete_plugin_defaults => :all})
+      expect(step.delete_plugin_defaults).to eq(:all)
+    end
+    it 'returns an empty Array if the key is missing' do
+      step = DopCommon::Step.new({:name => 'foo'})
+      expect(step.delete_plugin_defaults).to eq([])
+    end
+    it 'throws an exception if the delete_keys is invalid' do
+      step = DopCommon::Step.new({:name => 'foo', :delete_plugin_defaults => [{:plugin => 'ssh/custom', :delete_keys => 2}]})
+      expect{step.delete_plugin_defaults}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'throws an exception if an element in delete_keys is invalid' do
+      step = DopCommon::Step.new({:name => 'foo', :delete_plugin_defaults => [{:plugin => 'ssh/custom', :delete_keys => ['foo', 2]}]})
+      expect{step.delete_plugin_defaults}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
 end
 
