@@ -46,8 +46,9 @@ module DopCommon
         raise PlanParsingError, 'Plan: max_in_flight has to be greater than -1'
     end
 
+    ### START DEPRICATED KEY PARSING ssh_root_pass
     def ssh_root_pass_valid?
-      ### START DEPRICATED KEY PARSING plan => max_root_pass
+      ### START DEPRICATED KEY PARSING plan => ssh_root_pass
       if @hash[:ssh_root_pass].nil? # ssh_root_pass is optional
         return false if @hash[:plan].nil? # plan hash is optional
         return false if @hash[:plan][:ssh_root_pass].nil? # ssh_root_pass is optional
@@ -58,7 +59,10 @@ module DopCommon
       return false if @hash[:ssh_root_pass].nil? # ssh_root_pass is optional
       @hash[:ssh_root_pass].kind_of?(String) or
         raise PlanParsingError, 'Plan: ssh_root_pass has to be a string'
+      DopCommon.log.warn("'ssh_root_pass' is depricated. Please use the 'credentials' hash to specify your login credentials")
+      true
     end
+    ### END DEPRICATED KEY PARSING
 
     def canary_host_valid?
       return false if @hash[:canary_host].nil?
