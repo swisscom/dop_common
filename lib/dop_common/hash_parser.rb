@@ -19,7 +19,8 @@ module DopCommon
             "Two or more values found for the same thing. There can only be one of: #{key_list}"
         else
           value = hash[key] = hash.delete(key_alias)
-          DopCommon.log.debug("Key alias found '#{key_alias}', mapping for key #{key}")
+          key_s = key.kind_of?(Symbol) ? ':' + key.to_s : key
+          DopCommon.log.debug("Key alias found '#{key_alias}', mapping for key #{key_s}")
         end
       end
     end
