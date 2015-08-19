@@ -573,6 +573,67 @@ This can either be one or a list of nodes and/or Regex patterns or the keyword "
 
 If an entry starts and ends with a '/' DOPi will interpret the string as a regular expression.
 
+### set_plugin_defaults
+
+(This will be in DOPi >= 0.4)
+
+With "set_plugin_defaults" it is possible to specify some default values for plugin configuration which will persist over subsequent runs.
+
+The settings are node specific, so they will only be set for the nodes in your step. You can select the plugins for which this applies with
+a list or with regular expressions.
+
+Direct settings in the plugins will always overwrite the defaults.
+
+IMPORTANT: The keys you want to set have to be ruby symbols. This is a current limitation of the way the parser is implemented and may change in the future
+
+Example:
+```yaml
+
+steps:
+  - name: "Set default passwords for Plugins"
+    nodes: all
+    set_plugin_defaults:
+      - plugins: '/^ssh/'
+        :credentials: 'linux_staging_password'
+      - plugins: '/^winrm/'
+        :credentials: 'windows_staging_password'
+      - plugins:
+        - 'ssh/custom'
+        :quiet: false
+
+```
+
+### delete_plugin_defaults
+
+(This will be in DOPi >= 0.4)
+
+There are several possibilities how you can remove plugin settings with "delete_plugin_defaults"
+
+IMPORTANT: The keys you want to set have to be ruby symbols. This is a current limitation of the way the parser is implemented and may change in the future
+
+Example:
+```yaml
+  - name: "Remove some specific defaults for all nodes"
+    nodes: all
+    delete_plugin_defaults:
+      - plugins: '/^ssh/'
+        delete_keys:
+          - :credentials
+          - :timeout
+
+  - name: "Remove all the defaults for the ssh plugins for all nodes in role 'foo'"
+    roles:
+      - foo
+    delete_plugin_defaults:
+      - plugins: '/^ssh/'
+        delete_keys: all
+
+  - name: "Remove all the defaults for all plugins for all nodes"
+    nodes: all
+    delete_plugin_defaults: all
+
+```
+
 ### nodes_by_config
 
 Include nodes to a step by specific configuration values which are resolved over hiera.
