@@ -43,6 +43,10 @@ module DopCommon
       keytab_valid? ? @hash[:keytab] : nil
     end
 
+    def private_key
+      private_key_valid? ? @hash[:private_key] : nil
+    end
+
     def public_key
       public_key_valid? ? @hash[:public_key] : nil
     end
@@ -83,8 +87,10 @@ module DopCommon
     def ssh_key_valid?
       username_valid? or
         raise PlanParsingError, "A username is missing in the credential #{@name} which is of type #{@hash[:type]}"
-      public_key_valid? or
-        raise PlanParsingError, "A public_key is missing in the credential #{@name} which is of type #{@hash[:type]}"
+      private_key_valid? or
+        raise PlanParsingError, "A private_key is missing in the credential #{@name} which is of type #{@hash[:type]}"
+      public_key_valid?
+      true
     end
 
     # Attribute verification, will return false if the attribute is not valid, otherwise raise a PlanParsingError
@@ -129,8 +135,9 @@ module DopCommon
       true
     end
 
-    def keytab_valid?()     credentials_file_valid?(:keytab)     end
-    def public_key_valid?() credentials_file_valid?(:public_key) end
+    def keytab_valid?()      credentials_file_valid?(:keytab)      end
+    def private_key_valid?() credentials_file_valid?(:private_key) end
+    def public_key_valid?()  credentials_file_valid?(:public_key)  end
       
 
     def external_secret_valid?(hash)
