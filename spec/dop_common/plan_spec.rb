@@ -14,13 +14,15 @@ describe DopCommon::Plan do
     it 'will return the correct value if name is defined' do
       plan = DopCommon::Plan.new({:name => 'myplan'})
       expect(plan.name).to eq 'myplan'
+      plan = DopCommon::Plan.new({:name => 'my-plan'})
+      expect(plan.name).to eq 'my-plan'
     end
     it 'will throw and exception if the value is not a String' do
       plan = DopCommon::Plan.new({:name => 2})
       expect{plan.name}.to raise_error DopCommon::PlanParsingError
     end
     it 'will throw and exception if the value contais illegal chars' do
-      plan = DopCommon::Plan.new({:name => 'my-plan'})
+      plan = DopCommon::Plan.new({:name => 'my(plan'})
       expect{plan.name}.to raise_error DopCommon::PlanParsingError
     end
   end
