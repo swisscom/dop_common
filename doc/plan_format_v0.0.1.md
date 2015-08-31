@@ -32,6 +32,8 @@ This option can be overwritten on step level
 
 ### ssh_root_pass (optional)
 
+__*DEPRICATED*__ This method to set an ssh password is depricated in DOPi Version >=0.4 . Please see __*Credentials*__ for more information about how to set it now.
+
 The default password the ssh plugin will use to login on remote hosts if password login is enabled and sshpass is installed. This value can be overwritten via Hiera. DOPi will always try to lookup the variable over Hiera first and use this default if it finds nothing.
 
 ### canary_host (optional)
@@ -41,6 +43,54 @@ The default password the ssh plugin will use to login on remote hosts if passwor
 If this flag is set to true DOPi will randomly choose one host and apply the step in a first round only to this host and only run the others in parallel, once this step succeeded.
 
 This option can be overwritten on step level
+
+## Credentials
+The credentials hash can hold credentials used to login to systems, APIs or to set passwords or keys during setup.
+
+Example:
+```yaml
+credentials:
+ 'linux_staging_login':
+   type: :username_password
+   username: 'root'
+   password: 'foo'
+ 'linux_prod_login':
+   type: :ssh_key
+   private_key: '/home/root/.ssh/id_dsa'
+ 'windows_staging_login':
+   type: :username_password
+   username: 'administrator'
+   password: 'winfoo'
+ 'windows_prod_login':
+   type: :kerberos
+   realm: 'FOOOO'
+```
+
+The various DOPi plugins can use this credentials to login to a node if the type is supported by the plugin.
+It is recommended to use the set_plugin_defaults mechanic to set this credentials so it does not have to be
+specified in every command separately. You can also change this defaults in your steps flow.
+
+The credential types and the fields you can specify are listed here
+
+### username_password
+A simple username password pair.
+
+1. __*username*__ (required)
+2. __*password*__ (required)
+
+### kerberos
+Settings for a kerberos login
+
+1. __*realm*__ (required) - The kerberos realm
+2. __*service*__ (optional) - The service we try to use
+3. __*keytab*__ (optional) - The keytab file to use instead of the default one
+
+### ssh_key
+And SSH key we can use to login
+
+1. __*username*__ (required)
+2. __*private_key*__ (required) - The file where the private key is (smething like /root/.ssh/id_rsa)
+3. __*public_key*__ (optional) - The file where the public key is (smething like /root/.ssh/id_rsa.pub)
 
 ## Infrastructures
 The infrastructures hash holds information about cloud providers. Each entry in
