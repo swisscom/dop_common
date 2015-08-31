@@ -16,7 +16,7 @@ describe DopCommon::Credential do
       expect(credential.type).to eq :kerberos
     end
     it 'returns the type if specified correctly (ssh_key)' do
-      credential = DopCommon::Credential.new('test', {:type => :ssh_key, :username => 'a', :public_key => 'spec/data/fake_keyfile'})
+      credential = DopCommon::Credential.new('test', {:type => :ssh_key, :username => 'a', :private_key => 'spec/data/fake_keyfile'})
       expect(credential.type).to eq :ssh_key
     end
     it 'will raise an exception if the type is missing' do
