@@ -68,5 +68,29 @@ describe DopCommon::Node do
   end
 
 
+  describe '#interfaces' do
+    it 'will return an array of interfaces if specified correctly' do
+      node = DopCommon::Node.new('foo', {:interfaces => {'eth0' => {}, 'eth1' => {}}})
+      expect(node.interfaces.length).to eq 2
+      expect(node.interfaces.first.name).to eq 'eth0'
+    end
+    it 'will return an empty array if interfaces is not specified' do
+      node = DopCommon::Node.new('foo', {})
+      expect(node.interfaces).to eq([])
+    end
+    it 'will raise an error if interfaces is not a hash' do
+      node = DopCommon::Node.new('foo', {:interfaces => 2})
+      expect{node.interfaces}.to raise_error DopCommon::PlanParsingError
+    end
+     it 'will raise an error if a key in interfaces is not a string' do
+      node = DopCommon::Node.new('foo', {:interfaces => {2 => {}}})
+      expect{node.interfaces}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an error if a value in interfaces is not a hash' do
+      node = DopCommon::Node.new('foo', {:interfaces => {'eth0' => 2}})
+      expect{node.interfaces}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
 end
 

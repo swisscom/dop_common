@@ -6,6 +6,7 @@ require "dop_common/shared_options"
 require "dop_common/plan"
 require 'dop_common/infrastructure'
 require 'dop_common/node'
+require 'dop_common/interface'
 require 'dop_common/step'
 require 'dop_common/configuration'
 require 'dop_common/credential'
