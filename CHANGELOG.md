@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.1.0] - 2015-07-31
+### Added
+- Credentials hash parsing (username_password, kerberos, ssh_key)
+- set_plugin_defaults and delete_plugin_defaults parsing
+
+### Changed
+- if ssh_root_pass gets parsed it will output a deprication warning now.
+
 ## [0.0.15] - 2015-07-15
 ### Added
 - node_by_config and exclude patterns (also for node and role) parsing
