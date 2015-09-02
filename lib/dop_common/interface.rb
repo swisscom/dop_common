@@ -5,6 +5,7 @@ require 'ipaddr'
 
 module DopCommon
   class Interface
+    include Validator
 
     attr_reader :name
 
