@@ -16,6 +16,7 @@ module DopCommon
 
     def validate
       log_validation_method('plugin_valid?')
+      log_validation_method('verify_after_run_valid?')
       if @hash.kind_of?(Hash)
         log_validation_method('plugin_timeout_valid?')
         log_validation_method('verify_commands_valid?')
@@ -39,6 +40,10 @@ module DopCommon
 
     def verify_commands
       @verify_commands ||= verify_commands_valid? ? create_verify_commands : []
+    end
+
+    def verify_after_run
+      @verify_after_run ||= verify_after_run_valid? ? @hash[:verify_after_run] : false
     end
 
   private
@@ -89,6 +94,12 @@ module DopCommon
         when Array then @hash[:verify_commands].map {|c| ::DopCommon::Command.new(c)}
         else []
       end
+    end
+
+    def verify_after_run_valid?
+      return false if @hash[:verify_after_run].nil?
+      @hash[:verify_after_run].kind_of?(TrueClass) or @hash[:verify_after_run].kind_of?(FalseClass) or
+        raise PlanParsingError, "The value for 'verify_after_run' must be boolean"
     end
 
   end

@@ -66,5 +66,22 @@ describe DopCommon::Command do
     end
   end
 
+  describe '#verify_after_run' do
+    it 'returns false if verify_after_run is not defined' do
+      command = DopCommon::Command.new({})
+      expect(command.verify_after_run).to be false
+    end
+    it 'returns the correct value if set correctly' do
+      command = DopCommon::Command.new({:verify_after_run => true})
+      expect(command.verify_after_run).to be true
+      command = DopCommon::Command.new({:verify_after_run => false})
+      expect(command.verify_after_run).to be false
+    end
+    it 'raises an exeption if the value is not valid' do
+      command = DopCommon::Command.new({:verify_after_run => 2})
+      expect{command.verify_after_run}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
 end
 
