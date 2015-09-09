@@ -26,5 +26,25 @@ module DopCommon
     end
     module_function :key_aliases
 
+    def symbolize_keys(hash)
+      Hash[hash.map { |k, v| [k.to_sym, v] }]
+    end
+    module_function :symbolize_keys
+
+    def deep_symbolize_keys(hash)
+      case hash
+      when Hash
+        Hash[
+          hash.map do |k, v|
+          [ k.respond_to?(:to_sym) ? k.to_sym : k, recursive_symbolize_keys(v) ]
+          end
+        ]
+      when Enumerable
+        hash.map { |v| recursive_symbolize_keys(v) }
+      else
+        hash
+      end
+    end
+    module_function :deep_symbolize_keys
   end
 end
