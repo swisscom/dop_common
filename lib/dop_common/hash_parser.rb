@@ -36,11 +36,11 @@ module DopCommon
       when Hash
         Hash[
           hash.map do |k, v|
-          [ k.respond_to?(:to_sym) ? k.to_sym : k, recursive_symbolize_keys(v) ]
+          [ k.respond_to?(:to_sym) ? k.to_sym : k, deep_symbolize_keys(v) ]
           end
         ]
       when Enumerable
-        hash.map { |v| recursive_symbolize_keys(v) }
+        hash.map { |v| deep_symbolize_keys(v) }
       else
         hash
       end
