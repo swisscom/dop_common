@@ -97,6 +97,7 @@ module DopCommon
     end
 
     def verify_after_run_valid?
+      return false unless @hash.kind_of?(Hash)
       return false if @hash[:verify_after_run].nil?
       @hash[:verify_after_run].kind_of?(TrueClass) or @hash[:verify_after_run].kind_of?(FalseClass) or
         raise PlanParsingError, "The value for 'verify_after_run' must be boolean"
