@@ -64,9 +64,9 @@ describe DopCommon::Plan do
   end
 
   describe '#steps' do
-    it 'will throw and exception if the steps key is not defined' do
+    it 'will return empty array if the steps key is not defined' do
       plan = DopCommon::Plan.new({})
-      expect{plan.steps}.to raise_error DopCommon::PlanParsingError
+      expect(plan.steps).to eq([])
     end
     it 'will throw and exception if the value is not an Array' do
       plan = DopCommon::Plan.new({:steps => 'foo'})

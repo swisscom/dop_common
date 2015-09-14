@@ -48,7 +48,7 @@ module DopCommon
 
     def steps
       @steps ||= steps_valid? ?
-        create_steps : nil
+        create_steps : []
     end
 
     def configuration
@@ -115,6 +115,7 @@ module DopCommon
     end
 
     def steps_valid?
+      return false if @hash[:steps].nil? ## steps can be nil for DOPv only plans
       @hash[:steps] or
         raise PlanParsingError, 'Plan: steps hash is missing'
       @hash[:steps].kind_of? Array or
