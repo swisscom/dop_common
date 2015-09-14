@@ -27,7 +27,7 @@ module DopCommon
     module_function :key_aliases
 
     def symbolize_keys(hash)
-      Hash[hash.map { |k, v| [k.to_sym, v] }]
+      Hash[hash.map { |k, v| [k.to_sym, v] }] if hash.kind_of?(Hash)
     end
     module_function :symbolize_keys
 
