@@ -36,14 +36,14 @@ module DopCommon
       IPAddr.new(@hash[:ip_netmask])
       true
     rescue ArgumentError => e
-      raise "Network #{@name}: Invalid network mask definition"
+      raise PlanParsingError, "Network #{@name}: Invalid network mask definition"
     end
     
     def ip_defgw_valid?
       IPAddr.new(@hash[:ip_defgw])
       true
     rescue ArgumentError => e
-      raise "Network #{@name}: Invalid default gateway definition"
+      raise PlanParsingError, "Network #{@name}: Invalid default gateway definition"
     end
 
     def ip_pool_valid?
