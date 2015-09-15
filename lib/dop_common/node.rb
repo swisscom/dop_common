@@ -11,10 +11,10 @@ module DopCommon
 
     DEFAULT_DIGITS = 2
 
-    def initialize(name, hash, infrastructures)
+    def initialize(name, hash)
       @name = name
       @hash = hash.kind_of?(Hash) ? symbolize_keys(hash) : hash
-      @infrastructures = infrastructures
+      @infrastructures = @hash[:infrastructures]
     end
 
     def validate
