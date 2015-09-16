@@ -11,7 +11,10 @@ module DopCommon
     include Validator
     include SharedOptions
 
+    attr_reader :version
+
     def initialize(hash)
+      @version = DopCommon::VERSION
       # fix hash key names (convert them to symbols)
       @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]
       @hash[:plan] = Hash[@hash[:plan].map{|k,v| [k.to_sym, v]}] if @hash[:plan]
