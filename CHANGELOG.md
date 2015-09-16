@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.2.0] - 2015-08-16
+### Added
+- Basic interface hash parsing in node
+- Parsing for generic command plugin option 'verify_after_run'
+
+### Changed
+- Allow dashes in plan names
+
 ## [0.1.0] - 2015-07-31
 ### Added
 - Credentials hash parsing (username_password, kerberos, ssh_key)
