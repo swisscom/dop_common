@@ -19,15 +19,15 @@ module DopCommon
     end
 
     def positive
-      @positive ||= positive_valid? ? hash[:positive] : nil
+      @positive ||= positive_valid? ? @hash[:positive] : nil
     end
     
     def enforce
-      @enforce ||= enforce_valid? ? hash[:enforce] : nil
+      @enforce ||= enforce_valid? ? @hash[:enforce] : nil
     end
     
     def cluster
-      @ip_pool ||= cluster_valid? ? hash[:cluster] : nil
+      @ip_pool ||= cluster_valid? ? @hash[:cluster] : nil
     end
 
     private
