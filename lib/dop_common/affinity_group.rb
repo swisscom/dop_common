@@ -21,10 +21,12 @@ module DopCommon
     def positive
       @positive ||= positive_valid? ? @hash[:positive] : nil
     end
+    alias_method :positive?, :positive
     
     def enforce
       @enforce ||= enforce_valid? ? @hash[:enforce] : nil
     end
+    alias_method :enforced?, :enforce
     
     def cluster
       @ip_pool ||= cluster_valid? ? @hash[:cluster] : nil
