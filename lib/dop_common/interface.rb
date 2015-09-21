@@ -29,6 +29,7 @@ module DopCommon
         raise PlanParsingError, "Interface #{@name}: 'ip' has to be specified as a valid IP String or :dhcp"
       case @hash[:ip]
       when :dhcp, 'dhcp' then @hash[:ip] = :dhcp
+      when :none, 'none' then @hash[:ip] = :none
       else IPAddr.new(@hash[:ip])
       end
     rescue ArgumentError => e

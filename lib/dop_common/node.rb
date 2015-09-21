@@ -5,6 +5,7 @@
 module DopCommon
   class Node
     include Validator
+    include HashParser
 
     attr_reader :name
 
@@ -12,12 +13,14 @@ module DopCommon
 
     def initialize(name, hash)
       @name = name
-      @hash = hash.kind_of?(Hash) ? Hash[hash.map{|k,v| [k.to_sym, v]}] : hash
+      @hash = hash.kind_of?(Hash) ? symbolize_keys(hash) : hash
+      @infrastructures = @hash[:infrastructures]
     end
 
     def validate
       log_validation_method('digits_valid?')
       log_validation_method('range_valid?')
+      log_validation_method('infrastructure_valid?')
       log_validation_method('interfaces_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
     end
@@ -48,6 +51,10 @@ module DopCommon
 
     def interfaces
       @interfaces ||= interfaces_valid? ? create_interfaces : []
+    end
+
+    def infrastructure
+      @infrastructure ||= infrastructure_valid? ? create_infrastructure : nil
     end
 
   protected
@@ -91,11 +98,21 @@ module DopCommon
         raise PlanParsingError, "Node #{@name}: The values in the 'interface' hash have to be hashes"
     end
 
+    def infrastructure_valid?
+      @hash[:infrastructure].kind_of?(String) or
+        raise PlanParsingError, "Node #{@name}: The value of 'infrastructure' must be a string"
+      @infrastructures.find { |i| i.name == @hash[:infrastructure] } or
+        raise PlanParsingError, "Node #{@name}: No such infrastructure"
+    end
+
     def create_interfaces
       @hash[:interfaces].map do |interface_name, interface_hash|
         DopCommon::Interface.new(interface_name, interface_hash)
       end
     end
 
+    def create_infrastructure
+      @infrastructures.find { |i| i.name == @hash[:infrastructure] }
+    end
   end
 end

@@ -10,11 +10,12 @@ module DopCommon
   class Plan
     include Validator
     include SharedOptions
+    include HashParser
 
     def initialize(hash)
       # fix hash key names (convert them to symbols)
-      @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]
-      @hash[:plan] = Hash[@hash[:plan].map{|k,v| [k.to_sym, v]}] if @hash[:plan]
+      @hash = symbolize_keys(hash)
+      @hash[:plan] = symbolize_keys(@hash[:plan]) if @hash[:plan]
     end
 
     def validate
@@ -104,7 +105,7 @@ module DopCommon
 
     def parsed_nodes
       @parsed_nodes ||= @hash[:nodes].map do |name, hash|
-        ::DopCommon::Node.new(name.to_s, hash)
+        ::DopCommon::Node.new(name.to_s, hash.merge(:infrastructures => infrastructures))
       end
     end
 

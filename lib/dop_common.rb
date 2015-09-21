@@ -5,6 +5,8 @@ require "dop_common/hash_parser"
 require "dop_common/shared_options"
 require "dop_common/plan"
 require 'dop_common/infrastructure'
+require 'dop_common/network'
+require 'dop_common/affinity_group'
 require 'dop_common/node'
 require 'dop_common/interface'
 require 'dop_common/step'

@@ -44,7 +44,7 @@ describe DopCommon::Plan do
 
   describe '#nodes' do
     it 'will return a list of nodes' do
-      plan = DopCommon::Plan.new({:nodes => {'mynode{i}.example.com' =>{:range  => '1..10', :digits => 3}}})
+      plan = DopCommon::Plan.new({:infrastructures => {:management => {}}, :nodes => {'mynode{i}.example.com' =>{:range  => '1..10', :digits => 3}}})
       expect(plan.nodes.length).to be 10
       expect(plan.nodes[0].name).to eq 'mynode001.example.com'
       expect(plan.nodes[9].name).to eq 'mynode010.example.com'
