@@ -46,5 +46,100 @@ module DopCommon
       end
     end
     module_function :deep_symbolize_keys
+
+    # This method will retrun true if the String in 'value' starts and
+    # ends with /, which means it represents a regexp
+    def represents_regexp?(value)
+      value[/^\/(.*)\/$/, 1] ? true : false
+    end
+    module_function :represents_regexp?
+
+    # This method will return true if the string in 'value' represents
+    # a regex and if it is possible to create a regexp object
+    def is_valid_regexp?(value)
+      return false unless represents_regexp?(value)
+      Regexp.new(value[/^\/(.*)\/$/, 1])
+      true
+    rescue
+      false
+    end
+    module_function :is_valid_regexp?
+
+    # This method takes a hash and a key. It will then validate the
+    # pattern list in the value of that key.
+    #
+    # Examples (Simple String/Regexp):
+    #
+    # hash = { :key => 'my_node'}
+    # hash = { :key => '/my_node/'}
+    #
+    # Examples (Array of Strings, Regexps):
+    #
+    # hash = { :key => [ 'my_node', '/my_node/' ] }
+    #
+    def pattern_list_valid?(hash, key, optional = true)
+      return false if hash[key].nil? && optional
+      [Array, String, Symbol].include? hash[key].class or
+        raise PlanParsingError, "The value for '#{key}' has to be a string, an array or a symbol."
+      [hash[key]].flatten.each do |pattern| 
+        [String, Symbol].include? pattern.class or
+          raise PlanParsingError, "The pattern #{pattern} in '#{key}' is not a symbol or string."
+        if HashParser.represents_regexp?(pattern)
+          HashParser.is_valid_regexp?(pattern) or
+            raise PlanParsingError, "The pattern #{pattern} in '#{key}' is not a valid regular expression."
+        end
+      end
+      true
+    end
+    module_function :pattern_list_valid?
+
+    # This method takes a hash where all the values are pattern lists
+    # and checks if they are valid.
+    #
+    # Example:
+    #
+    # hash = {
+    #   :key => { 
+    #     'list_1' => [ 'my_node', '/my_node/' ],
+    #     'list_2' => '/my_node'/
+    #   }
+    # }
+    #
+    def hash_of_pattern_lists_valid?(hash, key, optional = true )
+      return false if hash[key].nil? && optional
+      hash[key].kind_of?(Hash) or
+        raise PlanParsingError, "The value for '#{key}' has to be a Hash"
+      hash[key].each_key do |list_name|
+        list_name.kind_of?(String) or
+          raise PlanParsingError, "The key '#{list_name.to_s}' in '#{key}' has to be a String"
+        HashParser.pattern_list_valid?(hash[key], list_name)
+      end
+      true
+    end
+    module_function :hash_of_pattern_lists_valid?
+
+    # This method will parse a valid pattern list and replace regexp
+    # strings with Regexp objects.
+    def parse_pattern_list(hash, key)
+      case hash[key]
+      when 'all', 'All', 'ALL', :all then :all
+      else
+        patterns = [hash[key]].flatten.compact
+        patterns.map do |pattern|
+          HashParser.represents_regexp?(pattern) ? Regexp.new(pattern[/^\/(.*)\/$/, 1]) : pattern
+        end
+      end
+    end
+    module_function :parse_pattern_list
+
+    # This method will parse a hash of pattern lists and replace the
+    # regexp strings with Regexp objects
+    def parse_hash_of_pattern_lists(hash, key)
+      Hash[hash[key].map do |list_name, pattern_list|
+        [list_name, parse_pattern_list(hash[key], list_name)]
+      end]
+    end
+    module_function :parse_hash_of_pattern_lists
+
   end
 end
