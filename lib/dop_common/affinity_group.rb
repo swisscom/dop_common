@@ -22,12 +22,12 @@ module DopCommon
       @positive ||= positive_valid? ? @hash[:positive] : nil
     end
     alias_method :positive?, :positive
-    
+
     def enforce
       @enforce ||= enforce_valid? ? @hash[:enforce] : nil
     end
     alias_method :enforced?, :enforce
-    
+
     def cluster
       @ip_pool ||= cluster_valid? ? @hash[:cluster] : nil
     end
@@ -45,7 +45,7 @@ module DopCommon
     end
 
     def cluster_valid?
-      @hash[:cluster].kind_of?(String) or 
+      @hash[:cluster].kind_of?(String) or
         raise PlanParsingError, "Affinity group #{@name}: cluster must be a string"
     end
   end
