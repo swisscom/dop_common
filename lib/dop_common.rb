@@ -16,5 +16,12 @@ require 'dop_common/command'
 require 'dop_common/plan_cache'
 
 module DopCommon
-  # Your code goes here...
+  PROVIDER_CLASSES = {
+    :ovirt      => 'Ovirt',
+    :rhev       => 'Ovirt',
+    :openstack  => 'OpenStack',
+    :vsphere    => 'Vspehere',
+    :vmware     => 'Vspehere',
+    :vsphere    => 'Vspehere'
+  }
 end
