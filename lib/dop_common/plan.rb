@@ -90,7 +90,7 @@ module DopCommon
 
     def create_infrastructures
       @hash[:infrastructures].map do |name, hash|
-        ::DopCommon::Infrastructure.new(name, hash)
+        ::DopCommon::Infrastructure.new(name, hash.merge(:parsed_credentials => credentials))
       end
     end
 
@@ -101,11 +101,13 @@ module DopCommon
         raise PlanParsingError, 'Plan: nodes key has not a hash as value'
       @hash[:nodes].any? or
         raise PlanParsingError, 'Plan: nodes hash is empty'
+      @hash[:nodes].values.all? { |n| n.kind_of?(Hash) } or
+        raise PlanParsingError, 'Plan: nodes must be of hash type'
     end
 
     def parsed_nodes
       @parsed_nodes ||= @hash[:nodes].map do |name, hash|
-        ::DopCommon::Node.new(name.to_s, hash.merge(:infrastructures => infrastructures))
+        ::DopCommon::Node.new(name.to_s, hash.merge(:parsed_infrastructures => infrastructures))
       end
     end
 
