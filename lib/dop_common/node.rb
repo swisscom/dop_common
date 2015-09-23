@@ -13,8 +13,8 @@ module DopCommon
 
     def initialize(name, hash)
       @name = name
-      @hash = hash.kind_of?(Hash) ? symbolize_keys(hash) : hash
-      @infrastructures = @hash[:infrastructures]
+      @hash = symbolize_keys(hash)
+      @parsed_infrastructures = @hash[:parsed_infrastructures]
     end
 
     def validate
@@ -100,8 +100,8 @@ module DopCommon
 
     def infrastructure_valid?
       @hash[:infrastructure].kind_of?(String) or
-        raise PlanParsingError, "Node #{@name}: The value of 'infrastructure' must be a string"
-      @infrastructures.find { |i| i.name == @hash[:infrastructure] } or
+        raise PlanParsingError, "Node #{@name}: The 'infrastructure' pointer must be a string"
+      @parsed_infrastructures.find { |i| i.name == @hash[:infrastructure] } or
         raise PlanParsingError, "Node #{@name}: No such infrastructure"
     end
 
@@ -112,7 +112,7 @@ module DopCommon
     end
 
     def create_infrastructure
-      @infrastructures.find { |i| i.name == @hash[:infrastructure] }
+      @parsed_infrastructures.find { |i| i.name == @hash[:infrastructure] }
     end
   end
 end
