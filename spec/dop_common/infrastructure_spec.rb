@@ -6,16 +6,16 @@ describe DopCommon::Infrastructure do
     DopCommon.log.level = ::Logger::ERROR
   end
 
-  describe '#type' do
-    it 'will set and return the type of infrastructure if specified correctly' do
+  describe '#provider' do
+    it 'will set and return the infrastructure type of infrastructure if specified correctly' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
-      expect(infrastructure.type).to eq(:rhev)
+      expect(infrastructure.provider).to eq(:rhev)
     end
     it 'will raise an error if the type is unspecified and/or invalid' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {})
-      expect { infrastructure.type }.to raise_error ::DopCommon::PlanParsingError
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => {:invalid => 'invalid'}})
-      expect { infrastructure.type }.to raise_error ::DopCommon::PlanParsingError
+      expect { infrastructure.provider }.to raise_error ::DopCommon::PlanParsingError
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'invalid'})
+      expect { infrastructure.provider }.to raise_error ::DopCommon::PlanParsingError
     end
   end
 
