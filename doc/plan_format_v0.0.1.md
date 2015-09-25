@@ -66,7 +66,7 @@ credentials:
    realm: 'FOOOO'
 ```
 
-The various DOPi plugins can use this credentials to login to a node if the type is supported by the plugin.
+The various DOPi plugins can use these credentials to login to a node if the type is supported by the plugin.
 It is recommended to use the set_plugin_defaults mechanic to set this credentials so it does not have to be
 specified in every command separately. You can also change this defaults in your steps flow.
 
@@ -96,32 +96,38 @@ And SSH key we can use to login
 The infrastructures hash holds information about cloud providers. Each entry in
 an infrastructures hash describes a certain infrastructure or cloud if you want.
 It is of hash type. Following is a list of keys:
- 1. __*type*__ - is the type of the infrastructure provider. Its value must be
-one of the following strings: *baremetal*, *ovirt*, *rhev*, *openstack*,
-*vsphere*, *vmware* and *baremetal*.
-Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and
-*vmware*. This is a required key.
- 2. __*endpoint*__ - is an URL that is an entry point for API calls. This is
- required.
- 3. __*credentials*__ - A credential hash. It consists of:
-    1. __*username*__ - Specifies the user name that is used to
-	log in.
-    2. __*password*__ - A password that is used to log in. In OpenStack-based
-	infrastructures a password might be called *apikey*. Please use its value
-	for the  __*password*__.
-    3. __*provider_pubkey_hash*__ - An optional property used in VSphere-based
-	infrastructures. Its value should be a fingerprint of the API endpoint's
-	public key, although DOPv is able to fetch the key and validate it
-	automatically if this option is omitted.
- 4. __*networks*__ - provides networks definition hashes. Each network definition
-is hashed by its name that can be an arbitrary string or symbol. Please refer to
-network subsection for further details.
+ 1. __*type*__ - is the type of the infrastructure provider. It is a reuired
+	propertu. The infrastructure provider type can be specified by following values:
+    - *baremetal*,
+	- *ovirt* or *rhev*,
+	- *openstack*,
+	- *vsphere* or *vmware*.
+    Please note that *rhev* and *ovirt* are synonyms and so are *vsphere* and *vmware*.
+ 2. __*endpoint*__ - is an URL that is an entry point for API calls.
+ 
+    __IMPORTANT__: This property is required unless the provider type is *baremetal*.
+ 
+ 3. __*credentials*__ - A pointer to an entry in credentials hash. Please refer
+   to credentials section above for further for further information.
+
+	__IMPORTANT__: Currently, only one credentials provider is required and
+	supported for infrastructure. The credentials must be of
+	__*username_password*__ type.
+
+	__IMPORTANT__: This property is required unless the provider type is *baremetal*.
+ 
+ 4. __*networks*__ - provides networks definition hashes. Each network
+    definition is hashed by its name that can be an arbitrary string or symbol.
+	Please refer to network subsection for further details.
+
+	__IMPORTANT__: This property is required unless the provider type is *baremetal*.
+ 
  5. __*affinity_groups*__ - provides affinity groups definition hashes. Each
-affinity group definition itself is a hash. Affinity groups may be provider
-specific. For instance, OVirt/RHEVm infrastructure must define __*name*__,
-__*cluster*__, __*positive*__ and __*enforced*__ properties. Plese note that
-some providers may not have affinities implemented, hence this feature is
-optional in deployment plan.
+ 	affinity group definition itself is a hash. Affinity groups may be provider
+	specific. For instance, OVirt/RHEVm infrastructure must define __*name*__,
+	__*cluster*__, __*positive*__ and __*enforced*__ properties. Please note
+	that some providers may not have affinities implemented, hence this feature
+	is optional in deployment plan.
 
 The following snippet is an example infrastructures configuration:
 ```yaml
@@ -139,7 +145,7 @@ infrastructures:
           to: 192.168.254.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.254.254
-	  production:
+    production:
         ip_pool:
           from: 192.168.1.11
           to: 192.168.1.245
@@ -182,7 +188,6 @@ infrastructures:
     credentials:
       username: myuser
       password: mypass
-	  provider_pubkey_hash: e32af...
     networks:
       management:
         ip_pool:
@@ -199,18 +204,18 @@ infrastructures:
 ```
 
 ### Network
-Network hash describes a particular network within a given infrastructure
+The network hash describes a particular network within a given infrastructure
 provider (cloud). Following are the properties of a network hash:
  1. __*ip_pool*__ - a hash of IP addresses which can be assigned to guest VMs.
- The hash must contain __*ip_from*__ and __*ip_to*__ keywords that specify the
- lower and upper bounds of IP addresses that can be assigned statically.
+ 	The hash must contain __*ip_from*__ and __*ip_to*__ keywords that specify
+	the lower and upper bounds of IP addresses that can be assigned statically.
  2. __*ip_netmask*__ - a network mask in octet format.
  3. __*ip_defgw*__ - an IP address of the default gateway of the network. This
-is optional.
+ 	is optional.
 
-__IMPORTANT__: *Please note that network names must refer to sub-network names
+__IMPORTANT__: Please note that network names must refer to sub-network names
 or their identifiers in case of [OpenStack](http://www.openstack.org/) based
-infrastructures.*
+infrastructures.
 
 ## Nodes
 
@@ -222,132 +227,139 @@ key:
 ```yaml
 nodes:
     mysql01.example.com:
-	  ...
+      ...
 	  ...
     ...
 ```
 
-__IMPORTANT__: *The node name must be unique for each deployment. Please keep
-this in mind when combining several deployments into a single deployment file.*
+__IMPORTANT__: The node name must be unique for each deployment. Please keep
+this in mind when combining several deployments into a single deployment file.
 
 ### Node Properties
 Each node configuration is described by a so-called *"node hash"*. The list
 bellow provides an overview of various node properties. Please note that
-a property name is actually a keyword of node hash.
+a property name is actually a keyword of a node hash.
  1. __*fqdn*__ - an optional fully qualified domain name that is used to
  generate the hostname of the guest. If not defined, the hostname is implicitly
  derived from the node name itself (for instance, in case of
  `mgt01.example.com`, the hostname definition would match the node name, i.e.
  `mgt01.example.com`).
 
- __NOTE__: *This property is not required for baremetal infrastructures.*
-
  2. __*infrastructure*__ - a name of the  infrastructure this node is a part of.
  This is a required property and its value must point to a valid entry of
  infrastructures hash.
 
- __NOTE__: *This property is not required for baremetal infrastructures.*
-
  3. __*infrastructure_properties*__ - a hash that specifies various properties
- of a given infrastructure:
-   1.  __*affinity_groups*__ is an optional OVirt/RHEVm-specific property that
-   designates what affinity groups should be specific node associated with.
-   2.  __*keep_ha*__ An optional OVirt/RHEVm-specific boolean property that
-   indicates whether the VM should be highly available or not. By default,
-   instances are set as highly available. If the provider also supports a
-   migration priorities they are set to low by default.
-   3. __*datacenter*__ and __*cluster*__ allows to specify under which cluster in
-   which datacenter should the node be deployed. These properties are specific
-   to OVirt/RHEVm and VSphere infrastructure providers. These properties
-   are required for provider types mentioned previously.
-   4. __*default_pool*__ property specifies the default data storage which is
+ 	of a given node should be deployed with in an infrastructure.
+   
+   1. __*affinity_groups*__ - an optional OVirt/RHEVm-specific property that
+      designates what affinity groups should be a node associated with.
+   
+   2.  __*keep_ha*__ - an optional OVirt/RHEVm-specific boolean property that
+       indicates whether the VM should be highly available or not. By default,
+	   instances are set as highly available. If the provider also supports a
+	   migration priorities they are set to low by default.
+   3. __*datacenter*__ and __*cluster*__ - Specify which datacentr and cluster
+	  should be the node deployed into.
+   
+      __IMPORTANT__: These properties are required for provider OVirt/RHEVm and
+	  VSphere providers. Other providers silently disregard it.
+
+   4. __*default_pool*__ - property specifies the default data storage which is
    used when deploying a guest from the template. It is also used for persistent
    disks that do not specify an explicit __*pool*__. This attribute is optional.
+   
    5. __*dest_folder*__ property defines a destination folder into which the
    guest shall be deployed. This folder must exist before the deployment
    of the guest. This is propery is optional and VSphere-specific.
    6. __*tenant*__ property specifies the name of the tenant for OpenStack
    infrastructures. It is required for OpenStack infrastructures.
 
- __IMPORTANT__: *Infrastructure properties may differ across different
- provider types.*
+   __IMPORTANT__: Infrastructure properties may differ across different
+   provider types.
 
- __NOTE__: *This property is not required for baremetal infrastructures.*
+   __IMPORTANT__: In general, some of infrastructure properties have to be
+   defined for each provider other than *baremetal*.
 
- 4. __*image*__ - image to deploy the node from (a.k.a template). It is a
- required property. An image must be registered within the provider.
+ 4. __*image*__ - an image to deploy the node from (a.k.a template). It is a
+ 	required property. An image must be registered within the provider.
 
- __NOTE__: *This property is not required for baremetal infrastructures.*
+	__IMPORTANT__: This property is required unless the provider type is
+	*baremetal*.
 
- 5. __*full_clone*__ - an optional boolean property that instructs OVirt/RHEVm:
-   1. To provision a node from a template as a full independent clone if set to
-   `true` or unset.
-   2. To provision a node from a template as thin (dependent) clone if set to
-   `false`.
- The default is to provision a fully independent clone.
+ 5. __*full_clone*__ - an optional boolean property that instructs OVirt/RHEVm
+	providers:
+    1. To provision a node from a template as a full independent clone if set to
+	   `true` or unset.
+    2. To provision a node from a template as thin (dependent) clone if set to
+	   `false`.
+    
+	The default is to provision a fully independent clone.
 
- __NOTE__: *This property is not required for baremetal infrastructures.*
+ 6. __*interfaces*__ - network interface hash cards specification. Each NIC is
+    hashed by its name (for instance, *eth0*, *eth1*, etc).
 
- 6. __*interfaces*__ - network interface cards specification. This property is
- required and it is of hash type. Each NIC is hashed by its name (for instance,
- *eth0*, *eth1*, etc).
+    __IMPORTANT__: For Linux guests, the NIC name defined in a plan should
+	correspond to its logical name of within the guest OS.
 
- __IMPORTANT__: *The NIC name has to correspond with a name under which the OS
- recognizes it. Please note that NICs are indexed in the OS in the order they
- were defined in the plan.*
+	__NOTE__: NICs are ordered and configured within the the guest OS in the
+	order they were defined in the plan.
 
- __NOTE__: *This property is not required for baremetal infrastructures.*
+	__IMPORTANT__: This property is required unless the provider type is
+	*baremetal*.
 
- Following is a list of properties of a given network interface card:
-   1. __*network*__ - name of the network the NIC belongs to. The network must be
-   a valid definition in an infrastructures' networks hash. This definition is
-   required.
+    Following is a list of properties that descirbe a network interface card:
+    1. __*network*__ - name of the network the NIC belongs to. The network
+	    must exist in infrastructures' networks hash.
 
-      __IMPORTANT:__ *For OpenStack provider, the network name must point to a
-	  valid subnet rather than a network name.*
+	  __IMPORTANT:__ In case of OpenStack providers, the network name must
+	  point to a valid subnet rather than a network name.
 
-   2. __*ip*__ - a property that defines an IP address in case of static IP
-   assignment or a *dhcp* literal if the IP should be assigned by DHCP.
+    2. __*ip*__ - a property that defines an IP address. Following values are
+	   permitted:
+       - a properly formatted string witn an IP in case of static,
+       - a *dhcp* literal in case the IP should by assigned by DHCP,
+       - *none* literal in case no IP adress should be set for a given interface.
 
-	  __IMPORTANT:__ The current implementation of cloud-init in *fog* and its
-	  underlying library *rbovirt* does not support DHCP nor multiple NIC
-	  configurations, hence the cloud-init is applied by DOPv onto the first
-	  interface which has a static IP in its definition. Please note that there
-	  is another bug in *rbovirt* that prevents statically defined interface
-	  from being configured if one of the parameters netmask or gateway is
-	  undefined.
+	   __IMPORTANT:__ Current implementation of cloud-init in 
+	   `[rbovirt](https://github.com/abenari/rbovirt/blob/master/lib/ovirt/vm.rb#L132)`
+	   does not support neither DHCP/NONE nor multiple NIC configurations, hence the
+	   cloud-init is applied by DOPv onto the first statically configured interface
+	   Please note that there is another bug in *rbovirt* that prevents statically
+	   defined interface from being configured if one of the parameters netmask or
+	   gateway is undefined.
+	   Only OVirt/RHEVm infrastructure providers are affected.
 
-   3. __*set_gateway*__ - an optional boolean property that defines, whether a
-   gateway should be defined for a given interface during guest customization.
-   It is `true` by default.
+    3. __*set_gateway*__ - an optional boolean property that defines, whether a
+	   gateway should be defined for a given interface during guest customization.
+	   It is `true` by default.
 
-   4. __*virtual_switch*__ - an optional (currently VSphere-specific) property
-   that specifies which distributed virtual switch should be used.
+    4. __*virtual_switch*__ - an optional (currently VSphere-specific) property
+	   that specifies which distributed virtual switch should be used.
 
-   5. __*floating_network*__ - an optional OpenStack specific property. It is
-   the name of the network that within the __floating__ IP is created and
-   associated with the given interface.
+    5. __*floating_network*__ - an optional OpenStack specific property that
+	   specifies the network from which is the __floating__ IP provisioned and
+	   associated with the interface.
 
- 7. __*disks*__ - an optional property to list additional disks that should
- persist accross deployments. It is of array type. A persistant disk itself
+ 7. __*disks*__ - an optional property to define additional disks that should
+ persist accross deployments. It is of an array type. A persistant disk itself
  is described by a so-called *"disk hash"* with following keywords:
    1. __*name*__ - disk name. It is required.
    2. __*pool*__ - the name of the storage pool that should be used as a backing
-   store for a disk. This is a required property for non-OpenStack providers,
-   unless the __*default_pool*__ is specified in __*infrastructure_properties*__.
-   3. __*size*__ - the name size of the disk in megabytes (when the value has a
-  suffix *M*) or gigabytes (when the value has a suffix *G*).
-   4. __*thin*__ - an optional boolean flag that indicates whether disk will be
-   created as thin provisioned. Its default  value is *true*, meaning the
-   disks are thin-provisioned by default. Please use *false* as the value if
-   you need to thick provision a disk.
+      store for a disk. It is required for OVirt/RHEVm and VSphere providers,
+	  unless the __*default_pool*__ is specified in
+	  __*infrastructure_properties*__.
+   3. __*size*__ - the size of the disk in megabytes (when the value has a
+      suffix *M*) or gigabytes (when the value has a suffix *G*).
+   4. __*thin*__ - an optional boolean flag that indicates whether the disk will be
+       thin provisioned. Its default  value is *true*, meaning the disks are
+	   thin-provisioned by default. Please use *false* as the value if you need to
+	   thick provision a disk.
 
- __IMPORTANT:__ *Currently, the selection of provisioning type is honored only
- by RHEVm/OVirt provider. Please also note that a thick-provisioned disk
- within OVirt/RHEVm is of __raw__ rather than __cow__ type. As a consequence, it
- is not possible to create a snapshot of such a disk.*
-
- __NOTE__: *This property is not required for baremetal infrastructures.*
+       __IMPORTANT:__ Currently, the selection of provisioning type is honored
+	   only by OVirt/RHEVm provider. A thick-provisioned disk in OVirt/RHEVm
+	   provider is of __raw__ rather than __cow__ type. As a consequence,
+	   it is not possible to create a snapshot of such a disk.*
 
  8. __*credentials*__ - an optional property to define credentials for
  administrator user (root, Administrator). This information is passed to the
