@@ -9,7 +9,7 @@ describe DopCommon::Infrastructure do
   describe '#type' do
     it 'will set and return the type of infrastructure if specified correctly' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
-      expect(infrastructure.type).to eq('rhev')
+      expect(infrastructure.type).to eq(:rhev)
     end
     it 'will raise an error if the type is unspecified and/or invalid' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {})
@@ -18,7 +18,27 @@ describe DopCommon::Infrastructure do
       expect { infrastructure.type }.to raise_error ::DopCommon::PlanParsingError
     end
   end
-  
+
+  describe '#endpoint' do
+    it 'will set and return an URL object of infrastructure endpoint if specified correctly' do
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'baremetal'})
+      expect(infrastructure.endpoint.to_s).to eq('')
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'endpoint' => 'https://foo.bar/endp'})
+      expect(infrastructure.endpoint.to_s).to eq('https://foo.bar/endp')
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'baremetal', 'endpoint' => 'https://foo.bar/endp'})
+      expect(infrastructure.endpoint.to_s).to eq('https://foo.bar/endp')
+    end
+    it 'will raise an error if endpoint is unspecified and the cloud provider is not of baremetal type' do
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev' })
+    end
+    it 'will raise an error if the endpoint specification is invalid' do
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'endpoint' => {}})
+      expect { infrastructure.endpoint }.to raise_error ::DopCommon::PlanParsingError
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'baremetal', 'endpoint' => {}})
+      expect { infrastructure.endpoint }.to raise_error ::DopCommon::PlanParsingError
+    end
+  end
+
   describe '#networks' do
     it 'will set and return networks if specified correctly' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})

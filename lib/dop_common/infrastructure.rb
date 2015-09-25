@@ -2,6 +2,8 @@
 # DOP Common infrastructure hash parser
 #
 
+require 'uri'
+
 module DopCommon
   class Infrastructure
     include Validator
@@ -16,7 +18,8 @@ module DopCommon
     end
 
     def validate
-      log_validation_method(:type_valid?)
+      log_validation_method(:provider_valid?)
+      log_validation_method(:endpoint_valid?)
       log_validation_method(:networks_valid?)
       log_validation_method(:affinity_groups_valid?)
       try_validate_obj("Plan: Can't validate the networks part because of a previous error") { networks }
@@ -24,15 +27,18 @@ module DopCommon
     end
 
     def provider
-      @provider ||= provider_valid? ? @hash[:type] : nil
+      @provider ||= provider_valid? ? @hash[:type].to_sym : nil
     end
     alias_method :type, :provider
 
     def provides?(type)
-      provider_valid?(type)
       provider == type.downcase.to_sym
     end
     alias_method :type?, :provides?
+
+    def endpoint
+      @endpoint ||= endpoint_valid? ? create_endpoint : nil
+    end
 
     def credentials
       @credentials ||= credentials_valid? ? create_credentials : nil
@@ -56,10 +62,19 @@ module DopCommon
         ::DopCommon::PROVIDER_CLASSES.has_key?(@hash[:type].to_sym.downcase) or
           raise PlanParsingError, "Infrastructure #{@name}: invalid provider type"
       else
-        raise PlanParsingError, "Infrastructure #{@name}: provider (type) must be a string"
+        raise PlanParsingError, "Infrastructure #{@name}: provider type must be a string"
       end
     end
     alias_method :type_valid?, :provider_valid?
+
+    def endpoint_valid?
+      if not provides?(:baremetal) and @hash[:endpoint].nil?
+        raise PlanParsingError, "Infrastructure #{@name}: endpoint is a required property"
+      end
+      ::URI.parse(@hash[:endpoint]) if @hash[:endpoint]
+    rescue URI::InvalidURIError
+      raise PlanParsingError, "Interface #{@name}: the specified endpoint URL is invalid"
+    end
 
     def credentials_valid?
       @hash[:credentials].kind_of?(String) or
@@ -88,6 +103,10 @@ module DopCommon
         raise PlanParsingError, "Infrastructure #{@name}: affinity group names have to be string"
       @hash[:affinity_groups].values.all? { |ag| ag.kind_of?(Hash) } or
         raise PlanParsingError, "Infrastructure #{@name}: affinity groups have to be defined as hash"
+    end
+
+    def create_endpoint
+      ::URI.parse(@hash[:endpoint]) rescue ::URI.parse("")
     end
 
     def create_credentials
