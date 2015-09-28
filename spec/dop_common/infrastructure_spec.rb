@@ -41,22 +41,58 @@ describe DopCommon::Infrastructure do
 
   describe '#networks' do
     it 'will set and return networks if specified correctly' do
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'baremetal'})
       expect(infrastructure.networks).to eq({})
+      infrastructure = ::DopCommon::Infrastructure.new(
+        'dummy',
+        {
+          'type' => 'baremetal',
+          'networks' => {
+            'net1' => {'ip_defgw' => '192.168.1.1', 'netmask' => '255.255.255.0'},
+            'net2' => {'ip_defgw' => '192.168.2.1', 'netmask' => '255.255.255.0'}
+          }
+        }
+      )
+      expect(infrastructure.networks.find { |n| n.name == 'net1' }).to be_a ::DopCommon::Network
+      expect(infrastructure.networks.find { |n| n.name == 'net2' }).to be_a ::DopCommon::Network
       infrastructure = ::DopCommon::Infrastructure.new(
         'dummy',
         {
           'type' => 'rhev',
           'networks' => {
-            'net1' => nil,
-            'net2' => {'ip_defgw' => '172.17.27.1', 'netmask' => '255.255.255.0'}
+            'net1' => {'ip_defgw' => '192.168.1.1', 'netmask' => '255.255.255.0'},
+            'net2' => {'ip_defgw' => '192.168.2.1', 'netmask' => '255.255.255.0'}
           }
         }
       )
-      expect(infrastructure.networks['net1']).to be_a ::DopCommon::Network
-      expect(infrastructure.networks['net2']).to be_a ::DopCommon::Network
+      expect(infrastructure.networks.find { |n| n.name == 'net1' }).to be_a ::DopCommon::Network
+      expect(infrastructure.networks.find { |n| n.name == 'net2' }).to be_a ::DopCommon::Network
     end
     it 'will raise an error if network specification is invalid' do
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
+      expect { infrastructure.networks }.to raise_error ::DopCommon::PlanParsingError
+      infrastructure = ::DopCommon::Infrastructure.new(
+        'dummy',
+        {
+          'type' => 'baremetal',
+          'networks' => {
+            'net1' => {'ip_defgw' => 'invalid', 'netmask' => '255.255.255.0'},
+            'net1' => {'ip_defgw' => '192.168.2.1', 'netmask' => '255.255.255.0'}
+          }
+        }
+      )
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'networks' => 'invalid'})
+      expect { infrastructure.networks }.to raise_error ::DopCommon::PlanParsingError
+      infrastructure = ::DopCommon::Infrastructure.new(
+        'dummy',
+        {
+          'type' => 'rhev',
+          'networks' => {
+            'net1' => {'ip_defgw' => '192.168.1.1', 'netmask' => '255.255.255.0'},
+            'net1' => {'ip_defgw' => '192.168.2.1'}
+          }
+        }
+      )
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'networks' => 'invalid'})
       expect { infrastructure.networks }.to raise_error ::DopCommon::PlanParsingError
     end

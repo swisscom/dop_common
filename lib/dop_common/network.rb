@@ -7,6 +7,8 @@ module DopCommon
     include Validator
     include HashParser
 
+    attr_accessor :name
+
     def initialize(name, hash)
       @name = name
       @hash = deep_symbolize_keys(hash)
@@ -21,7 +23,7 @@ module DopCommon
     def ip_netmask
       @ip_netmask ||= ip_netmask_valid? ? IPAddr.new(@hash[:ip_netmask]) : nil
     end
-    
+
     def ip_defgw
       @ip_defgw ||= ip_defgw_valid? ? IPAddr.new(@hash[:ip_defgw]) : nil
     end
@@ -35,19 +37,19 @@ module DopCommon
     def ip_netmask_valid?
       IPAddr.new(@hash[:ip_netmask])
       true
-    rescue ArgumentError => e
+    rescue ArgumentError
       raise PlanParsingError, "Network #{@name}: Invalid network mask definition"
     end
     
     def ip_defgw_valid?
       IPAddr.new(@hash[:ip_defgw])
       true
-    rescue ArgumentError => e
+    rescue ArgumentError
       raise PlanParsingError, "Network #{@name}: Invalid default gateway definition"
     end
 
     def ip_pool_valid?
-      return false if @hash.nil?
+      #return false if @hash.nil?
       return false if @hash[:ip_pool].nil?
       @hash[:ip_pool].has_key?(:from) and @hash[:ip_pool].has_key?(:to) or
         raise PlanParsingError, "Network #{@name}: 'from' and 'to' entries must be specified for an IP pool"
@@ -62,12 +64,12 @@ module DopCommon
       net.include?(ip_from) and net.include?(ip_to) or
         raise PlanParsingError, "Network #{@name}: All IPs specified by IP pool and the default gateway must belong to the same network"
 
-    rescue ArgumentError => e
+    rescue ArgumentError
       raise PlanParsingError, "Network #{@name}: Invalid network specification"
     end
 
     def create_ip_pool
-      Hash[@hash[:ip_pool].map { |k,v| [k.to_sym, IPAddr.new(v)] }]
+      Hash[@hash[:ip_pool].collect { |k,v| [k.to_sym, IPAddr.new(v)] }]
     end
   end
 end

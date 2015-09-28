@@ -86,13 +86,17 @@ module DopCommon
     end
 
     def networks_valid?
-      return false if @hash[:networks].nil?
-      @hash[:networks].kind_of?(Hash) or
-        raise PlanParsingError, "Infrastructure #{@name}: networks must be a hash"
-      @hash[:networks].keys.all? { |name| name.kind_of?(String) } or
-        raise PlanParsingError, "Infrastructure #{@name}: network names have to be string"
-      @hash[:networks].values.all? { |network| network.nil? or network.kind_of?(Hash) } or
-        raise PlanParsingError, "Infrastructure #{@name}: networks have to be defined as nil or hash"
+      if !provides?(:baremetal) && @hash[:networks].nil?
+        raise PlanParsingError, "Infrastructure #{@name}: network is a required property"
+      elsif @hash[:networks] # Baremetal provider may or may not specify 
+        raise PlanParsingError, "Infrastructure #{@name}: networks must be a hash" unless
+          @hash[:networks].kind_of?(Hash)
+        raise PlanParsingError, "Infrastructure #{@name}: network names have to be string" unless
+          @hash[:networks].keys.all? { |name| name.kind_of?(String) }
+        raise PlanParsingError, "Infrastructure #{@name}: each network has to be defined as hash" unless
+          @hash[:networks].values.all? { |network| network.kind_of?(Hash) }
+        true
+      end
     end
 
     def affinity_groups_valid?
@@ -114,9 +118,7 @@ module DopCommon
     end
 
     def create_networks
-      Hash[@hash[:networks].map do |name, hash|
-        [name, ::DopCommon::Network.new(name, hash)]
-      end]
+      @hash[:networks].collect { |name, hash| ::DopCommon::Network.new(name, hash) }
     end
 
     def create_affinity_groups
