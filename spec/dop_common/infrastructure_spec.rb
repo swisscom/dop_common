@@ -11,9 +11,11 @@ describe DopCommon::Infrastructure do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
       expect(infrastructure.provider).to eq(:rhev)
     end
-    it 'will raise an error if the type is unspecified and/or invalid' do
+    it 'will raise an error if the type is missing' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {})
       expect { infrastructure.provider }.to raise_error ::DopCommon::PlanParsingError
+    end
+    it 'will raise an error ig the infrastructure provider type is invalid' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'invalid'})
       expect { infrastructure.provider }.to raise_error ::DopCommon::PlanParsingError
     end
@@ -23,18 +25,15 @@ describe DopCommon::Infrastructure do
     it 'will set and return an URL object of infrastructure endpoint if specified correctly' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'baremetal'})
       expect(infrastructure.endpoint.to_s).to eq('')
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'endpoint' => 'https://foo.bar/endp'})
-      expect(infrastructure.endpoint.to_s).to eq('https://foo.bar/endp')
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'baremetal', 'endpoint' => 'https://foo.bar/endp'})
-      expect(infrastructure.endpoint.to_s).to eq('https://foo.bar/endp')
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'endpoint' => 'https://foo.bar/baz'})
+      expect(infrastructure.endpoint.to_s).to eq('https://foo.bar/baz')
     end
     it 'will raise an error if endpoint is unspecified and the cloud provider is not of baremetal type' do
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev' })
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
+      expect { infrastructure.endpoint }.to raise_error ::DopCommon::PlanParsingError
     end
     it 'will raise an error if the endpoint specification is invalid' do
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'endpoint' => {}})
-      expect { infrastructure.endpoint }.to raise_error ::DopCommon::PlanParsingError
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'baremetal', 'endpoint' => {}})
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'endpoint' => nil})
       expect { infrastructure.endpoint }.to raise_error ::DopCommon::PlanParsingError
     end
   end
@@ -42,85 +41,23 @@ describe DopCommon::Infrastructure do
   describe '#networks' do
     it 'will set and return networks if specified correctly' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'baremetal'})
-      expect(infrastructure.networks).to eq({})
-      infrastructure = ::DopCommon::Infrastructure.new(
-        'dummy',
-        {
-          'type' => 'baremetal',
-          'networks' => {
-            'net1' => {'ip_defgw' => '192.168.1.1', 'netmask' => '255.255.255.0'},
-            'net2' => {'ip_defgw' => '192.168.2.1', 'netmask' => '255.255.255.0'}
-          }
-        }
-      )
+      expect(infrastructure.networks).to eq([])
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'networks' => {'net1' => {}}})
       expect(infrastructure.networks.find { |n| n.name == 'net1' }).to be_a ::DopCommon::Network
-      expect(infrastructure.networks.find { |n| n.name == 'net2' }).to be_a ::DopCommon::Network
-      infrastructure = ::DopCommon::Infrastructure.new(
-        'dummy',
-        {
-          'type' => 'rhev',
-          'networks' => {
-            'net1' => {'ip_defgw' => '192.168.1.1', 'netmask' => '255.255.255.0'},
-            'net2' => {'ip_defgw' => '192.168.2.1', 'netmask' => '255.255.255.0'}
-          }
-        }
-      )
-      expect(infrastructure.networks.find { |n| n.name == 'net1' }).to be_a ::DopCommon::Network
-      expect(infrastructure.networks.find { |n| n.name == 'net2' }).to be_a ::DopCommon::Network
     end
     it 'will raise an error if network specification is invalid' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
-      expect { infrastructure.networks }.to raise_error ::DopCommon::PlanParsingError
-      infrastructure = ::DopCommon::Infrastructure.new(
-        'dummy',
-        {
-          'type' => 'baremetal',
-          'networks' => {
-            'net1' => {'ip_defgw' => 'invalid', 'netmask' => '255.255.255.0'},
-            'net1' => {'ip_defgw' => '192.168.2.1', 'netmask' => '255.255.255.0'}
-          }
-        }
-      )
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'networks' => 'invalid'})
-      expect { infrastructure.networks }.to raise_error ::DopCommon::PlanParsingError
-      infrastructure = ::DopCommon::Infrastructure.new(
-        'dummy',
-        {
-          'type' => 'rhev',
-          'networks' => {
-            'net1' => {'ip_defgw' => '192.168.1.1', 'netmask' => '255.255.255.0'},
-            'net1' => {'ip_defgw' => '192.168.2.1'}
-          }
-        }
-      )
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'networks' => 'invalid'})
       expect { infrastructure.networks }.to raise_error ::DopCommon::PlanParsingError
     end
   end
 
   describe '#affinity_groups' do
     it 'will set and return affinity groups if specified correctly' do
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
-      expect(infrastructure.affinity_groups).to eq({})
-      infrastructure = ::DopCommon::Infrastructure.new(
-        'dummy',
-        {
-          'type' => 'rhev',
-          'affinity_groups' => {
-            'ag1' => {'positive' => true, 'enforce' => false, 'cluster' => 'cl1'},
-            'ag2' => {'positive' => false, 'enforce' => false, 'cluster' => 'cl1'}
-          }
-        }
-      )
-      expect(infrastructure.affinity_groups['ag1']).to be_a ::DopCommon::AffinityGroup
-      expect(infrastructure.affinity_groups['ag2']).to be_a ::DopCommon::AffinityGroup
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'affinity_groups' => {}})
+      expect(infrastructure.affinity_groups).to eq([])
     end
     it 'will raise an error in case of invalid specification of affinity groups' do
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'affinity_groups' => 'invalid'})
-      expect { infrastructure.affinity_groups }.to raise_error ::DopCommon::PlanParsingError
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'affinity_groups' => { :invalid => {}}})
-      expect { infrastructure.affinity_groups }.to raise_error ::DopCommon::PlanParsingError
-      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'affinity_groups' => { 'ag1' => 'invalid' }})
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'affinity_groups' => :invalid})
       expect { infrastructure.affinity_groups }.to raise_error ::DopCommon::PlanParsingError
     end
   end

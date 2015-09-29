@@ -16,12 +16,4 @@ require 'dop_common/command'
 require 'dop_common/plan_cache'
 
 module DopCommon
-  PROVIDER_CLASSES = {
-    :baremetal  => 'BareMetal',
-    :openstack  => 'OpenStack',
-    :ovirt      => 'Ovirt',
-    :rhev       => 'Ovirt',
-    :vsphere    => 'Vspehere',
-    :vmware     => 'Vspehere',
-  }
 end
