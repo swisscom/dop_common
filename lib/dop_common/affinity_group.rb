@@ -7,6 +7,8 @@ module DopCommon
     include Validator
     include HashParser
 
+    attr_reader :name
+
     def initialize(name, hash)
       @name = name
       @hash = symbolize_keys(hash)
@@ -35,18 +37,21 @@ module DopCommon
     private
 
     def positive_valid?
-      @hash[:positive].kind_of?(TrueClass) or @hash[:positive].kind_of?(FalseClass) or
-        raise PlanParsingError, "Affinity group #{@name}: positive flag must be one of 'true' or 'false'"
+      raise PlanParsingError, "Affinity group #{@name}: positive flag must be one of 'true' or 'false'" unless
+        @hash[:positive].kind_of?(TrueClass) || @hash[:positive].kind_of?(FalseClass)
+      true
     end
 
     def enforce_valid?
-      @hash[:enforce].kind_of?(TrueClass) or @hash[:enforce].kind_of?(FalseClass) or
-        raise PlanParsingError, "Affinity group #{@name}: enforce flag must be one of 'true' or 'false'"
+      raise PlanParsingError, "Affinity group #{@name}: enforce flag must be one of 'true' or 'false'" unless
+        @hash[:enforce].kind_of?(TrueClass) || @hash[:enforce].kind_of?(FalseClass)
+      true
     end
 
     def cluster_valid?
-      @hash[:cluster].kind_of?(String) or
-        raise PlanParsingError, "Affinity group #{@name}: cluster must be a string"
+      raise PlanParsingError, "Affinity group #{@name}: cluster must be a string" unless
+        @hash[:cluster].kind_of?(String)
+      true
     end
   end
 end
