@@ -39,7 +39,7 @@ module DopCommon
     alias_method :type?, :provides?
 
     def endpoint
-      @endpoint ||= create_endpoint if endpoint_valid?
+      @endpoint ||= endpoint_valid? ? create_endpoint : nil
     end
 
     def credentials
