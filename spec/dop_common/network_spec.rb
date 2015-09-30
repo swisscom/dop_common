@@ -6,155 +6,84 @@ describe DopCommon::Network do
     DopCommon.log.level = ::Logger::ERROR
   end
 
-  describe '#ip_netmask' do
-    it 'will return netmask object if the netmask is correct' do
-      network = DopCommon::Network.new('net0', {:ip_netmask => '255.255.255.0'})
-      expect(network.ip_netmask.to_s).to eq('255.255.255.0')
+  good_ip_defgw = '192.168.1.1'
+  good_ip_netmask = '255.255.255.0'
+  good_net = {
+    'ip_defgw' => good_ip_defgw,
+    'ip_netmask' => good_ip_netmask
+  }
+
+  describe '#ip_defgw' do
+    it 'will return a netmask object if the default gateway is correct' do
+      network = DopCommon::Network.new('dummy', {})
+      expect(network.ip_defgw).to eq(nil)
+      network = DopCommon::Network.new('dummy', good_net)
+      expect(network.ip_defgw.to_s).to eq(good_net['ip_defgw'])
     end
-    it 'will raise an error in case of invalid netmask' do
-      network = DopCommon::Network.new('net0', {:ip_netmask => '300.0.0.0'})
-      expect { network.ip_netmask }.to raise_error DopCommon::PlanParsingError
-      network = DopCommon::Network.new('net0', {:ip_netmask => 'invalid'})
-      expect { network.ip_netmask }.to raise_error DopCommon::PlanParsingError
-      network = DopCommon::Network.new('net0', {:ip_netmask => {:invalid => 'invalid'}})
-      expect { network.ip_netmask }.to raise_error DopCommon::PlanParsingError
+    it 'will raise an error in case of invalid default gateway IP' do
+      network = DopCommon::Network.new('dummy', {'ip_defgw' => :invalid})
+      expect { network.ip_defgw }.to raise_error DopCommon::PlanParsingError
     end
   end
 
-  describe '#ip_defgw' do
-    it 'will return default gateway object if its IP is correct' do
-      network = DopCommon::Network.new('net0', {:ip_defgw => '192.168.2.254'})
-      expect(network.ip_defgw.to_s).to eq('192.168.2.254')
+  describe '#ip_netmask' do
+    it 'will return a netmask object if the netmask is correct' do
+      network = DopCommon::Network.new('dummy', {})
+      expect(network.ip_netmask).to eq(nil)
+      network = DopCommon::Network.new('dummy', {'ip_netmask' => good_ip_netmask})
+      expect(network.ip_netmask.to_s).to eq(good_ip_netmask)
     end
     it 'will raise an error in case of invalid netmask' do
-      network = DopCommon::Network.new('net0', {:ip_defgw => '300.254.752.1'})
-      expect { network.ip_defgw }.to raise_error DopCommon::PlanParsingError
-      network = DopCommon::Network.new('net0', {:ip_defgw => 'invalid'})
-      expect { network.ip_defgw }.to raise_error DopCommon::PlanParsingError
-      network = DopCommon::Network.new('net0', {:ip_defgw => {:invalid => 'invalid'}})
-      expect { network.ip_defgw }.to raise_error DopCommon::PlanParsingError
+      network = DopCommon::Network.new('dummy', {'ip_netmask' => :invalid})
+      expect { network.ip_netmask }.to raise_error DopCommon::PlanParsingError
     end
   end
 
   describe '#ip_pool' do
-    it 'will return a hash with "from" and "to" IP objects if specified correctly' do
-      # No IP pool specified
-      network = DopCommon::Network.new('net0', {})
-      expect(network.ip_pool).to eq(nil)
-      # IP pool specified
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_defgw   => '192.168.2.254',
-          :ip_netmask => '255.255.255.0',
-          :ip_pool    => {
-            :from => '192.168.2.25',
-            :to => '192.168.2.155'
-          }
-        }
-      )
-      expect(network.ip_pool[:from].to_s).to eq('192.168.2.25')
-      expect(network.ip_pool[:to].to_s).to eq('192.168.2.155')
+    good_ip_from = '192.168.1.11'
+    good_ip_to = '192.168.1.249'
+
+    it 'will return an empty hash if "ip_pool" is unspecified' do
+      network = DopCommon::Network.new('dummy', {})
+      expect(network.ip_pool).to eq({})
     end
-    it 'will raise an error in case of invalid ip_pool, netmask or default gateway specification' do
-      # Missing netmask and default gateway entry
-      network = DopCommon::Network.new('net0', {:ip_pool => {:from => '192.168.2.25', :to => '192.168.2.155'}})
+
+    it 'will return a hash with "from" and "to" if network is specified properly' do
+      network = DopCommon::Network.new('dummy', good_net.merge('ip_pool' => {'from' => good_ip_from, 'to' => good_ip_to}))
+      expect(network.ip_pool[:from].to_s).to eq(good_ip_from)
+      expect(network.ip_pool[:to].to_s).to eq(good_ip_to)
+    end
+
+    it 'will raise an error if ip_pool is not a hash and any of "from" or "to" is not defined' do
+      network = DopCommon::Network.new('dummy', good_net.merge('ip_pool' => :invalid))
       expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
-      # Missing netmask entry
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_defgw => '192.168.2.254',
-          :ip_pool => {:from => '192.168.2.25', :to => '192.168.2.155'}
-        }
-      )
+      network = DopCommon::Network.new('dummy', good_net.merge('ip_pool' => {'to' => good_ip_to}))
       expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
-      # Missing default gateway entry
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_netmask => '192.168.2.254',
-          :ip_pool => {:from => '192.168.2.25', :to => '192.168.2.155'}
-        }
-      )
+      network = DopCommon::Network.new('dummy', good_net.merge('ip_pool' => {'from' => good_ip_from}))
       expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
-      # Invalid pool range specification
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_defgw   => '192.168.2.254',
-          :ip_netmask => '255.255.255.0',
-          :ip_pool    => {
-            :from => '192.168.2.234',
-            :to => '192.168.2.155'
-          }
-        }
-      )
+    end
+
+    it 'will raise an error in case "from" is an invalid IP' do
+      network = DopCommon::Network.new('dummy', good_net.merge('ip_pool' => {'from' => :invalid, 'to' => good_ip_to}))
       expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
-      # The default GW is not from the same network the IP pool specifies
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_defgw   => '192.168.1.254',
-          :ip_netmask => '255.255.255.0',
-          :ip_pool    => {
-            :from => '192.168.2.25',
-            :to => '192.168.2.155'
-          }
-        }
-      )
+    end
+
+    it 'will raise an error in case "to" is an invalid IP' do
+      network = DopCommon::Network.new('dummy', good_net.merge('ip_pool' => {'from' => good_ip_from, 'to' => :invalid}))
       expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
-      # The IP pool spans over more sub-networks
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_defgw   => '192.168.2.254',
-          :ip_netmask => '255.255.255.0',
-          :ip_pool    => {
-            :from => '192.168.2.25',
-            :to => '192.168.4.155'
-          }
-        }
-      )
+    end
+
+    it 'will raise an error in case of invalid ip_pool specification (from > to)' do
+      network = DopCommon::Network.new('dummy', good_net.merge('ip_pool' => {'from' => good_ip_to, 'to' => good_ip_from}))
       expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
-      # The IP pool includes the ip of default gateway
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_defgw   => '192.168.2.254',
-          :ip_netmask => '255.255.255.0',
-          :ip_pool    => {
-            :from => '192.168.2.25',
-            :to => '192.168.2.254'
-          }
-        }
-      )
-      expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
-      # Invalid data specified in 'from' field of the IP pool
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_defgw   => '192.168.2.254',
-          :ip_netmask => '255.255.255.0',
-          :ip_pool    => {
-            :from => 'invalid',
-            :to => '192.168.2.254'
-          }
-        }
-      )
-      expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
-      # Invalid data specified in 'to' field of the IP pool
-      network = DopCommon::Network.new(
-        'net0',
-        {
-          :ip_defgw   => '192.168.2.254',
-          :ip_netmask => '255.255.255.0',
-          :ip_pool    => {
-            :from => '192.168.2.25',
-            :to => { :invalid => nil }
-          }
-        }
-      )
+    end
+
+    it 'will raise an error if the IP of default gateway is within IP pool range' do
+      bad_net = {
+        'ip_defgw' => good_ip_from,
+        'ip_netmask' => good_net['ip_netmask']
+      }
+      network = DopCommon::Network.new('dummy', bad_net.merge('ip_pool' => {'from' => good_ip_to, 'to' => good_ip_from}))
       expect { network.ip_pool }.to raise_error DopCommon::PlanParsingError
     end
   end

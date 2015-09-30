@@ -7,7 +7,7 @@ module DopCommon
     include Validator
     include HashParser
 
-    attr_accessor :name
+    attr_reader :name
 
     def initialize(name, hash)
       @name = name
@@ -16,8 +16,8 @@ module DopCommon
 
     def validate
       log_validation_method(:ip_pool_valid?)
-      log_validation_method(:ip_netmask_valid?)
       log_validation_method(:ip_defgw_valid?)
+      log_validation_method(:ip_netmask_valid?)
     end
 
     def ip_netmask
@@ -27,21 +27,23 @@ module DopCommon
     def ip_defgw
       @ip_defgw ||= ip_defgw_valid? ? IPAddr.new(@hash[:ip_defgw]) : nil
     end
-    
+
     def ip_pool
-      @ip_pool ||= ip_pool_valid? ? create_ip_pool : nil
+      @ip_pool ||= ip_pool_valid? ? create_ip_pool : {}
     end
 
     private
 
     def ip_netmask_valid?
+      return false if @hash.empty?
       IPAddr.new(@hash[:ip_netmask])
       true
     rescue ArgumentError
       raise PlanParsingError, "Network #{@name}: Invalid network mask definition"
     end
-    
+
     def ip_defgw_valid?
+      return false if @hash.empty?
       IPAddr.new(@hash[:ip_defgw])
       true
     rescue ArgumentError
@@ -49,23 +51,24 @@ module DopCommon
     end
 
     def ip_pool_valid?
-      #return false if @hash.nil?
-      return false if @hash[:ip_pool].nil?
-      @hash[:ip_pool].has_key?(:from) and @hash[:ip_pool].has_key?(:to) or
-        raise PlanParsingError, "Network #{@name}: 'from' and 'to' entries must be specified for an IP pool"
+      return false if @hash.empty? # An empty network specification is valid
+      # It must be a hash with from and to keys if defined
+      raise PlanParsingError, "Network #{@name}: An IP pool must be a hash with 'from' and 'to' keys" unless
+        @hash[:ip_pool].kind_of?(Hash) && @hash[:ip_pool].keys.sort == [:from, :to]
+      # The IP defined by from must be lower than the IP defined by to keyword
       ip_from = IPAddr.new(@hash[:ip_pool][:from])
       ip_to   = IPAddr.new(@hash[:ip_pool][:to])
-      ip_from < ip_to or
-        raise PlanParsingError, "Network #{@name}: The IP defined in 'from' field has to be lower than the IP specified in 'to' field"
-      ip_defgw < ip_from or ip_defgw > ip_to or
-        raise PlanParsingError, "Network #{@name}: The default gateway must lie outside of the IP range specified by 'to' and 'from' fields"
-      
+      raise PlanParsingError, "Network #{@name}: The IP defined by 'from' must to be lower than the IP defined by in 'to'" unless ip_from < ip_to
+      # The IP of default gateway must be out of IP pool range
+      raise PlanParsingError, "Network #{@name}: The default gateway must be out of IP pool range" unless ip_defgw < ip_from || ip_defgw > ip_to
+      # IPs specified by IP pool and the default gateway must belong to the same network
       net = ip_defgw.mask(ip_netmask.to_s)
-      net.include?(ip_from) and net.include?(ip_to) or
-        raise PlanParsingError, "Network #{@name}: All IPs specified by IP pool and the default gateway must belong to the same network"
-
+      raise PlanParsingError, "Network #{@name}: IPs specified by IP pool and the default gateway must belong to the same network" unless
+        net.include?(ip_from) && net.include?(ip_to)
+      true
     rescue ArgumentError
-      raise PlanParsingError, "Network #{@name}: Invalid network specification"
+      # Invalide IP/Netmasl definition
+      raise PlanParsingError, "Network #{@name}: Invalid IP and/or netmask definition"
     end
 
     def create_ip_pool
