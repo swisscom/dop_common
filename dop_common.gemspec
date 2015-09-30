@@ -6,8 +6,8 @@ require 'dop_common/version'
 Gem::Specification.new do |spec|
   spec.name          = "dop_common"
   spec.version       = DopCommon::VERSION
-  spec.authors       = ["Andreas Zuber"]
-  spec.email         = ["zuber@puzzle.ch"]
+  spec.authors       = ["Andreas Zuber", "Pavol Dilung"]
+  spec.email         = ["zuber@puzzle.ch", "pavol.dilung@swisscom.com"]
   spec.description   = <<-EOF
     This gem is part of the Deployment and Orchestration for Puppet
     or DOP for short. dop_common is a library for the parsing and
