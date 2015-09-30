@@ -90,7 +90,7 @@ module DopCommon
 
     def create_infrastructures
       @hash[:infrastructures].map do |name, hash|
-        ::DopCommon::Infrastructure.new(name, hash.merge(:parsed_credentials => credentials))
+        ::DopCommon::Infrastructure.new(name, hash, {:parsed_credentials => credentials})
       end
     end
 
@@ -107,7 +107,7 @@ module DopCommon
 
     def parsed_nodes
       @parsed_nodes ||= @hash[:nodes].map do |name, hash|
-        ::DopCommon::Node.new(name.to_s, hash.merge(:parsed_infrastructures => infrastructures))
+        ::DopCommon::Node.new(name.to_s, hash, {:parsed_infrastructures => infrastructures})
       end
     end
 

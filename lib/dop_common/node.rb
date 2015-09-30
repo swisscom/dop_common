@@ -11,10 +11,10 @@ module DopCommon
 
     DEFAULT_DIGITS = 2
 
-    def initialize(name, hash)
+    def initialize(name, hash, parent={})
       @name = name
       @hash = symbolize_keys(hash)
-      @parsed_infrastructures = @hash[:parsed_infrastructures]
+      @parsed_infrastructures = parent[:parsed_infrastructures]
     end
 
     def validate

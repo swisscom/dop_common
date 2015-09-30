@@ -13,10 +13,10 @@ module DopCommon
 
     VALID_PROVIDER_TYPES = [:baremetal, :openstack, :ovirt, :rhev, :rhevm, :vmware, :vsphere]
 
-    def initialize(name, hash)
+    def initialize(name, hash, parent={})
       @name = name
       @hash = symbolize_keys(hash)
-      @parsed_credentials = @hash[:parsed_credentials]
+      @parsed_credentials = parent[:parsed_credentials]
     end
 
     def validate
