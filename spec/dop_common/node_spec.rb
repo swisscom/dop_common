@@ -67,6 +67,36 @@ describe DopCommon::Node do
     end
   end
 
+  describe '#image' do
+    infrastructures = [
+      DopCommon::Infrastructure.new('rhev', {'type' => 'rhev'}),
+      DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'})
+    ]
+
+    it 'will return an image of a node' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'image' => 'dummy'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.image).to eq 'dummy'
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'baremetal'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.image).to eq nil
+    end
+
+    it 'will raise an error if image is not a string' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'image' => :invalid},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.image}.to raise_error DopCommon::PlanParsingError
+    end
+  end
 
   describe '#interfaces' do
     it 'will return an array of interfaces if specified correctly' do

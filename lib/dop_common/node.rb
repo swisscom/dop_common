@@ -49,12 +49,16 @@ module DopCommon
       end
     end
 
-    def interfaces
-      @interfaces ||= interfaces_valid? ? create_interfaces : []
-    end
-
     def infrastructure
       @infrastructure ||= infrastructure_valid? ? create_infrastructure : nil
+    end
+
+    def image
+      @image ||= image_valid? ? @hash[:image] : nil
+    end
+
+    def interfaces
+      @interfaces ||= interfaces_valid? ? create_interfaces : []
     end
 
   protected
@@ -88,6 +92,19 @@ module DopCommon
         raise PlanParsingError, "Node #{@name}: the first number has to be smaller than the second in 'range'"
     end
 
+    def infrastructure_valid?
+      @hash[:infrastructure].kind_of?(String) or
+        raise PlanParsingError, "Node #{@name}: The 'infrastructure' pointer must be a string"
+      @parsed_infrastructures.find { |i| i.name == @hash[:infrastructure] } or
+        raise PlanParsingError, "Node #{@name}: No such infrastructure"
+    end
+
+    def image_valid?
+      return false if infrastructure.provides?(:baremetal) && @hash[:image].nil?
+      raise PlanParsingError, "Node #{@name}: The 'image' must be a string" unless @hash[:image].kind_of?(String)
+      true
+    end
+
     def interfaces_valid?
       return false if @hash[:interfaces].nil? # TODO: interfaces should only be optional for baremetal
       @hash[:interfaces].kind_of?(Hash) or
@@ -96,13 +113,6 @@ module DopCommon
         raise PlanParsingError, "Node #{@name}: The keys in the 'interface' hash have to be strings"
       @hash[:interfaces].values.all?{|v| v.kind_of?(Hash)} or
         raise PlanParsingError, "Node #{@name}: The values in the 'interface' hash have to be hashes"
-    end
-
-    def infrastructure_valid?
-      @hash[:infrastructure].kind_of?(String) or
-        raise PlanParsingError, "Node #{@name}: The 'infrastructure' pointer must be a string"
-      @parsed_infrastructures.find { |i| i.name == @hash[:infrastructure] } or
-        raise PlanParsingError, "Node #{@name}: No such infrastructure"
     end
 
     def create_interfaces
