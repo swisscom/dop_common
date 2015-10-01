@@ -12,7 +12,10 @@ module DopCommon
     include SharedOptions
     include HashParser
 
+    attr_reader :version
+
     def initialize(hash)
+      @version = DopCommon::VERSION
       # fix hash key names (convert them to symbols)
       @hash = symbolize_keys(hash)
       @hash[:plan] = symbolize_keys(@hash[:plan]) if @hash[:plan]
