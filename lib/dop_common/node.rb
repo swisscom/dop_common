@@ -21,6 +21,7 @@ module DopCommon
       log_validation_method('digits_valid?')
       log_validation_method('range_valid?')
       log_validation_method('infrastructure_valid?')
+      log_validation_method('image_valid?')
       log_validation_method('interfaces_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
     end
