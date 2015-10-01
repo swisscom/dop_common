@@ -22,6 +22,7 @@ module DopCommon
       log_validation_method('range_valid?')
       log_validation_method('infrastructure_valid?')
       log_validation_method('image_valid?')
+      log_validation_method('full_clone_valid?')
       log_validation_method('interfaces_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
     end
@@ -57,6 +58,11 @@ module DopCommon
     def image
       @image ||= image_valid? ? @hash[:image] : nil
     end
+
+    def full_clone
+      @full_clone ||= full_clone_valid? ? @hash[:full_clone] : true
+    end
+    alias_method :full_clone?, :full_clone
 
     def interfaces
       @interfaces ||= interfaces_valid? ? create_interfaces : []
@@ -103,6 +109,15 @@ module DopCommon
     def image_valid?
       return false if infrastructure.provides?(:baremetal) && @hash[:image].nil?
       raise PlanParsingError, "Node #{@name}: The 'image' must be a string" unless @hash[:image].kind_of?(String)
+      true
+    end
+
+    def full_clone_valid?
+      return false if infrastructure.provides?(:ovirt) && @hash[:full_clone].nil?
+      raise PlanParsingError, "Node #{@node}: The 'full_clone' can be used only for OVirt/RHEVm providers" unless
+        infrastructure.provides?(:ovirt)
+      raise PlanParsingError, "Node #{@node}: The 'full_clone', if defined, must be true or false" unless
+        @hash.has_key?(:full_clone) && (@hash[:full_clone].kind_of?(TrueClass) || @hash[:full_clone].kind_of?(FalseClass))
       true
     end
 

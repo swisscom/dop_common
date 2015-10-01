@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe DopCommon::Node do
+  infrastructures = [
+    DopCommon::Infrastructure.new('rhev', {'type' => 'rhev'}),
+    DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'})
+  ]
 
   before :all do
     DopCommon.log.level = ::Logger::ERROR
@@ -68,11 +72,6 @@ describe DopCommon::Node do
   end
 
   describe '#image' do
-    infrastructures = [
-      DopCommon::Infrastructure.new('rhev', {'type' => 'rhev'}),
-      DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'})
-    ]
-
     it 'will return an image of a node' do
       node = DopCommon::Node.new(
         'dummy',
@@ -95,6 +94,48 @@ describe DopCommon::Node do
         {:parsed_infrastructures => infrastructures}
       )
       expect{node.image}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
+  describe '#full_clone' do
+    it 'will return "true" for OVirt/RHEVm-like provider if unspecified' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.full_clone).to eq true
+    end
+    it 'will return a boolean value if specified properly' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'full_clone' => true},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.full_clone).to eq true
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'full_clone' => false},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.full_clone).to eq false
+    end
+
+    it 'will raise an error in case of invalid provider type' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'baremetal'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.full_clone}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an error if "full_clone" is of invalid type' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'full_clone' => :invalid},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.full_clone}.to raise_error DopCommon::PlanParsingError
     end
   end
 

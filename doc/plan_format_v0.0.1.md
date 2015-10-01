@@ -303,6 +303,9 @@ a property name is actually a keyword of a node hash.
 
     The default is to provision a fully independent clone.
 
+    __IMPORTANT__: Do not use this property for other cloud provider types than
+    OVirt/RHEVm.
+
  6. __*interfaces*__ - network interface hash cards specification. Each NIC is
     hashed by its name (for instance, *eth0*, *eth1*, etc).
 
