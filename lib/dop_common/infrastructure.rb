@@ -11,7 +11,14 @@ module DopCommon
 
     attr_reader :name
 
-    VALID_PROVIDER_TYPES = [:baremetal, :openstack, :ovirt, :rhev, :rhevm, :vmware, :vsphere]
+    VALID_PROVIDER_TYPES = [:baremetal, :openstack, :ovirt, :vsphere]
+
+    VALID_PROVIDER_ALIASES = {
+      :rhev => :ovirt,
+      :rhevm => :ovirt,
+      :rhos => :openstack,
+      :vmware => :vsphere
+    }
 
     def initialize(name, hash, parent={})
       @name = name
@@ -34,9 +41,11 @@ module DopCommon
     alias_method :type, :provider
 
     def provides?(type)
-      provider == type.downcase.to_sym
+      p = type.downcase.to_sym
+      provider == p || VALID_PROVIDER_ALIASES[provider] == p
     end
     alias_method :type?, :provides?
+
 
     def endpoint
       @endpoint ||= endpoint_valid? ? create_endpoint : nil
@@ -61,8 +70,9 @@ module DopCommon
       when nil
         raise PlanParsingError, "Infrastructure #{@name}: provider type is a required property"
       when String
+        p = @hash[:type].downcase.to_sym
         raise PlanParsingError, "Infrastructure #{@name}: invalid provider type" unless
-          VALID_PROVIDER_TYPES.include?(@hash[:type].downcase.to_sym)
+          VALID_PROVIDER_TYPES.include?(p) || VALID_PROVIDER_ALIASES.keys.include?(p)
       else
         raise PlanParsingError, "Infrastructure #{@name}: provider type must be a string"
       end
