@@ -71,6 +71,28 @@ describe DopCommon::Node do
     end
   end
 
+  describe '#fqdn' do
+    it 'will return FQDN is it is syntactically correct' do
+      node = DopCommon::Node.new('dummy', {})
+      expect(node.fqdn).to eq 'dummy'
+      node = DopCommon::Node.new('dummy', { 'fqdn' => 'f.q.dn.' })
+      expect(node.fqdn).to eq 'f.q.dn'
+    end
+
+    it 'will raise an error if it is not a string' do
+      node = DopCommon::Node.new('dummy', { 'fqdn' => :invalid })
+      expect{node.fqdn}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an error if FQDN is too long' do
+      node = DopCommon::Node.new('dummy', { 'fqdn' => "#{'long'*300}.f.q.dn" })
+      expect{node.fqdn}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an error if FQDN is syntactically invalid' do
+      node = DopCommon::Node.new('dummy', { 'fqdn' => 'invalid.f!.q.dn' })
+      expect{node.fqdn}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
   describe '#image' do
     it 'will return an image of a node' do
       node = DopCommon::Node.new(

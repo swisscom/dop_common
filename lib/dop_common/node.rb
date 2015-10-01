@@ -20,6 +20,7 @@ module DopCommon
     def validate
       log_validation_method('digits_valid?')
       log_validation_method('range_valid?')
+      log_validation_method('fqdn_valid?')
       log_validation_method('infrastructure_valid?')
       log_validation_method('image_valid?')
       log_validation_method('full_clone_valid?')
@@ -49,6 +50,10 @@ module DopCommon
         @node_copy.name = @name.gsub('{i}', "%0#{digits}d" % node_number)
         @node_copy
       end
+    end
+
+    def fqdn
+      @fqdn ||= fqdn_valid? ? create_fqdn : nil
     end
 
     def infrastructure
@@ -99,6 +104,19 @@ module DopCommon
         raise PlanParsingError, "Node #{@name}: the first number has to be smaller than the second in 'range'"
     end
 
+    def fqdn_valid?
+      nodename = @hash[:fqdn] || @name # FQDN is implicitly derived from a node name
+      raise PlanParsingError, "Node #{@name}: FQDN must be a string" unless nodename.kind_of?(String)
+      raise PlanParsingError, "Node #{@name}: FQDN must not exceed 255 characters" if nodename.size > 255
+      # f.q.dn. is a valid FQDN
+      nodename = nodename[0...-1] if nodename[-1] == '.'
+      raise PlanParsingError, "Node #{@name}: FQDN has invalid format" unless
+        nodename.split('.').collect do |tok|
+          !tok.empty? && tok.size <= 63 && tok[0] != '-' && tok[-1] != '-' && !tok.scan(/[^a-z\d-]/i).any?
+        end.all?
+      true
+    end
+
     def infrastructure_valid?
       @hash[:infrastructure].kind_of?(String) or
         raise PlanParsingError, "Node #{@name}: The 'infrastructure' pointer must be a string"
@@ -129,6 +147,11 @@ module DopCommon
         raise PlanParsingError, "Node #{@name}: The keys in the 'interface' hash have to be strings"
       @hash[:interfaces].values.all?{|v| v.kind_of?(Hash)} or
         raise PlanParsingError, "Node #{@name}: The values in the 'interface' hash have to be hashes"
+    end
+
+    def create_fqdn
+      nodename = (@hash[:fqdn] || @name)
+      nodename[-1] == '.' ? nodename[0...-1] : nodename
     end
 
     def create_interfaces
