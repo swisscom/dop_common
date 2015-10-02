@@ -11,10 +11,6 @@ module DopCommon
 
     DEFAULT_DIGITS = 2
 
-    KILO_BYTE = 1024
-    MEGA_BYTE = 1024 * KILO_BYTE
-    GIGA_BYTE = 1024 * MEGA_BYTE
-
     VALID_FLAVOR_TYPES = {
       :tiny     => {
         :cores    => 1,
@@ -266,30 +262,26 @@ module DopCommon
       @hash[:flavor].nil? ? @hash[:cores] : VALID_FLAVOR_TYPES[flavor.to_sym][:cores]
     end
 
-    def create_memory
-      if @hash[:flavor].nil?
-        case @hash[:memory]
-        when /^\d+[Mm]$/
-          @hash[:memory].split(/[Mm]/).first.to_i * MEGA_BYTE
-        when /^\d+[Gg]$/
-          @hash[:memory].split(/[Gg]/).first.to_i * GIGA_BYTE
+    def to_bytes(str)
+      value, unit = str.downcase.scan(/\d+|[mg]/).collect do |tok|
+        case tok
+        when /\d+/
+          tok.to_i
+        when tok == "m"
+          1048576
+        else
+          1073741824
         end
-      else
-        VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
       end
+      value * unit
+    end
+
+    def create_memory
+      @hash[:flavor].nil? ? to_bytes(@hash[:memory]) : VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
     end
 
     def create_storage
-      if @hash[:flavor].nil?
-        case @hash[:storage]
-        when /^\d+[Mm]$/
-          @hash[:storage].split(/[Mm]/).first.to_i * MEGA_BYTE
-        when /^\d+[Gg]$/
-          @hash[:storage].split(/[Gg]/).first.to_i * GIGA_BYTE
-        end
-      else
-        VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
-      end
+      @hash[:flavor].nil? ? to_bytes(@hash[:storage]) : VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
     end
   end
 end
