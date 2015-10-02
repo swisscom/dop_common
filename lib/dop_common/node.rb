@@ -11,6 +11,44 @@ module DopCommon
 
     DEFAULT_DIGITS = 2
 
+    KILO_BYTE = 1024
+    MEGA_BYTE = 1024 * KILO_BYTE
+    GIGA_BYTE = 1024 * MEGA_BYTE
+
+    VALID_FLAVOR_TYPES = {
+      :tiny     => {
+        :cores    => 1,
+        :memory   => 536870912,
+        :storage  => 1073741824
+      },
+      :small    => {
+        :cores    => 1,
+        :memory   => 2147483648,
+        :storage  => 10737418240
+      },
+      :medium   => {
+        :cores    => 2,
+        :memory   => 4294967296,
+        :storage  => 10737418240
+      },
+      :large    => {
+        :cores    => 4,
+        :memory   => 8589934592,
+        :storage  => 10737418240
+      },
+      :xlarge   => {
+        :cores    => 8,
+        :memory   => 17179869184,
+        :storage  => 10737418240
+      }
+    }
+
+    DEFAULT_OPENSTACK_FLAVOR = 'm1.medium'
+
+    DEFAULT_CORES   = VALID_FLAVOR_TYPES[:medium][:cores]
+    DEFAULT_MEMORY  = VALID_FLAVOR_TYPES[:medium][:memory]
+    DEFAULT_STORAGE = VALID_FLAVOR_TYPES[:medium][:storage]
+
     def initialize(name, hash, parent={})
       @name = name
       @hash = symbolize_keys(hash)
@@ -25,6 +63,10 @@ module DopCommon
       log_validation_method('image_valid?')
       log_validation_method('full_clone_valid?')
       log_validation_method('interfaces_valid?')
+      log_validation_method('flavor_valid?')
+      log_validation_method('cores_valid?')
+      log_validation_method('memory_valid?')
+      log_validation_method('storage_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
     end
 
@@ -71,6 +113,24 @@ module DopCommon
 
     def interfaces
       @interfaces ||= interfaces_valid? ? create_interfaces : []
+    end
+
+    def flavor
+      @flavor ||= flavor_valid? ?
+        @hash[:flavor] : (infrastructure.provides?(:openstack) ? DEFAULT_OPENSTACK_FLAVOR : "")
+
+    end
+
+    def cores
+      @cores ||= cores_valid? ? create_cores : DEFAULT_CORES
+    end
+
+    def memory
+      @memory ||= memory_valid? ? create_memory : DEFAULT_MEMORY
+    end
+
+    def storage
+      @storage ||= storage_valid? ? create_storage : DEFAULT_STORAGE
     end
 
   protected
@@ -149,6 +209,44 @@ module DopCommon
         raise PlanParsingError, "Node #{@name}: The values in the 'interface' hash have to be hashes"
     end
 
+    def flavor_valid?
+      return false if @hash[:flavor].nil?
+      raise PlanParsingError, "Node #{@name}: Flavor must be string" unless @hash[:flavor].kind_of?(String)
+      raise PlanParsingError, "Node #{@name}: Invalid flavor" unless
+        !infrastructure.provides?(:openstack) && VALID_FLAVOR_TYPES.has_key?(@hash[:flavor].to_sym)
+      true
+    end
+
+    def cores_valid?
+      return false if @hash[:cores].nil? && @hash[:flavor].nil?
+      return true if @hash[:cores].nil?
+      raise PlanParsingError, "Node #{@name}: specification of 'cores' is not allowed for OpenStack provider type" if
+        infrastructure.provides?(:openstack)
+      raise PlanParsingError, "Node #{@name}: CPU cores must be an integer number" unless
+        @hash[:cores].kind_of?(Fixnum) || @hash[:cores].kind_of?(Integer)
+      true
+    end
+
+    def memory_valid?
+      return false if @hash[:memory].nil? && @hash[:flavor].nil?
+      return true if @hash[:memory].nil?
+      raise PlanParsingError, "Node #{@name}: specification of 'memory' is not allowed for OpenStack provider type" if
+        infrastructure.provides?(:openstack)
+      raise PlanParsingError, "Node #{@name}: Memory must be a string of numbers followed by one of (M,m,G,g) characters" unless
+        @hash[:memory].kind_of?(String) && @hash[:memory] =~ /^\d+[GgMm]$/
+      true
+    end
+
+    def storage_valid?
+      return false if @hash[:storage].nil? && @hash[:flavor].nil?
+      return true if @hash[:storage].nil?
+      raise PlanParsingError, "Node #{@name}: specification of 'storage' is not allowed for OpenStack provider type" if
+        infrastructure.provides?(:openstack)
+      raise PlanParsingError, "Node #{@name}: Storage must be a string of numbers followed by one of (M,m,G,g) characters" unless
+        @hash[:storage].kind_of?(String) && @hash[:storage] =~ /^\d+[GgMm]$/
+      true
+    end
+
     def create_fqdn
       nodename = (@hash[:fqdn] || @name)
       nodename[-1] == '.' ? nodename[0...-1] : nodename
@@ -162,6 +260,36 @@ module DopCommon
 
     def create_infrastructure
       @parsed_infrastructures.find { |i| i.name == @hash[:infrastructure] }
+    end
+
+    def create_cores
+      @hash[:flavor].nil? ? @hash[:cores] : VALID_FLAVOR_TYPES[flavor.to_sym][:cores]
+    end
+
+    def create_memory
+      if @hash[:flavor].nil?
+        case @hash[:memory]
+        when /^\d+[Mm]$/
+          @hash[:memory].split(/[Mm]/).first.to_i * MEGA_BYTE
+        when /^\d+[Gg]$/
+          @hash[:memory].split(/[Gg]/).first.to_i * GIGA_BYTE
+        end
+      else
+        VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
+      end
+    end
+
+    def create_storage
+      if @hash[:flavor].nil?
+        case @hash[:storage]
+        when /^\d+[Mm]$/
+          @hash[:storage].split(/[Mm]/).first.to_i * MEGA_BYTE
+        when /^\d+[Gg]$/
+          @hash[:storage].split(/[Gg]/).first.to_i * GIGA_BYTE
+        end
+      else
+        VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
+      end
     end
   end
 end
