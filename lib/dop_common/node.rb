@@ -131,7 +131,7 @@ module DopCommon
     end
 
     def full_clone_valid?
-      return false if infrastructure.provides?(:ovirt) && @hash[:full_clone].nil?
+      return false if @hash[:full_clone].nil?
       raise PlanParsingError, "Node #{@node}: The 'full_clone' can be used only for OVirt/RHEVm providers" unless
         infrastructure.provides?(:ovirt)
       raise PlanParsingError, "Node #{@node}: The 'full_clone', if defined, must be true or false" unless
