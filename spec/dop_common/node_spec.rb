@@ -127,7 +127,7 @@ describe DopCommon::Node do
         {'infrastructure' => 'rhev'},
         {:parsed_infrastructures => infrastructures}
       )
-      expect(node.full_clone).to eq true
+      expect(node.full_clone).to be true
     end
     it 'will return a boolean value if specified properly' do
       node = DopCommon::Node.new(
@@ -135,22 +135,22 @@ describe DopCommon::Node do
         {'infrastructure' => 'rhev', 'full_clone' => true},
         {:parsed_infrastructures => infrastructures}
       )
-      expect(node.full_clone).to eq true
+      expect(node.full_clone).to be true
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'full_clone' => false},
         {:parsed_infrastructures => infrastructures}
       )
-      expect(node.full_clone).to eq false
+      expect(node.full_clone).to be false
     end
 
-    it 'will raise an error in case of invalid provider type' do
+    it 'will return the default value in case of invalid provider type' do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'baremetal'},
         {:parsed_infrastructures => infrastructures}
       )
-      expect{node.full_clone}.to raise_error DopCommon::PlanParsingError
+      expect(node.full_clone).to be true
     end
     it 'will raise an error if "full_clone" is of invalid type' do
       node = DopCommon::Node.new(
