@@ -47,7 +47,20 @@ class Hiera
             rescue DopCommon::ConfigurationValueNotFound
               next
             else
-              break if answer = Backend.parse_answer(data, scope)
+              new_answer = Backend.parse_answer(data, scope)
+              case resolution_type
+              when :array
+                raise StandardError, "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.kind_of? Array or new_answer.kind_of? String
+                answer ||= []
+                answer << new_answer
+              when :hash
+                raise Exception, "Hiera type mismatch: expected Hash and got #{new_answer.class}" unless new_answer.kind_of? Hash
+                answer ||= {}
+                answer = Backend.merge_answer(new_answer,answer)
+              else
+                answer = new_answer
+                break
+              end
             end
           end
         rescue StandardError => e
