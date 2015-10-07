@@ -3,6 +3,7 @@ require 'spec_helper'
 describe DopCommon::Node do
   infrastructures = [
     DopCommon::Infrastructure.new('rhev', {'type' => 'rhev'}),
+    DopCommon::Infrastructure.new('rhos', {'type' => 'rhos'}),
     DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'})
   ]
 
@@ -185,5 +186,38 @@ describe DopCommon::Node do
     end
   end
 
+  describe '#flavor' do
+    it 'will return an empty string if not specified and the provider is other than openstack' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.flavor).to eq ""
+    end
+    it 'will return "m1.medium" if not specified and the provider is openstack' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhos'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.flavor).to eq 'm1.medium'
+    end
+    it 'will return flavor name if flavor is specified properly' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'flavor' => 'tiny'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.flavor).to eq 'tiny'
+    end
+    it 'will raise an error if it is not a string' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'flavor' => :invalid},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.flavor}.to raise_error DopCommon::PlanParsingError
+    end
+  end
 end
-
