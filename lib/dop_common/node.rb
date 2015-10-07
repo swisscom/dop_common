@@ -262,12 +262,13 @@ module DopCommon
       @hash[:flavor].nil? ? @hash[:cores] : VALID_FLAVOR_TYPES[flavor.to_sym][:cores]
     end
 
+    # Expects valid input -> to be used after validation
     def to_bytes(str)
       value, unit = str.downcase.scan(/\d+|[mg]/).collect do |tok|
         case tok
         when /\d+/
           tok.to_i
-        when tok == "m"
+        when 'm'
           1048576
         else
           1073741824
