@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [Unreleased]
+### Added
+- The dop hiera plugin now supports merging operations
+
 ## [0.2.0] - 2015-08-16
 ### Added
 - Basic interface hash parsing in node
