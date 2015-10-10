@@ -63,18 +63,30 @@ describe DopCommon::Plan do
     end
   end
 
-  describe '#steps' do
-    it 'will return empty array if the steps key is not defined' do
+  describe '#step_sets' do
+    it 'will return an empty array if the steps key is not defined' do
       plan = DopCommon::Plan.new({})
-      expect(plan.steps).to eq([])
+      expect(plan.step_sets).to eq([])
     end
-    it 'will throw and exception if the value is not an Array' do
+    it 'will return a StepSet object if the stepset is specified correctly' do
+      plan = DopCommon::Plan.new({:stes => []})
+      expect(plan.step_sets.all?{|s| s.kind_of?(StepSet)}).to be true
+      plan = DopCommon::Plan.new({:stes => {'foo' => {}}})
+      expect(plan.step_sets.all?{|s| s.kind_of?(StepSet)}).to be true
+    end
+    it 'will throw and exception if the value is not an Array or Hash' do
       plan = DopCommon::Plan.new({:steps => 'foo'})
-      expect{plan.steps}.to raise_error DopCommon::PlanParsingError
+      expect{plan.step_sets}.to raise_error DopCommon::PlanParsingError
     end
     it 'will throw and exception if the hash is empty' do
-      plan = DopCommon::Plan.new({:steps => []})
-      expect{plan.steps}.to raise_error DopCommon::PlanParsingError
+      plan = DopCommon::Plan.new({:steps => {}})
+      expect{plan.step_sets}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will throw and exception if the hash is invalid' do
+      plan = DopCommon::Plan.new({:steps => {2 => {}}})
+      expect{plan.step_sets}.to raise_error DopCommon::PlanParsingError
+      plan = DopCommon::Plan.new({:steps => {'foo' => 2}})
+      expect{plan.step_sets}.to raise_error DopCommon::PlanParsingError
     end
   end
 

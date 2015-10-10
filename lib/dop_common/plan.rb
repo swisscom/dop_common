@@ -26,12 +26,12 @@ module DopCommon
       log_validation_method('name_valid?')
       log_validation_method('infrastructures_valid?')
       log_validation_method('nodes_valid?')
-      log_validation_method('steps_valid?')
+      log_validation_method('step_sets_valid?')
       log_validation_method('configuration_valid?')
       log_validation_method('credentials_valid?')
       try_validate_obj("Plan: Can't validate the infrastructures part because of a previous error"){infrastructures}
       try_validate_obj("Plan: Can't validate the nodes part because of a previous error"){nodes}
-      try_validate_obj("Plan: Can't validate the steps part because of a previous error"){steps}
+      try_validate_obj("Plan: Can't validate the steps part because of a previous error"){step_sets}
       try_validate_obj("Plan: Can't validate the credentials part because of a previous error"){credentials}
     end
 
@@ -50,9 +50,9 @@ module DopCommon
         inflate_nodes : nil
     end
 
-    def steps
-      @steps ||= steps_valid? ?
-        create_steps : []
+    def step_sets
+      @step_sets ||= step_sets_valid? ?
+        create_step_sets : []
     end
 
     def configuration
@@ -120,19 +120,31 @@ module DopCommon
       end.flatten
     end
 
-    def steps_valid?
-      return false if @hash[:steps].nil? ## steps can be nil for DOPv only plans
-      @hash[:steps] or
-        raise PlanParsingError, 'Plan: steps hash is missing'
-      @hash[:steps].kind_of? Array or
-        raise PlanParsingError, 'Plan: steps key has not a array as value'
-      @hash[:steps].any? or
-        raise PlanParsingError, 'Plan: steps hash is empty'
+    def step_sets_valid?
+      case @hash[:steps]
+      when nil then return false #steps can be nil for DOPv only plans
+      when Array then return true
+      when Hash # multiple step_sets defined
+        @hash[:steps].any? or
+          raise PlanParsingError, 'Plan: the hash in steps must not be empty'
+        @hash[:steps].keys.all?{|k| k.kind_of?(String)} or
+          raise PlanParsingError, 'Plan: all the keys in the steps hash have to be strings'
+        @hash[:steps].keys.all?{|v| v.kind_of?(Array)} or
+          raise PlanParsingError, 'Plan: all values in the steps hash have to be arrays'
+      else
+        raise PlanParsingError, 'Plan: steps key has not a array or hash as value'
+      end
+      true
     end
 
-    def create_steps
-      @hash[:steps].map do |hash|
-        ::DopCommon::Step.new(hash)
+    def create_step_sets
+      case @hash[:steps]
+      when Array
+        [::DopCommon::StepSet.new('default', @hash[:steps])]
+      when Hash
+        @hash[:steps].map do |name, steps|
+          ::DopCommon::StepSet.new(name, steps)
+        end
       end
     end
 
