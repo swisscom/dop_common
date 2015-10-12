@@ -129,7 +129,7 @@ module DopCommon
           raise PlanParsingError, 'Plan: the hash in steps must not be empty'
         @hash[:steps].keys.all?{|k| k.kind_of?(String)} or
           raise PlanParsingError, 'Plan: all the keys in the steps hash have to be strings'
-        @hash[:steps].keys.all?{|v| v.kind_of?(Array)} or
+        @hash[:steps].values.all?{|v| v.kind_of?(Array)} or
           raise PlanParsingError, 'Plan: all values in the steps hash have to be arrays'
       else
         raise PlanParsingError, 'Plan: steps key has not a array or hash as value'

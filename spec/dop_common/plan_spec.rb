@@ -69,10 +69,10 @@ describe DopCommon::Plan do
       expect(plan.step_sets).to eq([])
     end
     it 'will return a StepSet object if the stepset is specified correctly' do
-      plan = DopCommon::Plan.new({:stes => []})
-      expect(plan.step_sets.all?{|s| s.kind_of?(StepSet)}).to be true
-      plan = DopCommon::Plan.new({:stes => {'foo' => {}}})
-      expect(plan.step_sets.all?{|s| s.kind_of?(StepSet)}).to be true
+      plan = DopCommon::Plan.new({:steps => []})
+      expect(plan.step_sets.all?{|s| s.kind_of?(DopCommon::StepSet)}).to be true
+      plan = DopCommon::Plan.new({:steps => {'foo' => []}})
+      expect(plan.step_sets.all?{|s| s.kind_of?(DopCommon::StepSet)}).to be true
     end
     it 'will throw and exception if the value is not an Array or Hash' do
       plan = DopCommon::Plan.new({:steps => 'foo'})
