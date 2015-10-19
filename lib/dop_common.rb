@@ -2,7 +2,7 @@ require "dop_common/version"
 require "dop_common/log"
 require "dop_common/validator"
 require "dop_common/hash_parser"
-require "dop_common/shared_options"
+require "dop_common/run_options"
 require "dop_common/plan"
 require 'dop_common/infrastructure'
 require 'dop_common/network'

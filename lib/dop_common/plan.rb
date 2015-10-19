@@ -9,8 +9,8 @@ module DopCommon
 
   class Plan
     include Validator
-    include SharedOptions
     include HashParser
+    include RunOptions
 
     attr_reader :version
 

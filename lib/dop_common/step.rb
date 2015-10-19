@@ -5,7 +5,7 @@
 module DopCommon
   class Step
     include Validator
-    include SharedOptions
+    include RunOptions
 
     def initialize(hash)
       @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]

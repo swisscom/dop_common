@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [0.3.0]
+## [0.3.0] - 2015-10-12
 ### Added
 - The dop hiera plugin now supports merging operations
 - New step set parsing
