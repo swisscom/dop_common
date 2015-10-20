@@ -203,6 +203,14 @@ describe DopCommon::Node do
       )
       expect(node.flavor).to eq 'm1.medium'
     end
+    it 'will return the flavor as-is if it is specified and the provider is openstack' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhos', 'flavor' => 'm1.tiny'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.flavor).to eq 'm1.tiny'
+    end
     it 'will return flavor name if flavor is specified properly' do
       node = DopCommon::Node.new(
         'dummy',
