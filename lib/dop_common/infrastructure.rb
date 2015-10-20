@@ -40,12 +40,13 @@ module DopCommon
     end
     alias_method :type, :provider
 
-    def provides?(type)
-      p = type.downcase.to_sym
-      provider == p || VALID_PROVIDER_ALIASES[provider] == p
+    def provides?(*t)
+      t.any? do |p|
+        p = p.downcase.to_sym
+        p == provider || p == VALID_PROVIDER_ALIASES[provider]
+      end
     end
     alias_method :type?, :provides?
-
 
     def endpoint
       @endpoint ||= endpoint_valid? ? create_endpoint : nil
