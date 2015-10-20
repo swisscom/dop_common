@@ -331,15 +331,6 @@ a property name is actually a keyword of a node hash.
        - a *dhcp* literal in case the IP should by assigned by DHCP,
        - *none* literal in case no IP adress should be set for a given interface.
 
-       __IMPORTANT:__ Current implementation of cloud-init in
-       [rbovirt](https://github.com/abenari/rbovirt/blob/master/lib/ovirt/vm.rb#L132)
-       does not support neither DHCP/NONE nor multiple NIC configurations, hence the
-       cloud-init is applied by DOPv onto the first statically configured interface
-       Please note that there is another bug in *rbovirt* that prevents statically
-       defined interface from being configured if one of the parameters netmask or
-       gateway is undefined.
-       Only OVirt/RHEVm infrastructure providers are affected.
-
     3. __*set_gateway*__ - an optional boolean property that defines, whether a
        gateway should be defined for a given interface during guest customization.
        It is `true` by default.
