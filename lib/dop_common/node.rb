@@ -209,37 +209,40 @@ module DopCommon
       return false if @hash[:flavor].nil?
       raise PlanParsingError, "Node #{@name}: Flavor must be string" unless @hash[:flavor].kind_of?(String)
       raise PlanParsingError, "Node #{@name}: Invalid flavor" unless
-        !infrastructure.provides?(:openstack) && VALID_FLAVOR_TYPES.has_key?(@hash[:flavor].to_sym)
+        infrastructure.provides?(:openstack) || VALID_FLAVOR_TYPES.has_key?(@hash[:flavor].to_sym)
       true
     end
 
     def cores_valid?
-      return false if @hash[:cores].nil? && @hash[:flavor].nil?
-      return true if @hash[:cores].nil?
-      raise PlanParsingError, "Node #{@name}: specification of 'cores' is not allowed for OpenStack provider type" if
-        infrastructure.provides?(:openstack)
-      raise PlanParsingError, "Node #{@name}: CPU cores must be an integer number" unless
-        @hash[:cores].kind_of?(Fixnum) || @hash[:cores].kind_of?(Integer)
+      return false if @hash[:cores].nil? && !infrastructure.provides?(:openstack)
+      unless @hash[:cores].nil?
+        raise PlanParsingError, "Node #{@name}: specification of 'cores' is not allowed for OpenStack provider type" if
+          infrastructure.provides?(:openstack)
+        raise PlanParsingError, "Node #{@name}: CPU cores must be an integer number" unless
+          @hash[:cores].kind_of?(Integer)
+      end
       true
     end
 
     def memory_valid?
-      return false if @hash[:memory].nil? && @hash[:flavor].nil?
-      return true if @hash[:memory].nil?
-      raise PlanParsingError, "Node #{@name}: specification of 'memory' is not allowed for OpenStack provider type" if
-        infrastructure.provides?(:openstack)
-      raise PlanParsingError, "Node #{@name}: Memory must be a string of numbers followed by one of (M,m,G,g) characters" unless
-        @hash[:memory].kind_of?(String) && @hash[:memory] =~ /^\d+[GgMm]$/
+      return false if @hash[:memory].nil? && !infrastructure.provides?(:openstack)
+      unless @hash[:memory].nil?
+        raise PlanParsingError, "Node #{@name}: specification of 'memory' is not allowed for OpenStack provider type" if
+          infrastructure.provides?(:openstack)
+        raise PlanParsingError, "Node #{@name}: Memory must be a string of numbers followed by M,m,G or g character" unless
+          @hash[:memory].kind_of?(String) && @hash[:memory] =~ /^\d+[GgMm]$/
+      end
       true
     end
 
     def storage_valid?
-      return false if @hash[:storage].nil? && @hash[:flavor].nil?
-      return true if @hash[:storage].nil?
-      raise PlanParsingError, "Node #{@name}: specification of 'storage' is not allowed for OpenStack provider type" if
-        infrastructure.provides?(:openstack)
-      raise PlanParsingError, "Node #{@name}: Storage must be a string of numbers followed by one of (M,m,G,g) characters" unless
-        @hash[:storage].kind_of?(String) && @hash[:storage] =~ /^\d+[GgMm]$/
+      return false if @hash[:storage].nil? && !infrastructure.provides?(:openstack)
+      unless @hash[:memory].nil?
+        raise PlanParsingError, "Node #{@name}: specification of 'storage' is not allowed for OpenStack provider type" if
+          infrastructure.provides?(:openstack)
+        raise PlanParsingError, "Node #{@name}: Storage must be a string of numbers followed by M,m,G or g character" unless
+          @hash[:storage].kind_of?(String) && @hash[:storage] =~ /^\d+[GgMm]$/
+      end
       true
     end
 
@@ -259,6 +262,7 @@ module DopCommon
     end
 
     def create_cores
+      return nil if infrastructure.provides?(:openstack)
       @hash[:flavor].nil? ? @hash[:cores] : VALID_FLAVOR_TYPES[flavor.to_sym][:cores]
     end
 
@@ -278,10 +282,12 @@ module DopCommon
     end
 
     def create_memory
+      return nil if infrastructure.provides?(:openstack)
       @hash[:flavor].nil? ? to_bytes(@hash[:memory]) : VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
     end
 
     def create_storage
+      return nil if infrastructure.provides?(:openstack)
       @hash[:flavor].nil? ? to_bytes(@hash[:storage]) : VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
     end
   end
