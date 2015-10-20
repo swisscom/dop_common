@@ -4,7 +4,7 @@
 require 'yaml'
 
 module DopCommon
-  module SharedOptions
+  module RunOptions
     include Validator
 
     def valitdate_shared_options

@@ -577,7 +577,7 @@ configuration:
 
 This is only used from puppet over the hiera plugin and not from DOP itself at the moment.
 
-## Steps
+## Steps and step sets
 
 The steps array is a list of commands that have to be executed in the correct order. Each element in the array contains a hash of settings which describe the step, the nodes involved and the command to execute.
 
@@ -607,6 +607,40 @@ steps:
       arguments:
         '--noop':
 ```
+
+You can define multiple sets of steps which can be executed independently of each other.
+
+Example:
+```yaml
+steps:
+  'default':
+    - name: run_puppet_on_mysql
+      nodes:
+        - mysql01.example.com
+      command: ssh_run_puppet
+
+    - name: run_puppet_on_webserver
+      roles:
+        - httpd_basic
+        - https_special
+      command: ssh_run_puppet
+
+  'maintenance':
+    - name: reboot_all_nodes
+      nodes: all
+      command: ssh_reboot
+
+    - name: run_puppet_in_noop_on_proxies
+      roles:
+        - haproxy
+      command:
+        plugin: ssh_puppet_run
+        arguments:
+          '--noop':
+```
+
+The run command will always execute the 'default' step set if nothing else is specified. If only one set is
+specified in the array form without a name this set will have the name 'default'.
 
 ### name
 
@@ -749,7 +783,6 @@ Works exactly like exclude_nodes but excludes roles.
 The command can either be directly a plugin name if no parameters are needed or a command hash which will be passed to the plugin. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depends on the plugin in use and how it will parse the hash.
 
 For more documentation about the plugins and the variables available for configuring them, check the DOPi documentation.
-
 
 # Examples
 

@@ -1,3 +1,6 @@
+name: 'example'
+max_in_flight: 2
+
 infrastructures:
     management:
         type: rhev
@@ -122,7 +125,6 @@ nodes:
         infrastructure_properties:
             keep_ha: false
         image: rhel6
-        full_clone: false
         flavor: small
         interfaces:
             eth0:
@@ -137,7 +139,6 @@ nodes:
         infrastructure_properties:
             keep_ha: false
         image: rhel6
-        full_clone: false
         flavor: medium
         interfaces:
             eth0:
@@ -162,6 +163,12 @@ nodes:
                 network: production
                 ip: dhcp
 
+credentials:
+    'linux_login':
+        type: 'username_password'
+        username: 'root'
+        password: 'mypass'
+
 configuration:
     hosts:
         mysql01.example.com:
@@ -181,11 +188,13 @@ configuration:
                 user: myuser
                 password: mypass
 
-plan:
-    max_in_flight: 2
-    ssh_root_pass: mypass
-
 steps:
+    - name: 'Configure credentials for SSH plugins'
+      nodes: 'all'
+      set_plugin_defaults:
+        - plugins: '/^ssh/'
+          credentials: 'linux_login'
+      command: 'dummy'
 
     - name: 'Make sure we can login to all nodes'
       nodes: all
