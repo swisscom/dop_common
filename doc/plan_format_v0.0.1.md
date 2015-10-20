@@ -331,15 +331,6 @@ a property name is actually a keyword of a node hash.
        - a *dhcp* literal in case the IP should by assigned by DHCP,
        - *none* literal in case no IP adress should be set for a given interface.
 
-       __IMPORTANT:__ Current implementation of cloud-init in
-       [rbovirt](https://github.com/abenari/rbovirt/blob/master/lib/ovirt/vm.rb#L132)
-       does not support neither DHCP/NONE nor multiple NIC configurations, hence the
-       cloud-init is applied by DOPv onto the first statically configured interface
-       Please note that there is another bug in *rbovirt* that prevents statically
-       defined interface from being configured if one of the parameters netmask or
-       gateway is undefined.
-       Only OVirt/RHEVm infrastructure providers are affected.
-
     3. __*set_gateway*__ - an optional boolean property that defines, whether a
        gateway should be defined for a given interface during guest customization.
        It is `true` by default.
@@ -586,7 +577,7 @@ configuration:
 
 This is only used from puppet over the hiera plugin and not from DOP itself at the moment.
 
-## Steps
+## Steps and step sets
 
 The steps array is a list of commands that have to be executed in the correct order. Each element in the array contains a hash of settings which describe the step, the nodes involved and the command to execute.
 
@@ -616,6 +607,40 @@ steps:
       arguments:
         '--noop':
 ```
+
+You can define multiple sets of steps which can be executed independently of each other.
+
+Example:
+```yaml
+steps:
+  'default':
+    - name: run_puppet_on_mysql
+      nodes:
+        - mysql01.example.com
+      command: ssh_run_puppet
+
+    - name: run_puppet_on_webserver
+      roles:
+        - httpd_basic
+        - https_special
+      command: ssh_run_puppet
+
+  'maintenance':
+    - name: reboot_all_nodes
+      nodes: all
+      command: ssh_reboot
+
+    - name: run_puppet_in_noop_on_proxies
+      roles:
+        - haproxy
+      command:
+        plugin: ssh_puppet_run
+        arguments:
+          '--noop':
+```
+
+The run command will always execute the 'default' step set if nothing else is specified. If only one set is
+specified in the array form without a name this set will have the name 'default'.
 
 ### name
 
@@ -758,7 +783,6 @@ Works exactly like exclude_nodes but excludes roles.
 The command can either be directly a plugin name if no parameters are needed or a command hash which will be passed to the plugin. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depends on the plugin in use and how it will parse the hash.
 
 For more documentation about the plugins and the variables available for configuring them, check the DOPi documentation.
-
 
 # Examples
 
