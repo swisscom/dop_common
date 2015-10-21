@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [unreleased]
+### Added
+- dop_common now filters all the secrets from the logs
+
 ## [0.3.0] - 2015-10-12
 ### Added
 - The dop hiera plugin now supports merging operations
