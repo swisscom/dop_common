@@ -195,23 +195,23 @@ describe DopCommon::Node do
       )
       expect(node.flavor).to eq ""
     end
-    it 'will return "m1.medium" if not specified and the provider is openstack' do
+    it 'will return DEFAULT_OPENSTACK_FLAVOR if not specified and the provider is openstack' do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhos'},
         {:parsed_infrastructures => infrastructures}
       )
-      expect(node.flavor).to eq 'm1.medium'
+      expect(node.flavor).to eq DopCommon::Node::DEFAULT_OPENSTACK_FLAVOR
     end
     it 'will return the flavor as-is if it is specified and the provider is openstack' do
       node = DopCommon::Node.new(
         'dummy',
-        {'infrastructure' => 'rhos', 'flavor' => 'm1.tiny'},
+        {'infrastructure' => 'rhos', 'flavor' => 'anyflavor'},
         {:parsed_infrastructures => infrastructures}
       )
-      expect(node.flavor).to eq 'm1.tiny'
+      expect(node.flavor).to eq 'anyflavor'
     end
-    it 'will return flavor name if flavor is specified properly' do
+    it 'will return the name of the flavor if it exists in VALID_FLAVIR_TYPES and the provider is not openstack' do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'flavor' => 'tiny'},
@@ -226,6 +226,143 @@ describe DopCommon::Node do
         {:parsed_infrastructures => infrastructures}
       )
       expect{node.flavor}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an error if infrastructure is not openstack and the flavor is invalid' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'flavor' => 'invalid'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.flavor}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
+  describe '#cores' do
+    it 'will return number of cores if specified properly' do
+      [nil, 1].each do |cores|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'rhev', 'cores' => cores},
+          {:parsed_infrastructures => infrastructures}
+        )
+        expect(node.cores).to eq cores.nil? ? DopCommon::Node::DEFAULT_CORES : cores
+      end
+    end
+    it 'will raise an exception if specified for unallowed provider' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhos', 'cores' => 2},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.cores}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an exception in case of invalid input' do
+      [:invalid, 'four', '4'].each do |cores|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'rhev', 'cores' => cores},
+          {:parsed_infrastructures => infrastructures}
+        )
+        expect{node.cores}.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
+
+  describe '#memory' do
+    it 'will return the memory size in bytes if the specified properly' do
+      [nil, '500m', '500M', '10g', '10G'].each do |memory|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'rhev', 'memory' => memory},
+          {:parsed_infrastructures => infrastructures}
+        )
+        expect(node.memory).to eq memory.nil? ? DopCommon::Node::DEFAULT_MEMORY : node.send(:to_bytes, memory)
+      end
+    end
+    it 'will return the memory size in bytes if appropriate flavor is specified' do
+      flavor = 'tiny'
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'flavor' => flavor},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.memory).to eq DopCommon::Node::VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
+    end
+    it 'will return the memory size in bytes defined by flavor if both memory and flavor are used' do
+      flavor = 'tiny'
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'flavor' => flavor, 'memory' => '100G'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.memory).to eq DopCommon::Node::VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
+    end
+    it 'will raise an exception if specified for unallowed provider' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhos', 'memory' => '1G'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.memory}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an exception in case of invalid input' do
+      [:invalid, 'invalid', 500].each do |memory|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'rhev', 'memory' => memory},
+          {:parsed_infrastructures => infrastructures}
+        )
+        expect{node.memory}.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
+
+  describe '#storage' do
+    it 'will return the storage size in bytes if the specified properly' do
+      [nil, '20000m', '20000M', '20g', '20G'].each do |storage|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'rhev', 'storage' => storage},
+          {:parsed_infrastructures => infrastructures}
+        )
+        expect(node.storage).to eq storage.nil? ? DopCommon::Node::DEFAULT_STORAGE : node.send(:to_bytes, storage)
+      end
+    end
+    it 'will return the storage size in bytes if appropriate flavor is specified' do
+      flavor = 'tiny'
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'flavor' => flavor},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.storage).to eq DopCommon::Node::VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
+    end
+    it 'will return the storage size in bytes defined by flavor if both storage and flavor are used' do
+      flavor = 'tiny'
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'flavor' => flavor, 'storage' => '1000G'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.storage).to eq DopCommon::Node::VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
+    end
+    it 'will raise an exception if specified for unallowed provider' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhos', 'storage' => '1G'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.storage}.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an exception in case of invalid input' do
+      [:invalid, 'invalid', 500].each do |storage|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'rhev', 'storage' => storage},
+          {:parsed_infrastructures => infrastructures}
+        )
+        expect{node.storage}.to raise_error DopCommon::PlanParsingError
+      end
     end
   end
 end
