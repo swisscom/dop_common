@@ -13,10 +13,18 @@ module DopCommon
     def initialize(name, hash)
       @name = name
       @hash = hash.kind_of?(Hash) ? Hash[hash.map{|k,v| [k.to_sym, v]}] : hash
+      DopCommon.add_log_filter(Proc.new {|msg| filter_secrets(msg)})
     end
 
     def validate
       log_validation_method('type_valid?')
+    end
+
+    # This method filters the secrets from a message
+    def filter_secrets(msg)
+      case type
+      when :username_password then msg.gsub(password, '****')
+      end
     end
 
     def type
@@ -138,7 +146,6 @@ module DopCommon
     def keytab_valid?()      credentials_file_valid?(:keytab)      end
     def private_key_valid?() credentials_file_valid?(:private_key) end
     def public_key_valid?()  credentials_file_valid?(:public_key)  end
-      
 
     def external_secret_valid?(hash)
       #TODO: implement

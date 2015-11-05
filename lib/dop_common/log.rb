@@ -6,11 +6,44 @@ require 'logger'
 module DopCommon
 
   def self.log
-    @log ||= Logger.new(STDOUT)
+    @log ||= create_logger(STDOUT)
   end
 
   def self.logger=(logger)
+    logger.formatter = DopCommon.log_formatter
     @log = logger
+  end
+
+  def self.log_filters
+    @log_filters ||= []
+  end
+
+  def self.add_log_filter(filter_proc)
+    log_filters << filter_proc
+  end
+
+  def self.log_junctions
+    @log_junction ||= []
+  end
+
+  def self.add_log_junction(logger)
+    log_junctions << logger
+  end
+
+  def self.create_logger(logdev = STDOUT)
+    logger = Logger.new(logdev)
+    logger.formatter = log_formatter
+    logger
+  end
+
+  def self.log_formatter
+    original_formatter = Logger::Formatter.new
+    Proc.new do |severity, datetime, progname, msg|
+      filtered_message = msg
+      log_filters.each {|filter| filtered_message = filter.call(filtered_message)}
+      log_junctions.each {|logger| logger.log(::Logger.const_get(severity), filtered_message, progname)}
+      original_formatter.call(severity, datetime, progname, filtered_message)
+    end
   end
 
 end
