@@ -213,37 +213,35 @@ module DopCommon
       true
     end
 
-    def cores_valid?
-      return false if @hash[:cores].nil? && !infrastructure.provides?(:openstack)
-      unless @hash[:cores].nil?
-        raise PlanParsingError, "Node #{@name}: specification of 'cores' is not allowed for OpenStack provider type" if
+    def device_spec_valid?(device)
+      return false if @hash[device].nil? && @hash[:flavor].nil?
+      unless @hash[device].nil?
+        raise PlanParsingError, "Node #{@name}: specification of '#{device.to_s}' is not allowed for OpenStack provider type" if
           infrastructure.provides?(:openstack)
-        raise PlanParsingError, "Node #{@name}: CPU cores must be an integer number" unless
-          @hash[:cores].kind_of?(Integer)
+        case device
+        when :memory, :storage
+          raise PlanParsingError, "Node #{@name}: #{device.to_s} must be a string of numbers followed by M,m,G or g character" unless
+            @hash[device].kind_of?(String) && @hash[device] =~ /^\d+[GgMm]$/
+        when :cores
+          raise PlanParsingError, "Node #{@name}: CPU cores must be positive non-zero integer" unless
+            @hash[device].kind_of?(Integer) && @hash[device] > 0
+        else
+          raise PlanParsingError, "Node #{name}: Invalid virtual device"
+        end
       end
       true
+    end
+
+    def cores_valid?
+      device_spec_valid?(:cores)
     end
 
     def memory_valid?
-      return false if @hash[:memory].nil? && !infrastructure.provides?(:openstack)
-      unless @hash[:memory].nil?
-        raise PlanParsingError, "Node #{@name}: specification of 'memory' is not allowed for OpenStack provider type" if
-          infrastructure.provides?(:openstack)
-        raise PlanParsingError, "Node #{@name}: Memory must be a string of numbers followed by M,m,G or g character" unless
-          @hash[:memory].kind_of?(String) && @hash[:memory] =~ /^\d+[GgMm]$/
-      end
-      true
+      device_spec_valid?(:memory)
     end
 
     def storage_valid?
-      return false if @hash[:storage].nil? && !infrastructure.provides?(:openstack)
-      unless @hash[:memory].nil?
-        raise PlanParsingError, "Node #{@name}: specification of 'storage' is not allowed for OpenStack provider type" if
-          infrastructure.provides?(:openstack)
-        raise PlanParsingError, "Node #{@name}: Storage must be a string of numbers followed by M,m,G or g character" unless
-          @hash[:storage].kind_of?(String) && @hash[:storage] =~ /^\d+[GgMm]$/
-      end
-      true
+      device_spec_valid?(:storage)
     end
 
     def create_fqdn
