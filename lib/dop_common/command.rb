@@ -6,12 +6,14 @@ module DopCommon
   class Command
     include Validator
 
-    DEFAULT_PLUGIN_TIMEOUT = 300
-
     attr_reader :hash
 
     def initialize(hash)
       @hash = hash.kind_of?(Hash) ? Hash[hash.map{|k,v| [k.to_sym, v]}] : hash
+      @defaults = {
+        :plugin_timeout => 300,
+        :verify_after_run => false,
+      }
     end
 
     def validate
@@ -25,6 +27,10 @@ module DopCommon
       end
     end
 
+    def overwrite_defaults=(defaults_hash)
+      @defaults.merge!(defaults_hash)
+    end
+
     # Add the plugin specific validator
     def extended_validator=(obj)
       @extended_validator = obj if obj.respond_to?(:validate)
@@ -35,7 +41,7 @@ module DopCommon
     end
 
     def plugin_timeout
-      @plugin_timeout ||= plugin_timeout_valid? ? @hash[:plugin_timeout] : DEFAULT_PLUGIN_TIMEOUT
+      @plugin_timeout = plugin_timeout_valid? ? @hash[:plugin_timeout] : @defaults[:plugin_timeout]
     end
 
     def verify_commands
@@ -43,7 +49,7 @@ module DopCommon
     end
 
     def verify_after_run
-      @verify_after_run ||= verify_after_run_valid? ? @hash[:verify_after_run] : false
+      @verify_after_run = verify_after_run_valid? ? @hash[:verify_after_run] : @defaults[:verify_after_run]
     end
 
   private
