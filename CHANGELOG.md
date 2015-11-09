@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [unreleased]
+## [0.4.0] - 2015-11-09
 ### Added
 - dop_common now filters all the secrets from the logs
 
