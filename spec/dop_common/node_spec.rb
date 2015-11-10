@@ -94,6 +94,30 @@ describe DopCommon::Node do
     end
   end
 
+  describe '#infrastructure_properties' do
+    it 'will return infrastructure properties' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {
+          'infrastructure' => 'rhev',
+          'infrastructure_properties' => { 'datacenter' => 'foo', 'cluster' => 'bar' }
+        },
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect(node.infrastructure_properties).to be_an_instance_of DopCommon::InfrastructureProperties
+    end
+    it 'will raise an error if infrastructure properties is not hash' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {
+          'infrastructure' => 'rhev',
+        },
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.infrastructure_properties}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
   describe '#image' do
     it 'will return an image of a node' do
       node = DopCommon::Node.new(

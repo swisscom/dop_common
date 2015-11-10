@@ -56,6 +56,7 @@ module DopCommon
       log_validation_method('range_valid?')
       log_validation_method('fqdn_valid?')
       log_validation_method('infrastructure_valid?')
+      log_validation_method('infrastructure_properties_valid?')
       log_validation_method('image_valid?')
       log_validation_method('full_clone_valid?')
       log_validation_method('interfaces_valid?')
@@ -64,6 +65,7 @@ module DopCommon
       log_validation_method('memory_valid?')
       log_validation_method('storage_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
+      try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
     end
 
     def digits
@@ -96,6 +98,11 @@ module DopCommon
 
     def infrastructure
       @infrastructure ||= infrastructure_valid? ? create_infrastructure : nil
+    end
+
+    def infrastructure_properties
+      @infrastructure_properties ||= infrastructure_properties_valid? ?
+        create_infrastructure_properties : nil
     end
 
     def image
@@ -180,6 +187,12 @@ module DopCommon
         raise PlanParsingError, "Node #{@name}: No such infrastructure"
     end
 
+    def infrastructure_properties_valid?
+      raise PlanParsingError, "Node #{@name}: The 'infrastructure_properties' must be a hash" unless
+        @hash[:infrastructure_properties].kind_of?(Hash)
+      true
+    end
+
     def image_valid?
       return false if infrastructure.provides?(:baremetal) && @hash[:image].nil?
       raise PlanParsingError, "Node #{@name}: The 'image' must be a string" unless @hash[:image].kind_of?(String)
@@ -257,6 +270,13 @@ module DopCommon
 
     def create_infrastructure
       @parsed_infrastructures.find { |i| i.name == @hash[:infrastructure] }
+    end
+
+    def create_infrastructure_properties
+      DopCommon::InfrastructureProperties.new(
+        @hash[:infrastructure_properties],
+        {:node => self}
+      )
     end
 
     def create_cores
