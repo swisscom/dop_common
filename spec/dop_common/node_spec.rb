@@ -393,20 +393,23 @@ describe DopCommon::Node do
 
   describe '#timezone' do
     it "will return a parsed 'timezone' property" do
-      [nil, '095'].each do |tz|
+      property_values = {'rhev' => nil, 'vsphere' => '095'}
+      property_values.each do |infrastructure, property_val|
         node = DopCommon::Node.new(
           'dummy',
-          {'infrastructure' => 'vsphere', 'timezone' => tz }
+          {'infrastructure' => infrastructure, 'timezone' => property_val },
+          {:parsed_infrastructures => infrastructures}
         )
-        expect(node.timezone).to eq tz
+        expect(node.timezone).to eq property_val
       end
     end
 
     it 'will trow an error if input timezone is invalid' do
-      ["", :invalid, []].each do |tz|
+      [nil, "", :invalid, []].each do |property_val|
         node = DopCommon::Node.new(
           'dummy',
-          {'infrastructure' => 'vsphere', 'timezone' => tz}
+          {'infrastructure' => 'vsphere', 'timezone' => property_val},
+          {:parsed_infrastructures => infrastructures}
         )
         expect{node.timezone}.to raise_error DopCommon::PlanParsingError
       end
