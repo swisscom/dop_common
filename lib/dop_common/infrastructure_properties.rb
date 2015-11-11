@@ -7,9 +7,9 @@ module DopCommon
     include Validator
     include HashParser
 
-    def initialize(hash, parent={})
+    def initialize(hash, parsed_infrastructure)
       @hash = symbolize_keys(hash)
-      @parent_node = parent[:node]
+      @parsed_infrastructure = parsed_infrastructure
     end
 
     def validate
@@ -70,18 +70,18 @@ module DopCommon
     end
 
     def datacenter_valid?
-      return false unless @parent_node.infrastructure.provides?(:ovirt, :vsphere)
+      return false unless @parsed_infrastructure.provides?(:ovirt, :vsphere)
       raise PlanParsingError, "Infrastructure properties: The 'datacenter' must be defined" if
-        @parent_node.infrastructure.provides?(:ovirt, :vsphere) && @hash[:datacenter].nil?
+        @parsed_infrastructure.provides?(:ovirt, :vsphere) && @hash[:datacenter].nil?
       raise PlanParsingError, "Infrastructure properties: The 'datacenter' must be a non-empty string" if
         !@hash[:datacenter].kind_of?(String) || @hash[:datacenter].empty?
       true
     end
 
     def cluster_valid?
-      return false unless @parent_node.infrastructure.provides?(:ovirt, :vsphere)
+      return false unless @parsed_infrastructure.provides?(:ovirt, :vsphere)
       raise PlanParsingError, "Infrastructure properties: The 'cluster' must be defined" if
-        @parent_node.infrastructure.provides?(:ovirt, :vsphere) && @hash[:cluster].nil?
+        @parsed_infrastructure.provides?(:ovirt, :vsphere) && @hash[:cluster].nil?
       raise PlanParsingError, "Infrastructure properties: The 'cluster' must be a non-empty string" if
         !@hash[:cluster].kind_of?(String) || @hash[:cluster].empty?
       true
@@ -102,9 +102,9 @@ module DopCommon
     end
 
     def tenant_valid?
-      return false unless @parent_node.infrastructure.provides?(:openstack)
+      return false unless @parsed_infrastructure.provides?(:openstack)
       raise PlanParsingError, "Infrastructure properties: The 'tenant' must be defined" if
-        @parent_node.infrastructure.provides?(:openstack) && @hash[:tenant].nil?
+        @parsed_infrastructure.provides?(:openstack) && @hash[:tenant].nil?
       raise PlanParsingError, "Infrastructure properties: The 'tenant' must be a non-empty string" if
         !@hash[:tenant].kind_of?(String) || @hash[:tenant].empty?
       true

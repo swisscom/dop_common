@@ -275,7 +275,7 @@ module DopCommon
     def create_infrastructure_properties
       DopCommon::InfrastructureProperties.new(
         @hash[:infrastructure_properties],
-        {:node => self}
+        infrastructure
       )
     end
 
