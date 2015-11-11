@@ -66,6 +66,7 @@ module DopCommon
       log_validation_method('storage_valid?')
       log_validation_method('timezone_valid?')
       log_validation_method('product_id_valid?')
+      log_validation_method('organization_name_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
       try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
     end
@@ -144,6 +145,10 @@ module DopCommon
 
     def product_id
       @product_id ||= product_id_valid? ? @hash[:product_id] : nil
+    end
+
+    def organization_name
+      @organization_name ||= organization_name_valid? ? @hash[:organization_name] : nil
     end
 
   protected
@@ -279,6 +284,13 @@ module DopCommon
       return false if @hash[:product_id].nil?
       raise PlanParsingError, "Node #{name}: 'product_id' must be a string" unless
         @hash[:product_id].kind_of?(String)
+      true
+    end
+
+    def organization_name_valid?
+      return false if @hash[:organization_name].nil?
+      raise PlanParsingError, "Node #{name}: 'organization_name' must be a non-empty string" if
+        !@hash[:organization_name].kind_of?(String) || @hash[:organization_name].empty?
       true
     end
 

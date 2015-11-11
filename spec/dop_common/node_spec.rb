@@ -413,24 +413,28 @@ describe DopCommon::Node do
     end
   end
 
-  describe '#product_id' do
-    it "will return a parsed 'product_id' property" do
-      ["", nil, "a74230-f3485-84"].each do |product_id|
-        node = DopCommon::Node.new(
-          'dummy',
-          {'infrastructure' => 'vsphere', 'product_id' => product_id }
-        )
-        expect(node.product_id).to eq product_id
+  %w(product_id organization_name).each do |property_name|
+    describe "##{property_name}" do
+      it "will return a parsed '#{property_name}' property" do
+        ["", nil, "a74230-f3485-84"].each do |property_val|
+          next if property_name == "organization_name" && property_val == ""
+          node = DopCommon::Node.new(
+            'dummy',
+            {'infrastructure' => 'vsphere', property_name => property_val }
+          )
+          expect(node.send(property_name.to_sym)).to eq property_val
+        end
       end
-    end
 
-    it 'will trow an error if product_id format is invalid' do
-      [:invalid, []].each do |product_id|
-        node = DopCommon::Node.new(
-          'dummy',
-          {'infrastructure' => 'vsphere', 'product_id' => product_id}
-        )
-        expect{node.product_id}.to raise_error DopCommon::PlanParsingError
+      it "will trow an error if #{property_name} format is invalid" do
+        ["", :invalid, []].each do |property_val|
+          next if property_name == "product_id" && property_val == ""
+          node = DopCommon::Node.new(
+            'dummy',
+            {'infrastructure' => 'vsphere', property_name => property_val}
+          )
+          expect{node.send(property_name.to_sym)}.to raise_error DopCommon::PlanParsingError
+        end
       end
     end
   end
