@@ -40,7 +40,16 @@ module DopCommon
     original_formatter = Logger::Formatter.new
     Proc.new do |severity, datetime, progname, msg|
       filtered_message = msg
-      log_filters.each {|filter| filtered_message = filter.call(filtered_message)}
+      log_filters.each do |filter|
+        filtered_message = case filtered_message
+                           when Exception
+                             filtered_message.exception(filter.call(filtered_message.message))
+                           when String
+                             filter.call(filtered_message)
+                           else
+                             filter.call(filtered_message.inspect)
+                           end
+      end
       log_junctions.each {|logger| logger.log(::Logger.const_get(severity), filtered_message, progname)}
       original_formatter.call(severity, datetime, progname, filtered_message)
     end
