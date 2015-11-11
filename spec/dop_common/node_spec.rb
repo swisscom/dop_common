@@ -393,18 +393,17 @@ describe DopCommon::Node do
 
   describe '#timezone' do
     it "will return a parsed 'timezone' property" do
-      tz_defs = {'rhev' => nil, 'vsphere' => '095'}
-      tz_defs.each do |infrastructure, tz|
+      [nil, '095'].each do |tz|
         node = DopCommon::Node.new(
           'dummy',
-          {'infrastructure' => infrastructure, 'timezone' => tz }
+          {'infrastructure' => 'vsphere', 'timezone' => tz }
         )
         expect(node.timezone).to eq tz
       end
     end
 
     it 'will trow an error if input timezone is invalid' do
-      [:invalid, []].each do |tz|
+      ["", :invalid, []].each do |tz|
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => 'vsphere', 'timezone' => tz}
@@ -421,8 +420,7 @@ describe DopCommon::Node do
           'dummy',
           {'infrastructure' => 'vsphere', 'product_id' => product_id }
         )
-        rval = product_id.nil? ? "" : product_id
-        expect(node.product_id).to eq rval
+        expect(node.product_id).to eq product_id
       end
     end
 

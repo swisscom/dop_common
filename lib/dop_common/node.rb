@@ -143,7 +143,7 @@ module DopCommon
     end
 
     def product_id
-      @product_id ||= product_id_valid? ? @hash[:product_id] : ""
+      @product_id ||= product_id_valid? ? @hash[:product_id] : nil
     end
 
   protected
@@ -271,7 +271,7 @@ module DopCommon
     def timezone_valid?
       return false if @hash[:timezone].nil?
       raise PlanParsingError, "Node #{name}: 'timezone', if specified, must be a non-empty string" if
-        !@hash[:timezone].kind_of?(String) #&& @hash[:timezone].empty?
+        !@hash[:timezone].kind_of?(String) || @hash[:timezone].empty?
       true
     end
 
