@@ -269,11 +269,9 @@ module DopCommon
 
     # TODO: Do a better format validation
     def timezone_valid?
-      raise PlanParsingError, "Node #{name}: 'timezone' is a required for VSphere-based node" if
-        infrastructure.provides?(:vsphere) && @hash[:timezone].nil?
       return false if @hash[:timezone].nil?
-      raise PlanParsingError, "Node #{name}: 'timezone' must be a non-empty string" if
-        !@hash[:timezone].kind_of?(String) || @hash[:timezone].empty?
+      raise PlanParsingError, "Node #{name}: 'timezone', if specified, must be a non-empty string" if
+        !@hash[:timezone].kind_of?(String) #&& @hash[:timezone].empty?
       true
     end
 

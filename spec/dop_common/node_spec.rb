@@ -397,28 +397,17 @@ describe DopCommon::Node do
       tz_defs.each do |infrastructure, tz|
         node = DopCommon::Node.new(
           'dummy',
-          {'infrastructure' => infrastructure, 'timezone' => tz },
-          {:parsed_infrastructures => infrastructures}
+          {'infrastructure' => infrastructure, 'timezone' => tz }
         )
         expect(node.timezone).to eq tz
       end
     end
 
-    it 'will throw an error if unspecified for VSphere-based node' do
-      node = DopCommon::Node.new(
-        'dummy',
-        {'infrastructure' => 'vsphere'},
-        {:parsed_infrastructures => infrastructures}
-      )
-      expect{node.timezone}.to raise_error DopCommon::PlanParsingError
-    end
-
     it 'will trow an error if input timezone is invalid' do
-      ["", :invalid, []].each do |val|
+      [:invalid, []].each do |tz|
         node = DopCommon::Node.new(
           'dummy',
-          {'infrastructure' => 'vsphere', 'timezone' => val},
-          {:parsed_infrastructures => infrastructures}
+          {'infrastructure' => 'vsphere', 'timezone' => tz}
         )
         expect{node.timezone}.to raise_error DopCommon::PlanParsingError
       end
