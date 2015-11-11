@@ -31,8 +31,9 @@ module DopCommon
       log_validation_method(:endpoint_valid?)
       log_validation_method(:networks_valid?)
       log_validation_method(:affinity_groups_valid?)
-      try_validate_obj("Plan: Can't validate the networks part because of a previous error") { networks }
-      try_validate_obj("Plan: Can't validate the affinity groups part because of a previous error") { affinity_groups }
+      log_validation_method(:credentials_valid?)
+      try_validate_obj("Infrastructure #{name}: Can't validate the networks part because of a previous error") { networks }
+      try_validate_obj("Infrastructure #{name}: Can't validate the affinity groups part because of a previous error") { affinity_groups }
     end
 
     def provider
