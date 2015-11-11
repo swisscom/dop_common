@@ -64,6 +64,7 @@ module DopCommon
       log_validation_method('cores_valid?')
       log_validation_method('memory_valid?')
       log_validation_method('storage_valid?')
+      log_validation_method('timezone_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
       try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
     end
@@ -134,6 +135,10 @@ module DopCommon
 
     def storage
       @storage ||= storage_valid? ? create_storage : DEFAULT_STORAGE
+    end
+
+    def timezone
+      @timezone ||= timezone_valid? ? @hash[:timezone] : nil
     end
 
   protected
@@ -255,6 +260,16 @@ module DopCommon
 
     def storage_valid?
       device_spec_valid?(:storage)
+    end
+
+    # TODO: Do a better format validation
+    def timezone_valid?
+      raise PlanParsingError, "Node #{name}: 'timezone' is a required for VSphere-based node" if
+        infrastructure.provides?(:vsphere) && @hash[:timezone].nil?
+      return false if @hash[:timezone].nil?
+      raise PlanParsingError, "Node #{name}: 'timezone' must be a non-empty string" if
+        !@hash[:timezone].kind_of?(String) || @hash[:timezone].empty?
+      true
     end
 
     def create_fqdn

@@ -4,7 +4,8 @@ describe DopCommon::Node do
   infrastructures = [
     DopCommon::Infrastructure.new('rhev', {'type' => 'rhev'}),
     DopCommon::Infrastructure.new('rhos', {'type' => 'rhos'}),
-    DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'})
+    DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'}),
+    DopCommon::Infrastructure.new('vsphere', {'type' => 'vsphere'})
   ]
 
   before :all do
@@ -389,4 +390,39 @@ describe DopCommon::Node do
       end
     end
   end
+
+  describe '#timezone' do
+    it "will return a parsed 'timezone' property" do
+      tz_defs = {'rhev' => nil, 'vsphere' => '095'}
+      tz_defs.each do |infrastructure, tz|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => infrastructure, 'timezone' => tz },
+          {:parsed_infrastructures => infrastructures}
+        )
+        expect(node.timezone).to eq tz
+      end
+    end
+
+    it 'will throw an error if unspecified for VSphere-based node' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'vsphere'},
+        {:parsed_infrastructures => infrastructures}
+      )
+      expect{node.timezone}.to raise_error DopCommon::PlanParsingError
+    end
+
+    it 'will trow an error if input timezone is invalid' do
+      ["", :invalid, []].each do |val|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'vsphere', 'timezone' => val},
+          {:parsed_infrastructures => infrastructures}
+        )
+        expect{node.timezone}.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
 end
+
