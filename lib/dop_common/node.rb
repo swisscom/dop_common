@@ -65,6 +65,7 @@ module DopCommon
       log_validation_method('memory_valid?')
       log_validation_method('storage_valid?')
       log_validation_method('timezone_valid?')
+      log_validation_method('product_id_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
       try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
     end
@@ -139,6 +140,10 @@ module DopCommon
 
     def timezone
       @timezone ||= timezone_valid? ? @hash[:timezone] : nil
+    end
+
+    def product_id
+      @product_id ||= product_id_valid? ? @hash[:product_id] : ""
     end
 
   protected
@@ -269,6 +274,13 @@ module DopCommon
       return false if @hash[:timezone].nil?
       raise PlanParsingError, "Node #{name}: 'timezone' must be a non-empty string" if
         !@hash[:timezone].kind_of?(String) || @hash[:timezone].empty?
+      true
+    end
+
+    def product_id_valid?
+      return false if @hash[:product_id].nil?
+      raise PlanParsingError, "Node #{name}: 'product_id' must be a string" unless
+        @hash[:product_id].kind_of?(String)
       true
     end
 

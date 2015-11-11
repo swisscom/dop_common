@@ -424,5 +424,27 @@ describe DopCommon::Node do
       end
     end
   end
-end
 
+  describe '#product_id' do
+    it "will return a parsed 'product_id' property" do
+      ["", nil, "a74230-f3485-84"].each do |product_id|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'vsphere', 'product_id' => product_id }
+        )
+        rval = product_id.nil? ? "" : product_id
+        expect(node.product_id).to eq rval
+      end
+    end
+
+    it 'will trow an error if product_id format is invalid' do
+      [:invalid, []].each do |product_id|
+        node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'vsphere', 'product_id' => product_id}
+        )
+        expect{node.product_id}.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
+end
