@@ -1,13 +1,21 @@
 name: 'example'
 max_in_flight: 2
 
+credentials:
+    'linux_login':
+        type: 'username_password'
+        username: 'root'
+        password: 'mypass'
+    'api_login':
+        type: 'username_password'
+        username: 'root'
+        password: 'mypass'
+
 infrastructures:
     management:
         type: rhev
         endpoint: https://rhev.example.com/api
-        credentials:
-            username: myuser
-            password: mypass
+        credentials: api_login
         networks:
             rhevm:
                 ip_pool:
@@ -38,10 +46,7 @@ infrastructures:
     lamp:
         type: openstack
         endpoint: https://openstack.example.com/api
-        credentials:
-            username: myuser
-            password: mypass
-            provider_pubkey_hash: A4532FAA....
+        credentials: api_login
         networks:
             management:
                 ip_pool:
@@ -64,8 +69,8 @@ nodes:
                 - clu-lab1ch-ag_1
                 - clu-lab1ch-ag_3
             keep_ha: true
-        datacenter: lab1ch
-        cluster: clu-lab1ch
+            datacenter: lab1ch
+            cluster: clu-lab1ch
         image: rhel6cloudinit
         interfaces:
             eth0:
@@ -81,6 +86,8 @@ nodes:
         infrastructure: management
         infrastructure_properties:
             keep_ha: true
+            datacenter: lab1ch
+            cluster: clu-lab1ch
         image: win12r1_64
         cores: 6
         memory: 64G
@@ -100,6 +107,7 @@ nodes:
         infrastructure: lamp
         infrastructure_properties:
             keep_ha: true
+            tenant: lamp
         image: rhel6cloudinit
         flavor: medium
         interfaces:
@@ -124,6 +132,7 @@ nodes:
         infrastructure: lamp
         infrastructure_properties:
             keep_ha: false
+            tenant: lamp
         image: rhel6
         flavor: small
         interfaces:
@@ -138,6 +147,7 @@ nodes:
         infrastructure: lamp
         infrastructure_properties:
             keep_ha: false
+            tenant: lamp
         image: rhel6
         flavor: medium
         interfaces:
@@ -153,6 +163,7 @@ nodes:
         infrastructure: lamp
         infrastructure_properties:
             keep_ha: true
+            tenant: lamp
         image: rhel6cloudinit
         flavor: small
         interfaces:
@@ -162,12 +173,6 @@ nodes:
             eth1:
                 network: production
                 ip: dhcp
-
-credentials:
-    'linux_login':
-        type: 'username_password'
-        username: 'root'
-        password: 'mypass'
 
 configuration:
     hosts:
