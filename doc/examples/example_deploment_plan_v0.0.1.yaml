@@ -12,8 +12,9 @@ credentials:
         password: 'mypass'
 
 infrastructures:
-    baremettal:
-        type: baremettal
+    baremetal:
+        type: baremetal
+
     management:
         type: rhev
         endpoint: https://rhev.example.com/api
@@ -177,7 +178,7 @@ nodes:
                 ip: dhcp
 
     storage01.example.com:
-      infrastructure: baremettal
+      infrastructure: baremetal
 
 configuration:
     hosts:

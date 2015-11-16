@@ -105,7 +105,7 @@ module DopCommon
 
     def infrastructure_properties
       @infrastructure_properties ||= infrastructure_properties_valid? ?
-        create_infrastructure_properties : nil
+        create_infrastructure_properties : {}
     end
 
     def image
