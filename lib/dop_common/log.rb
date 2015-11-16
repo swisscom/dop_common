@@ -14,6 +14,12 @@ module DopCommon
     @log = logger
   end
 
+  def self.reset_logger
+    @log = nil
+    @log_filters = []
+    @log_junction = []
+  end
+
   def self.log_filters
     @log_filters ||= []
   end
