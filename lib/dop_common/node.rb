@@ -203,6 +203,7 @@ module DopCommon
     end
 
     def infrastructure_properties_valid?
+      return false unless @hash.has_key?(:infrastructure_properties)
       raise PlanParsingError, "Node #{@name}: The 'infrastructure_properties' must be a hash" unless
         @hash[:infrastructure_properties].kind_of?(Hash)
       true

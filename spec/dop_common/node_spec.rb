@@ -112,6 +112,7 @@ describe DopCommon::Node do
         'dummy',
         {
           'infrastructure' => 'rhev',
+          'infrastructure_properties' => 'foo'
         },
         {:parsed_infrastructures => infrastructures}
       )
