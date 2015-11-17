@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.5.0] - 2015-11-17
+### Added
+- Allow defaults overwrites from plugins
+- Infrastructure property parser
+
+### Fixed
+- Support all types of objects with log filters, not just strings
+
 ## [0.4.0] - 2015-11-09
 ### Added
 - dop_common now filters all the secrets from the logs
