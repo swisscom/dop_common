@@ -5,6 +5,7 @@
 module DopCommon
   class Credential
     include Validator
+    include HashParser
 
     attr_reader :hash, :name
 
@@ -12,7 +13,7 @@ module DopCommon
 
     def initialize(name, hash)
       @name = name
-      @hash = hash.kind_of?(Hash) ? Hash[hash.map{|k,v| [k.to_sym, v]}] : hash
+      @hash = deep_symbolize_keys(hash)
       DopCommon.add_log_filter(Proc.new {|msg| filter_secrets(msg)})
     end
 
@@ -36,7 +37,7 @@ module DopCommon
     end
 
     def password
-      password_valid? ? @hash[:password] : nil
+      password_valid? ? get_secret(:password) : nil
     end
 
     def realm
@@ -148,8 +149,32 @@ module DopCommon
     def public_key_valid?()  credentials_file_valid?(:public_key)  end
 
     def external_secret_valid?(hash)
-      #TODO: implement
-      raise PlanParsingError, "External secret sources for credentials are not implemented yet (#{@name})."
+      hash.count == 1 or
+        raise PlanParsingError, "You can only specify one external secret in credential #{@name}"
+      method, file = hash.first
+      [:file, :exec].include?(method) or
+        raise PlanParsingError, "The external secret lookup method #{method} " \
+          "in the credential #{name} is not valid. valid methods are :exec and :file"
+      File.exists?(file) or
+        raise PlanParsingError, "The file for the external secret defined in credential #{@name} does not exist."
+      File.readable?(file) or
+        raise PlanParsingError, "The file for the external secret defined in credential #{@name} is not readable."
+      if method == :exec
+        File.executable?(file) or
+          raise PlanParsingError, "The file for the external secret defined in credential #{@name} is not executable."
+      end
+    end
+
+    def get_secret(key)
+      if @hash[key].kind_of?(Hash)
+        method, file = @hash[key].first
+        case method
+        when :file then File.read(file).chomp
+        when :exec then %x[#{file}].chomp
+        end
+      else
+        @hash[key]
+      end
     end
 
   end

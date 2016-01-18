@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'securerandom'
+require 'tempfile'
 
 describe DopCommon::Credential do
 
@@ -60,6 +62,53 @@ describe DopCommon::Credential do
         credential = DopCommon::Credential.new('test', {key => 'spec/data/nonexisting_keyfile'})
         expect{credential.send(key)}.to raise_error DopCommon::PlanParsingError
       end
+    end
+  end
+
+  describe 'externel_secret' do
+    it 'successfully retrieves a password from a file' do
+      secret = SecureRandom.hex
+      key_file = Tempfile.new('secret_file', ENV['HOME'])
+      key_file.write(secret)
+      key_file.close
+      credential = DopCommon::Credential.new('test', {
+        :type     => :username_password,
+        :username => 'a',
+        :password => {:file => key_file.path}
+      })
+      expect(credential.password).to eq(secret)
+      key_file.delete
+    end
+
+    it 'successfully retrieves a password from an executable' do
+      secret = SecureRandom.hex
+      key_exec = Tempfile.new('secret_exec', ENV['HOME'])
+      key_exec.write("#!/bin/sh\necho \"#{secret}\"")
+      key_exec.close
+      FileUtils.chmod(0700, key_exec.path)
+      credential = DopCommon::Credential.new('test', {
+        :type     => :username_password,
+        :username => 'a',
+        :password => {:exec => key_exec.path}
+      })
+      expect(credential.password).to eq(secret)
+      key_exec.delete
+    end
+
+    it "raises an exeption if the file does not exist" do
+      file_name = SecureRandom.hex
+      credential = DopCommon::Credential.new('test', {
+        :type     => :username_password,
+        :username => 'a',
+        :password => {:file => File.join('/tmp', file_name)}
+      })
+      expect{credential.password}.to raise_error DopCommon::PlanParsingError
+      credential = DopCommon::Credential.new('test', {
+        :type     => :username_password,
+        :username => 'a',
+        :password => {:exec => File.join('/tmp', file_name)}
+      })
+      expect{credential.password}.to raise_error DopCommon::PlanParsingError
     end
   end
 
