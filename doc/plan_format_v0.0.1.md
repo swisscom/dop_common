@@ -70,27 +70,49 @@ The various DOPi plugins can use these credentials to login to a node if the typ
 It is recommended to use the set_plugin_defaults mechanic to set this credentials so it does not have to be
 specified in every command separately. You can also change this defaults in your steps flow.
 
+### Credential types
+
 The credential types and the fields you can specify are listed here
 
-### username_password
+#### username_password
 A simple username password pair.
 
 1. __*username*__ (required)
 2. __*password*__ (required)
 
-### kerberos
+#### kerberos
 Settings for a kerberos login
 
 1. __*realm*__ (required) - The kerberos realm
 2. __*service*__ (optional) - The service we try to use
 3. __*keytab*__ (optional) - The keytab file to use instead of the default one
 
-### ssh_key
+#### ssh_key
 And SSH key we can use to login
 
 1. __*username*__ (required)
 2. __*private_key*__ (required) - The file where the private key is (smething like /root/.ssh/id_rsa)
 3. __*public_key*__ (optional) - The file where the public key is (smething like /root/.ssh/id_rsa.pub)
+
+### External secrets
+
+Secrets like passwords can be stored outside of the plan so you don't have to check them into version control.
+Instead of the password you can specify a hash with only one key-value pair. The key is either :file or :exec.
+The value for :file is a simple file which will be read to get the password. For :exec it is an array of where
+the first entry is the executable and the rest is a bunch of options or arguments which will be joined together
+and passed to the executable on the command line.
+
+    credentials:
+      'linux_staging_login':
+        type: :username_password
+        username: 'root'
+        password:
+          file: '/path/to/my_external_secret'
+      'linux_prod_password':
+        type: :username_password
+        username: 'root'
+        password:
+          exec: ['/path/to/my_external_secret', '--some-option', 'arg1']
 
 ## Infrastructures
 The infrastructures hash holds information about cloud providers. Each entry in

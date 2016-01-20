@@ -151,10 +151,24 @@ module DopCommon
     def external_secret_valid?(hash)
       hash.count == 1 or
         raise PlanParsingError, "You can only specify one external secret in credential #{@name}"
-      method, file = hash.first
+      method, value = hash.first
       [:file, :exec].include?(method) or
         raise PlanParsingError, "The external secret lookup method #{method} " \
           "in the credential #{name} is not valid. valid methods are :exec and :file"
+      file = case value
+      when Array
+        value.count >= 1 or
+          raise PlanParsingError, "The array for the value for the external secret lookup method #{method} has to have at least one entry"
+        value.all?{|e| e.kind_of?(String)} or
+          raise PlanParsingError, "The array for the value for the external secret lookup method #{method} can only contain strings"
+        method != :file or
+          raise PlanParsingError, "The method :file in the external secret lookup method #{method} does not support arrays as an argument"
+        value.first
+      when String
+        value
+      else
+        raise PlanParsingError, "The value for the external secret lookup method #{method} has to be an array or string"
+      end
       File.exists?(file) or
         raise PlanParsingError, "The file for the external secret defined in credential #{@name} does not exist."
       File.readable?(file) or
@@ -167,7 +181,11 @@ module DopCommon
 
     def get_secret(key)
       if @hash[key].kind_of?(Hash)
-        method, file = @hash[key].first
+        method, value = @hash[key].first
+        file = case value
+        when Array  then value.join(' ')
+        when String then value
+        end
         case method
         when :file then File.read(file).chomp
         when :exec then %x[#{file}].chomp

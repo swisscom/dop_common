@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [Unreleased]
+### Added
+- dop_common can now get secrets in credentials from external files or return values of executables.
+
 ## [0.5.0] - 2015-11-17
 ### Added
 - Allow defaults overwrites from plugins

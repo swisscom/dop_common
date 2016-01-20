@@ -89,7 +89,22 @@ describe DopCommon::Credential do
       credential = DopCommon::Credential.new('test', {
         :type     => :username_password,
         :username => 'a',
-        :password => {:exec => key_exec.path}
+        :password => {:exec => [key_exec.path]}
+      })
+      expect(credential.password).to eq(secret)
+      key_exec.delete
+    end
+
+    it 'successfully retrieves a password from an executable with parameters' do
+      secret = SecureRandom.hex
+      key_exec = Tempfile.new('secret_exec', ENV['HOME'])
+      key_exec.write("#!/bin/sh\necho $2")
+      key_exec.close
+      FileUtils.chmod(0700, key_exec.path)
+      credential = DopCommon::Credential.new('test', {
+        :type     => :username_password,
+        :username => 'a',
+        :password => {:exec => [key_exec.path, '--secret', secret]}
       })
       expect(credential.password).to eq(secret)
       key_exec.delete
