@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.6.1] - 2016-01-27
+### Fixed
+- Fixed a bug which filtered all the log output away if a credential other than
+  username_password was defined
+
 ## [0.6.0] - 2016-01-27
 ### Added
 - dop_common can now get secrets in credentials from external files or return values of executables.
