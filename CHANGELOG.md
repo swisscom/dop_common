@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [Unreleased]
+## [0.6.0] - 2016-01-27
 ### Added
 - dop_common can now get secrets in credentials from external files or return values of executables.
 
