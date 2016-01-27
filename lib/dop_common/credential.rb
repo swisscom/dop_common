@@ -25,6 +25,7 @@ module DopCommon
     def filter_secrets(msg)
       case type
       when :username_password then msg.gsub(password, '****')
+      else msg
       end
     end
 
