@@ -43,7 +43,7 @@ module DopCommon
 
     def provides?(*t)
       t.any? do |p|
-        p = p.downcase.to_sym
+        p = p.downcase.to_sym if p.kind_of?(String)
         p == provider || p == VALID_PROVIDER_ALIASES[provider]
       end
     end

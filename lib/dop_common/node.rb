@@ -299,7 +299,7 @@ module DopCommon
 
     def create_fqdn
       nodename = (@hash[:fqdn] || @name)
-      nodename[-1] == '.' ? nodename[0...-1] : nodename
+      nodename[-1] == '.'[0] ? nodename[0...-1] : nodename
     end
 
     def create_interfaces

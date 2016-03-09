@@ -64,7 +64,7 @@ describe DopCommon::InfrastructureProperties do
             {prop_name => prop_val},
             infrastructure[p]
           )
-          expect(infrastructure_properties.send(prop_name.to_sym)).to eq (p == 'openstack' ? nil : prop_val)
+          expect(infrastructure_properties.send(prop_name.to_sym)).to eq(p == 'openstack' ? nil : prop_val)
         end
 
         it "will raise an exception if '#{prop_name}' is not specified properly" do
