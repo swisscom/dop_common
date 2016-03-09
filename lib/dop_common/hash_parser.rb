@@ -31,16 +31,19 @@ module DopCommon
     end
     module_function :symbolize_keys
 
-    def deep_symbolize_keys(hash)
-      case hash
-      when Hash
+    def deep_symbolize_keys(hash, stack = [])
+      # prevent loops in recursive function
+      return if stack.include?(hash.object_id)
+      stack << hash.object_id
+
+      if hash.kind_of?(Hash)
         Hash[
           hash.map do |k, v|
-          [ k.respond_to?(:to_sym) ? k.to_sym : k, deep_symbolize_keys(v) ]
+            [k.respond_to?(:to_sym) ? k.to_sym : k, deep_symbolize_keys(v, stack)]
           end
         ]
-      when Enumerable
-        hash.map { |v| deep_symbolize_keys(v) }
+      elsif hash.kind_of?(Array)
+        hash.map { |v| deep_symbolize_keys(v, stack) }
       else
         hash
       end
@@ -50,7 +53,11 @@ module DopCommon
     # This method will retrun true if the String in 'value' starts and
     # ends with /, which means it represents a regexp
     def represents_regexp?(value)
-      value[/^\/(.*)\/$/, 1] ? true : false
+      if value.kind_of?(String)
+        value[/^\/(.*)\/$/, 1] ? true : false
+      else
+        false
+      end
     end
     module_function :represents_regexp?
 
@@ -58,7 +65,8 @@ module DopCommon
     # a regex and if it is possible to create a regexp object
     def is_valid_regexp?(value)
       return false unless represents_regexp?(value)
-      Regexp.new(value[/^\/(.*)\/$/, 1])
+      regexp = value[/^\/(.*)\/$/, 1]
+      Regexp.new(regexp)
       true
     rescue
       false
@@ -81,7 +89,7 @@ module DopCommon
       return false if hash[key].nil? && optional
       [Array, String, Symbol].include? hash[key].class or
         raise PlanParsingError, "The value for '#{key}' has to be a string, an array or a symbol."
-      [hash[key]].flatten.each do |pattern| 
+      [hash[key]].flatten.each do |pattern|
         [String, Symbol].include? pattern.class or
           raise PlanParsingError, "The pattern #{pattern} in '#{key}' is not a symbol or string."
         if HashParser.represents_regexp?(pattern)
@@ -99,7 +107,7 @@ module DopCommon
     # Example:
     #
     # hash = {
-    #   :key => { 
+    #   :key => {
     #     'list_1' => [ 'my_node', '/my_node/' ],
     #     'list_2' => '/my_node'/
     #   }

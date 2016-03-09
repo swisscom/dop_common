@@ -3,7 +3,7 @@ require 'spec_helper'
 describe DopCommon::HashParser do
 
   before :all do
-    DopCommon.log.level = ::Logger::FATAL
+    #DopCommon.log.level = ::Logger::FATAL
   end
 
   describe '#key_aliases' do
@@ -19,24 +19,54 @@ describe DopCommon::HashParser do
     it 'raises an exception if more than one alias/key is already set' do
       hash = {'my_key' => 'test', :my_key => 'test2'}
       aliases = ['my_key', :my_keys, 'my_keys']
-      expect{DopCommon::HashParser.key_aliases(hash, :my_key, aliases)}.to raise_error DopCommon::PlanParsingError 
+      expect{DopCommon::HashParser.key_aliases(hash, :my_key, aliases)}.to raise_error DopCommon::PlanParsingError
     end
   end
 
   describe '#symbolize_keys' do
-    pending
+    subject { DopCommon::HashParser.symbolize_keys(
+      hash = {'a' => [{'aa' => 1, 'bb' => 2}], 'b' => 3}
+    )}
+    it { is_expected.to eq({:a => [{'aa' => 1, 'bb' => 2}], :b => 3}) }
   end
 
   describe '#deep_symbolize_keys' do
-    pending
+    context 'simple nested hash' do
+      subject { DopCommon::HashParser.deep_symbolize_keys(
+        hash = {'a' => [{'aa' => '1', 'bb' => 2}], 'b' => 3}
+      )}
+      it { is_expected.to eq({:a => [{:aa => '1', :bb => 2}], :b => 3}) }
+    end
+    context 'nested hash with loops' do
+      subject {
+        hash = {'a' => [{'aa' => 1, 'bb' => 2}], 'b' => 3}
+        hash['a'] << hash
+        DopCommon::HashParser.deep_symbolize_keys(hash)
+      }
+      it { is_expected.to be_a Hash }
+    end
   end
 
   describe '#represents_regexp?' do
-    pending
+    context 'valid regexp' do
+      subject {DopCommon::HashParser.represents_regexp?('/valid/')}
+      it { is_expected.to be true }
+    end
+    context 'invalid regexp' do
+      subject {DopCommon::HashParser.represents_regexp?('noregex')}
+      it { is_expected.to be false }
+    end
   end
 
   describe '#is_valid_regexp?' do
-    pending
+    context 'valid regexp' do
+      subject {DopCommon::HashParser.is_valid_regexp?('/valid/')}
+      it { is_expected.to be true }
+    end
+    context 'invalid regexp' do
+      subject {DopCommon::HashParser.is_valid_regexp?('/][/')}
+      it { is_expected.to be false }
+    end
   end
 
   describe '#pattern_list_valid?' do
