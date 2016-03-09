@@ -442,4 +442,43 @@ describe DopCommon::Node do
       end
     end
   end
+
+  describe '#credentials' do
+    before :all do
+      @credentials = {
+        'test_up' => DopCommon::Credential.new('test_up', {
+          :type     => 'username_password',
+          :username => 'alice',
+          :password => 'abc123',
+        }),
+        'test_ssh' => DopCommon::Credential.new('test_ssh', {
+          :type       => 'ssh_key',
+          :username   => 'bob',
+          :public_key => 'spec/fixtures/example_ssh_key.pub',
+        }),
+        'test_ssh2' => DopCommon::Credential.new('test_ssh2', {
+          :type        => 'ssh_key',
+          :username    => 'bob',
+          :private_key => 'spec/fixtures/example_ssh_key',
+        }),
+      }
+    end
+
+    it 'returns an array of credentials if properly defined' do
+      node = DopCommon::Node.new('dummy',
+        {:credentials => ['test_up', 'test_ssh']},
+        {:parsed_credentials => @credentials }
+      )
+      expect(node.credentials).to have(2).things
+      expect(node.credentials.all?{|c| c.kind_of?(DopCommon::Credential)}).to be true
+    end
+
+    it 'will throw an error if a node includes an invalid credential' do
+      node = DopCommon::Node.new('dummy',
+        {:credentials => ['test_up', 'test_ssh2']},
+        {:parsed_credentials => @credentials }
+      )
+      expect{node.credentials}.to raise_error DopCommon::PlanParsingError
+    end
+  end
 end

@@ -110,7 +110,10 @@ module DopCommon
 
     def parsed_nodes
       @parsed_nodes ||= @hash[:nodes].map do |name, hash|
-        ::DopCommon::Node.new(name.to_s, hash, {:parsed_infrastructures => infrastructures})
+        ::DopCommon::Node.new(name.to_s, hash, {
+          :parsed_infrastructures => infrastructures,
+          :parsed_credentials     => credentials,
+        })
       end
     end
 

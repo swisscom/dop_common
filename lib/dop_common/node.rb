@@ -49,6 +49,7 @@ module DopCommon
       @name = name
       @hash = symbolize_keys(hash)
       @parsed_infrastructures = parent[:parsed_infrastructures]
+      @parsed_credentials     = parent[:parsed_credentials]
     end
 
     def validate
@@ -124,7 +125,6 @@ module DopCommon
     def flavor
       @flavor ||= flavor_valid? ?
         @hash[:flavor] : (infrastructure.provides?(:openstack) ? DEFAULT_OPENSTACK_FLAVOR : "")
-
     end
 
     def cores
@@ -149,6 +149,9 @@ module DopCommon
 
     def organization_name
       @organization_name ||= organization_name_valid? ? @hash[:organization_name] : nil
+    end
+
+    def credentials
     end
 
   protected
@@ -295,6 +298,9 @@ module DopCommon
       raise PlanParsingError, "Node #{name}: 'organization_name' must be a non-empty string" if
         !@hash[:organization_name].kind_of?(String) || @hash[:organization_name].empty?
       true
+    end
+
+    def credentials_valid?
     end
 
     def create_fqdn
