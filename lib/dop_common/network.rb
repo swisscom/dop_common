@@ -54,7 +54,9 @@ module DopCommon
       return false if @hash.empty? # An empty network specification is valid
       # It must be a hash with from and to keys if defined
       raise PlanParsingError, "Network #{@name}: An IP pool must be a hash with 'from' and 'to' keys" unless
-        @hash[:ip_pool].kind_of?(Hash) && @hash[:ip_pool].keys.sort == [:from, :to]
+        @hash[:ip_pool].kind_of?(Hash) and
+        @hash[:ip_pool].has_key?(:from) and
+        @hash[:ip_pool].has_key?(:to)
       # The IP defined by from must be lower than the IP defined by to keyword
       ip_from = IPAddr.new(@hash[:ip_pool][:from])
       ip_to   = IPAddr.new(@hash[:ip_pool][:to])
