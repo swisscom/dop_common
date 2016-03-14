@@ -19,13 +19,14 @@ namespace :vagrant do
     'rhel7.example.com'
   ]
 
-  task :up do
+  task :prep do
     Bundler.with_clean_env do
       sh 'vagrant up'
+      sh 'vagrant rsync'
     end
   end
 
-  task :spec => ['vagrant:up'] do
+  task :spec => ['vagrant:prep'] do
     test_machines.each do |machine|
       Bundler.with_clean_env do
         commands = [

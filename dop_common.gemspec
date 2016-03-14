@@ -22,8 +22,15 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.required_ruby_version = '>= 1.8.7'
+
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake"
+
+  if RUBY_VERSION <= '1.8.7'
+    spec.add_development_dependency "rake", '~> 10.5'
+  else
+    spec.add_development_dependency "rake"
+  end
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-legacy_formatters"
   spec.add_development_dependency "rspec-mocks"
