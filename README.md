@@ -26,6 +26,19 @@ TODO: Write usage instructions here
 
 [DOP Plan Format v 0.0.1](doc/plan_format_v0.0.1.md)
 
+## Tests
+
+To run the tests for your current machine run:
+
+    $ bundle install
+    $ bundle exec rake
+
+To run the tests on all the supportet platform you will need
+a vagrant installation with virtualbox.
+
+    $ bundle install
+    $ bundle exec rake vagrant:spec
+
 ## Contributing
 
 1. Fork it
