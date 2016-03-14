@@ -303,6 +303,10 @@ a property name is actually a keyword of a node hash.
     6. __*tenant*__ property specifies the name of the tenant for OpenStack
        infrastructures. It is required for OpenStack infrastructures.
 
+	7. __*use_config_drive*__ boolean property specifies whether a config drive
+       should be used in OpenStack infrastructures. Its default value is `true`.
+       Please specify `false` if you want to use metada service instead.
+
     __IMPORTANT__: Infrastructure properties may differ across different
     provider types.
 
