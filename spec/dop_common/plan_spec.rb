@@ -9,7 +9,11 @@ describe DopCommon::Plan do
   describe '#name' do
     it 'will return a hash if no name is defined' do
       plan = DopCommon::Plan.new({})
-      expect(plan.name).to eq '44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a'
+      if RUBY_VERSION <= '1.8.7'
+        expect(plan.name).to eq 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+      else
+        expect(plan.name).to eq '44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a'
+      end
     end
     it 'will return the correct value if name is defined' do
       plan = DopCommon::Plan.new({:name => 'myplan'})

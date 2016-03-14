@@ -192,7 +192,7 @@ describe DopCommon::Node do
     it 'will return an array of interfaces if specified correctly' do
       node = DopCommon::Node.new('foo', {:interfaces => {'eth0' => {}, 'eth1' => {}}})
       expect(node.interfaces.length).to eq 2
-      expect(node.interfaces.first.name).to eq 'eth0'
+      expect(node.interfaces.all?{|i| i.kind_of?(DopCommon::Interface)}).to be true
     end
     it 'will return an empty array if interfaces is not specified' do
       node = DopCommon::Node.new('foo', {})
