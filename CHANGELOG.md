@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.7.0] - unreleased
+### Added
+- Implemented `use_config_drive` infrastructure property, which is used to
+  select a configuration backend of OpenStack providers. By default a config
+  drive is used. A user should specify `false` should he require metadata
+  service fo configuration.
+
 ## [0.6.1] - 2016-01-27
 ### Fixed
 - Fixed a bug which filtered all the log output away if a credential other than

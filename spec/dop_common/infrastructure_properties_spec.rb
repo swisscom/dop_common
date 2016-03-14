@@ -40,7 +40,7 @@ describe DopCommon::InfrastructureProperties do
       expect(infrastructure_properties.keep_ha).to eq true
     end
 
-    it "will return 'true' or 'false if specified in input hash properly" do
+    it "will return 'true' or 'false' if specified in input hash properly" do
       [true, false].each do |val|
         infrastructure_properties = DopCommon::InfrastructureProperties.new({'keep_ha' => val}, nil)
         expect(infrastructure_properties.keep_ha).to eq val
@@ -116,6 +116,27 @@ describe DopCommon::InfrastructureProperties do
       [nil, :invalid, ""].each do |prop_val|
         infrastructure_properties = DopCommon::InfrastructureProperties.new({'tenant' => prop_val}, infrastructure['openstack'])
         expect { infrastructure_properties.tenant }.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
+
+  describe '#use_config_drive' do
+    it "will return 'true' if not specified in input hash" do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({}, nil)
+      expect(infrastructure_properties.use_config_drive).to eq true
+    end
+
+    it "will return 'true' or 'false' if specified in input hash properly" do
+      [true, false].each do |val|
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'use_config_drive' => val}, nil)
+        expect(infrastructure_properties.use_config_drive).to eq val
+      end
+    end
+
+    it 'will raise an exception if not specified properly in input hash' do
+      ['true', 'false', 1, 0, :invalid, {}].each do |val|
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'use_config_drive' => val}, nil)
+        expect { infrastructure_properties.use_config_drive }.to raise_error DopCommon::PlanParsingError
       end
     end
   end

@@ -20,6 +20,7 @@ module DopCommon
       log_validation_method(:default_pool_valid?)
       log_validation_method(:dest_folder_valid?)
       log_validation_method(:tenant_valid?)
+      log_validation_method(:use_config_drive_valid?)
     end
 
     def affinity_groups
@@ -48,6 +49,10 @@ module DopCommon
 
     def tenant
       @tenant ||= tenant_valid? ? @hash[:tenant] : nil
+    end
+
+    def use_config_drive
+      @use_config_drive ||= use_config_drive_valid? ? @hash[:use_config_drive] : true
     end
 
     private
@@ -107,6 +112,13 @@ module DopCommon
         @parsed_infrastructure.provides?(:openstack) && @hash[:tenant].nil?
       raise PlanParsingError, "Infrastructure properties: The 'tenant' must be a non-empty string" if
         !@hash[:tenant].kind_of?(String) || @hash[:tenant].empty?
+      true
+    end
+
+    def use_config_drive_valid?
+      return false if @hash[:use_config_drive].nil?
+      raise PlanParsingError, "Infrastructure properties: The 'use_config_drive' must be boolean" unless
+        @hash[:use_config_drive].kind_of?(TrueClass) || @hash[:use_config_drive].kind_of?(FalseClass)
       true
     end
   end
