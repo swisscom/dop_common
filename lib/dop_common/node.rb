@@ -152,6 +152,7 @@ module DopCommon
     end
 
     def credentials
+      @credentials ||= credentials_valid? ? create_credentials : []
     end
 
   protected
@@ -301,6 +302,21 @@ module DopCommon
     end
 
     def credentials_valid?
+      return false if @hash[:credentials].nil?
+      [String, Symbol, Array].include?(@hash[:credentials].class) or
+        raise PlanParsingError, "Node #{name}: 'credentials' has to be a string, symbol or array"
+      [@hash[:credentials]].flatten.each do |credential|
+        [String, Symbol].include?(credential.class) or
+          raise PlanParsingError, "Node #{name}: the 'credentials' array should only contain strings, symbols"
+        @parsed_credentials.keys.include?(credential.to_sym) or
+          raise PlanParsingError, "Node #{name}: the credential #{credential.to_s} in 'credentials' does not exist"
+        real_credential = @parsed_credentials[credential.to_sym]
+        case real_credential.type
+        when :ssh_key
+          real_credential.public_key or
+            raise PlanParsingError, "Node #{name}: the ssh_key credential #{credential.to_s} in 'credentials' requires a public key"
+        end
+      end
     end
 
     def create_fqdn
@@ -353,6 +369,12 @@ module DopCommon
     def create_storage
       return nil if infrastructure.provides?(:openstack)
       @hash[:flavor].nil? ? to_bytes(@hash[:storage]) : VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
+    end
+
+    def create_credentials
+      [@hash[:credentials]].flatten.map do |credential|
+        @parsed_credentials[credential.to_sym]
+      end
     end
   end
 end

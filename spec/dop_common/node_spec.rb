@@ -446,17 +446,17 @@ describe DopCommon::Node do
   describe '#credentials' do
     before :all do
       @credentials = {
-        'test_up' => DopCommon::Credential.new('test_up', {
+        :test_up => DopCommon::Credential.new('test_up', {
           :type     => 'username_password',
           :username => 'alice',
           :password => 'abc123',
         }),
-        'test_ssh' => DopCommon::Credential.new('test_ssh', {
+        :test_ssh => DopCommon::Credential.new('test_ssh', {
           :type       => 'ssh_key',
           :username   => 'bob',
           :public_key => 'spec/fixtures/example_ssh_key.pub',
         }),
-        'test_ssh2' => DopCommon::Credential.new('test_ssh2', {
+        :test_ssh2 => DopCommon::Credential.new('test_ssh2', {
           :type        => 'ssh_key',
           :username    => 'bob',
           :private_key => 'spec/fixtures/example_ssh_key',
@@ -464,21 +464,50 @@ describe DopCommon::Node do
       }
     end
 
-    it 'returns an array of credentials if properly defined' do
+    it 'returns an empty array if nothing is defined' do
+      node = DopCommon::Node.new('dummy',{:parsed_credentials => @credentials })
+      expect(node.credentials).to be_an Array
+      expect(node.credentials.empty?).to be true
+    end
+
+    it 'returns an array if a credential if properly defined as a string' do
+      node = DopCommon::Node.new('dummy',
+        {:credentials => 'test_up'},
+        {:parsed_credentials => @credentials }
+      )
+      expect(node).to have_exactly(1).credentials
+      expect(node.credentials.all?{|c| c.kind_of?(DopCommon::Credential)}).to be true
+    end
+
+    it 'returns an array if an array of credentials if properly defined' do
       node = DopCommon::Node.new('dummy',
         {:credentials => ['test_up', 'test_ssh']},
         {:parsed_credentials => @credentials }
       )
-      expect(node.credentials).to have(2).things
+      expect(node).to have_exactly(2).credentials
       expect(node.credentials.all?{|c| c.kind_of?(DopCommon::Credential)}).to be true
     end
 
-    it 'will throw an error if a node includes an invalid credential' do
+    it 'will throw an error if credentials is not an array or string' do
+      node = DopCommon::Node.new('dummy',
+        {:credentials => 1},
+        {:parsed_credentials => @credentials }
+      )
+      expect{node.credentials}.to raise_error DopCommon::PlanParsingError
+      node = DopCommon::Node.new('dummy',
+        {:credentials => ['test_up', 1]},
+        {:parsed_credentials => @credentials }
+      )
+      expect{node.credentials}.to raise_error DopCommon::PlanParsingError
+    end
+
+    it 'will throw an error if a node includes a ssh_key credential without public_key' do
       node = DopCommon::Node.new('dummy',
         {:credentials => ['test_up', 'test_ssh2']},
         {:parsed_credentials => @credentials }
       )
       expect{node.credentials}.to raise_error DopCommon::PlanParsingError
     end
+
   end
 end
