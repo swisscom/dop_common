@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::AffinityGroup do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#positive' do
     it "will return 'true' if the affinity group is positive and 'false' if it is not" do
       affinity_group = DopCommon::AffinityGroup.new('ag', {'positive' => true, 'enforce' => true, 'cluster' => 'cl'})

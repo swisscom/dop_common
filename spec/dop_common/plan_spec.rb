@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::Plan do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#name' do
     it 'will return a hash if no name is defined' do
       plan = DopCommon::Plan.new({})

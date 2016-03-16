@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::Command do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#plugin' do
     it 'returns the name of the plugin' do
       command = DopCommon::Command.new({:plugin => 'dummy'})

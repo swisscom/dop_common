@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::Network do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   good_ip_defgw = '192.168.1.1'
   good_ip_netmask = '255.255.255.0'
   good_net = {

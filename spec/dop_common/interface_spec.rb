@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::Node do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#ip' do
     it 'will return :dhcp if dhcp is specified' do
       interface = DopCommon::Interface.new('eth0', {:ip => 'dhcp'})

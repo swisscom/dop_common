@@ -4,10 +4,6 @@ require 'spec_helper'
 
 describe DopCommon::Validator do
 
-  before :all do
-    DopCommon.log.level = ::Logger::FATAL
-  end
-
   describe 'valid?' do
     it 'should be valid if the validation returns true' do
       class ValidatorTestKlass

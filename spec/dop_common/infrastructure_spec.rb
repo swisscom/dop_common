@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::Infrastructure do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#provider' do
     it 'will set and return the infrastructure type of infrastructure if specified correctly' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})

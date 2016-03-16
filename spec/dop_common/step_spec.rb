@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::Step do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#name' do
     it 'returns the name if it is specified correctly' do
       step = DopCommon::Step.new({:name => 'foo'})

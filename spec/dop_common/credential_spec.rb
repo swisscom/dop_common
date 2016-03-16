@@ -4,10 +4,6 @@ require 'tempfile'
 
 describe DopCommon::Credential do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#type' do
     it 'returns the type if specified correctly (username_password)' do
       credential = DopCommon::Credential.new('test', {:type => :username_password, :username => 'a', :password => 'b'})

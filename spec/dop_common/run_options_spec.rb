@@ -7,10 +7,6 @@ end
 
 describe DopCommon::RunOptions do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#max_in_flight' do
     it 'will return nil if max_in_flight is not defined' do
       run_options = RunOptionsTestKlass.new({})
@@ -85,6 +81,5 @@ describe DopCommon::RunOptions do
       expect{run_options.canary_host}.to raise_error DopCommon::PlanParsingError
     end
   end
-
 
 end

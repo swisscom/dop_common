@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::StepSet do
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#steps' do
     it 'will return an array of steps if correctly specified' do
       step_set = DopCommon::StepSet.new('foo', [{:name => 'foo'}])

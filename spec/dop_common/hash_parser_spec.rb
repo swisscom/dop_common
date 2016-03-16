@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe DopCommon::HashParser do
 
-  before :all do
-    #DopCommon.log.level = ::Logger::FATAL
-  end
-
   describe '#key_aliases' do
     it 'should set the proper keys' do
       hash = {'my_key' => 'test'}

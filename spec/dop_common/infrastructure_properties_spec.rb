@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe DopCommon::InfrastructureProperties do
-  before(:all) do
-    DopCommon.log.level = ::Logger::ERROR
-  end
 
   providers = %w(ovirt vsphere openstack)
   infrastructure = Hash[

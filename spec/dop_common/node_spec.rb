@@ -8,10 +8,6 @@ describe DopCommon::Node do
     DopCommon::Infrastructure.new('vsphere', {'type' => 'vsphere'})
   ]
 
-  before :all do
-    DopCommon.log.level = ::Logger::ERROR
-  end
-
   describe '#range' do
     it 'will return nil if the node is not inflatable' do
       node = DopCommon::Node.new('mynode.example.com', {:range => '1..10'})
