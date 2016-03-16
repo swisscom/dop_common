@@ -97,8 +97,7 @@ module DopCommon
     def ssh_key_valid?
       username_valid? or
         raise PlanParsingError, "A username is missing in the credential #{@name} which is of type #{@hash[:type]}"
-      private_key_valid? or
-        raise PlanParsingError, "A private_key is missing in the credential #{@name} which is of type #{@hash[:type]}"
+      private_key_valid?
       public_key_valid?
       true
     end

@@ -5,6 +5,7 @@ SimpleCov.start do
   add_filter '/vendor/'
 end
 
+require 'rspec/collection_matchers'
 require 'dop_common'
 
 DopCommon.log.level = ::Logger::FATAL
