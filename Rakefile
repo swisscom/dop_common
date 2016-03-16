@@ -14,10 +14,10 @@ task :console do
 end
 
 namespace :vagrant do
-  test_machines = [
-    'rhel6.example.com',
-    'rhel7.example.com'
-  ]
+  test_machines = {
+    'rhel6.example.com' => ['ruby193'],
+    'rhel7.example.com' => [],
+  }
 
   task :prep do
     Bundler.with_clean_env do
@@ -27,14 +27,19 @@ namespace :vagrant do
   end
 
   task :spec => ['vagrant:prep'] do
-    test_machines.each do |machine|
+    test_machines.each_key do |machine|
       Bundler.with_clean_env do
         commands = [
           'cd /vagrant',
           'bundle install',
           'bundle exec rspec',
         ]
+        # system ruby
         sh "vagrant ssh #{machine} -c '#{commands.join(' && ')}'"
+        # scl ruby
+        test_machines[machine].each do |scl|
+          sh "vagrant ssh #{machine} -c 'scl enable ruby193 \"#{commands.join(' && ')}\"'"
+        end
       end
     end
   end

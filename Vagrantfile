@@ -8,13 +8,13 @@ Vagrant.configure(2) do |config|
 
   config.vm.define 'rhel6.example.com' do |machine|
     machine.vm.box = 'puppetlabs/centos-6.6-64-nocm'
-    machine.vm.provision 'shell', inline: 'yum install -y epel-release'
-    machine.vm.provision 'shell', inline: 'yum install -y ruby ruby-devel gcc rubygem-bundler git'
+    machine.vm.provision 'shell', inline: 'yum install -y gcc git epel-release centos-release-scl'
+    machine.vm.provision 'shell', inline: 'yum install -y ruby ruby-devel rubygem-bundler ruby193 ruby193-ruby-devel ruby193-rubygem-bundler'
   end
 
   config.vm.define 'rhel7.example.com' do |machine|
     machine.vm.box = 'puppetlabs/centos-7.0-64-nocm'
-    machine.vm.provision 'shell', inline: 'yum install -y ruby ruby-devel gcc rubygem-bundler git'
+    machine.vm.provision 'shell', inline: 'yum install -y gcc git ruby ruby-devel rubygem-bundler'
   end
 
 end
