@@ -127,4 +127,55 @@ describe DopCommon::HashParser do
     pending
   end
 
+  describe 'load_content' do
+    it 'successfully returns the content from a string' do
+      value = 'Some simple string'
+      expect{DopCommon::HashParser.load_content_valid?(value)}.to_not raise_error
+      expect(DopCommon::HashParser.load_content(value)).to eq('Some simple string')
+    end
+
+    it 'successfully retrieve content from a file' do
+      secret = SecureRandom.hex
+      key_file = Tempfile.new('secret_file', ENV['HOME'])
+      key_file.write(secret)
+      key_file.close
+      value = {:file => key_file.path}
+      expect{DopCommon::HashParser.load_content_valid?(value)}.to_not raise_error
+      expect(DopCommon::HashParser.load_content(value)).to eq(secret)
+      key_file.delete
+    end
+
+    it 'successfully retrieve content from an executable' do
+      secret = SecureRandom.hex
+      key_exec = Tempfile.new('secret_exec', ENV['HOME'])
+      key_exec.write("#!/bin/sh\necho \"#{secret}\"")
+      key_exec.close
+      FileUtils.chmod(0700, key_exec.path)
+      value = {:exec => [key_exec.path]}
+      expect{DopCommon::HashParser.load_content_valid?(value)}.to_not raise_error
+      expect(DopCommon::HashParser.load_content(value)).to eq(secret)
+      key_exec.delete
+    end
+
+    it 'successfully retrieve content from an executable with parameters' do
+      secret = SecureRandom.hex
+      key_exec = Tempfile.new('secret_exec', ENV['HOME'])
+      key_exec.write("#!/bin/sh\necho $2")
+      key_exec.close
+      FileUtils.chmod(0700, key_exec.path)
+      value = {:exec => [key_exec.path, '--secret', secret]}
+      expect{DopCommon::HashParser.load_content_valid?(value)}.to_not raise_error
+      expect(DopCommon::HashParser.load_content(value)).to eq(secret)
+      key_exec.delete
+    end
+
+    it "raises an exeption if the file does not exist" do
+      file_name = SecureRandom.hex
+      value = {:file => File.join('/tmp', file_name)}
+      expect{DopCommon::HashParser.load_content_valid?(value)}.to raise_error DopCommon::PlanParsingError
+      value = {:exec => File.join('/tmp', file_name)}
+      expect{DopCommon::HashParser.load_content_valid?(value)}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
 end

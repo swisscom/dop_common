@@ -149,5 +149,76 @@ module DopCommon
     end
     module_function :parse_hash_of_pattern_lists
 
+    # Load string content from different sources
+    #
+    # the content can be directly a string in which case it will
+    # immediatly return.
+    # load_content('hello world')
+    #
+    # it may also be a hash with the following content:
+    # load_content({ file => '/path/to/some/file' })
+    # This will check if the file exists and load it
+    #
+    # you can also specify a script it will execute to get the
+    # content
+    # load_content({ exec => '/path/to/some/executable_file' })
+    def load_content(value)
+      if value.kind_of?(Hash)
+        method, params = value.first
+        file = case params
+        when Array  then params.join(' ')
+        when String then params
+        end
+        case method
+        when :file then File.read(file).chomp
+        when :exec then %x[#{file}].chomp
+        end
+      else
+        value
+      end
+    end
+    module_function :load_content
+
+    # This is the validation method for the load_content
+    # method and will check if the value is a correctly
+    # specified content source
+    def load_content_valid?(value)
+      case value
+      when String then true
+      when Hash
+        value.count == 1 or
+          raise PlanParsingError, "You can only specify one content type"
+        method, params = value.first
+        [:file, :exec].include?(method) or
+          raise PlanParsingError, "#{method} is not a valid content method. valid methods are :exec and :file"
+        file = case params
+        when Array
+          params.count >= 1 or
+            raise PlanParsingError, "The array for method #{method} has to have at least one entry"
+          params.all?{|e| e.kind_of?(String)} or
+            raise PlanParsingError, "The array for method #{method} can only contain strings"
+          method != :file or
+            raise PlanParsingError, "The method :file does not support arrays as an argument"
+          params.first
+        when String
+          params
+        else
+          raise PlanParsingError, "The value for method #{method} has to be an array or string"
+        end
+        File.exists?(file) or
+          raise PlanParsingError, "The file #{file} does not exist."
+        File.readable?(file) or
+          raise PlanParsingError, "The file #{file} is not readable."
+        if method == :exec
+          File.executable?(file) or
+            raise PlanParsingError, "The file #{file} is not executable."
+        end
+      else
+        raise PlanParsingError, 'The content source has to be a string or a hash with a content lookup method'
+      end
+      true
+    end
+    module_function :load_content_valid?
+
   end
 end

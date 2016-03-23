@@ -27,7 +27,7 @@ describe DopCommon::Credential do
     end
   end
 
-  [:username, :realm, :service, :password].each do |key|
+  [:username, :realm, :service].each do |key|
     describe '#' + key.to_s do
       it "returns a #{key} if one is correctly specified" do
         credential = DopCommon::Credential.new('test', {key => 'a'})
@@ -44,82 +44,28 @@ describe DopCommon::Credential do
     end
   end
 
-  [:keytab, :public_key].each do |key|
+  [:password, :keytab, :public_key, :private_key].each do |key|
     describe '#' + key.to_s do
-      it "returns the filename if correctly specified" do
-        credential = DopCommon::Credential.new('test', {key => 'spec/data/fake_keyfile'})
-        expect(credential.send(key)).to eq 'spec/data/fake_keyfile'
+      it "returns the content if correctly specified as a string" do
+        credential = DopCommon::Credential.new('test', {key => 'my secret'})
+        expect(credential.send(key)).to eq 'my secret'
+      end
+      it 'returns the content if correctly specified as a file' do
+        key_file = Tempfile.new('secret_file', ENV['HOME'])
+        key_file.write("my secret")
+        key_file.close
+        credential = DopCommon::Credential.new('test', {key => {'file' => key_file.path}})
+        expect(credential.send(key)).to eq 'my secret'
+        key_file.delete
       end
       it "returns nil if #{key} is not specified" do
         credential = DopCommon::Credential.new('test', {})
         expect(credential.send(key)).to be nil
       end
       it "raises an exception if the file does not exist" do
-        credential = DopCommon::Credential.new('test', {key => 'spec/data/nonexisting_keyfile'})
+        credential = DopCommon::Credential.new('test', {key => {'file' => 'spec/data/nonexisting_keyfile'}})
         expect{credential.send(key)}.to raise_error DopCommon::PlanParsingError
       end
-    end
-  end
-
-  describe 'externel_secret' do
-    it 'successfully retrieves a password from a file' do
-      secret = SecureRandom.hex
-      key_file = Tempfile.new('secret_file', ENV['HOME'])
-      key_file.write(secret)
-      key_file.close
-      credential = DopCommon::Credential.new('test', {
-        :type     => :username_password,
-        :username => 'a',
-        :password => {:file => key_file.path}
-      })
-      expect(credential.password).to eq(secret)
-      key_file.delete
-    end
-
-    it 'successfully retrieves a password from an executable' do
-      secret = SecureRandom.hex
-      key_exec = Tempfile.new('secret_exec', ENV['HOME'])
-      key_exec.write("#!/bin/sh\necho \"#{secret}\"")
-      key_exec.close
-      FileUtils.chmod(0700, key_exec.path)
-      credential = DopCommon::Credential.new('test', {
-        :type     => :username_password,
-        :username => 'a',
-        :password => {:exec => [key_exec.path]}
-      })
-      expect(credential.password).to eq(secret)
-      key_exec.delete
-    end
-
-    it 'successfully retrieves a password from an executable with parameters' do
-      secret = SecureRandom.hex
-      key_exec = Tempfile.new('secret_exec', ENV['HOME'])
-      key_exec.write("#!/bin/sh\necho $2")
-      key_exec.close
-      FileUtils.chmod(0700, key_exec.path)
-      credential = DopCommon::Credential.new('test', {
-        :type     => :username_password,
-        :username => 'a',
-        :password => {:exec => [key_exec.path, '--secret', secret]}
-      })
-      expect(credential.password).to eq(secret)
-      key_exec.delete
-    end
-
-    it "raises an exeption if the file does not exist" do
-      file_name = SecureRandom.hex
-      credential = DopCommon::Credential.new('test', {
-        :type     => :username_password,
-        :username => 'a',
-        :password => {:file => File.join('/tmp', file_name)}
-      })
-      expect{credential.password}.to raise_error DopCommon::PlanParsingError
-      credential = DopCommon::Credential.new('test', {
-        :type     => :username_password,
-        :username => 'a',
-        :password => {:exec => File.join('/tmp', file_name)}
-      })
-      expect{credential.password}.to raise_error DopCommon::PlanParsingError
     end
   end
 
