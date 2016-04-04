@@ -164,7 +164,7 @@ module DopCommon
     # load_content({ exec => '/path/to/some/executable_file' })
     def load_content(value)
       if value.kind_of?(Hash)
-        method, params = value.first
+        method, params = symbolize_keys(value).first
         file = case params
         when Array  then params.join(' ')
         when String then params
@@ -188,7 +188,7 @@ module DopCommon
       when Hash
         value.count == 1 or
           raise PlanParsingError, "You can only specify one content type"
-        method, params = value.first
+        method, params = symbolize_keys(value).first
         [:file, :exec].include?(method) or
           raise PlanParsingError, "#{method} is not a valid content method. valid methods are :exec and :file"
         file = case params
