@@ -5,11 +5,12 @@
 module DopCommon
   class Command
     include Validator
+    include HashParser
 
     attr_reader :hash
 
     def initialize(hash)
-      @hash = hash.kind_of?(Hash) ? Hash[hash.map{|k,v| [k.to_sym, v]}] : hash
+      @hash = symbolize_keys(hash)
       @defaults = {
         :plugin_timeout => 300,
         :verify_after_run => false,
