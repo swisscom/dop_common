@@ -8,7 +8,8 @@ module DopCommon
     include RunOptions
 
     def initialize(hash)
-      @hash = Hash[hash.map{|k,v| [k.to_sym, v]}]
+      @hash = HashParser.symbolize_keys(hash)
+      HashParser.key_aliases(@hash, :commands, [:command])
     end
 
     def name
@@ -25,9 +26,9 @@ module DopCommon
       log_validation_method('exclude_nodes_by_config_valid?')
       log_validation_method('roles_valid?')
       log_validation_method('exclude_roles_valid?')
-      log_validation_method('command_valid?')
+      log_validation_method('commands_valid?')
       r_name = @name || 'unknown' # name may not be set because of a previous error
-      try_validate_obj("Step #{r_name}: Can't validate the command part because of a previous error"){command}
+      try_validate_obj("Step #{r_name}: Can't validate the commands part because of a previous error"){commands}
     end
 
     def nodes
@@ -60,8 +61,8 @@ module DopCommon
         HashParser.parse_pattern_list(@hash, :exclude_roles) : []
     end
 
-    def command
-      @command ||= command_valid? ? create_command : nil
+    def commands
+      @commands ||= commands_valid? ? create_commands : nil
     end
 
     def set_plugin_defaults
@@ -112,15 +113,25 @@ module DopCommon
       raise PlanParsingError, "Step #{@name}: #{e.message}"
     end
 
-    def command_valid?
-      @hash[:command] or
-        raise PlanParsingError, "Step #{@name}: A command key has to be defined"
-      @hash[:command].kind_of?(Hash) || @hash[:command].kind_of?(String) or
-        raise PlanParsingError, "Step #{@name}: The value for command has to be a string or a hash"
+    def commands_valid?
+      @hash[:commands] or
+        raise PlanParsingError, "Step #{@name}: A commands key has to be defined"
+      case @hash[:commands]
+      when String, Hash
+        true
+      when Array
+        @hash[:commands].all?{|c| c.kind_of?(String) or c.kind_of?(Hash)} or
+          raise PlanParsingError, "Step #{@name}: All commands must be Strings or Hashes"
+      else
+        raise PlanParsingError,
+          "Step #{@name}: The value for commands has to be a string, a hash or an array"
+      end
     end
 
-    def create_command
-      @command = ::DopCommon::Command.new(@hash[:command])
+    def create_commands
+      [@hash[:commands]].flatten.map do |command|
+        ::DopCommon::Command.new(command)
+      end
     end
 
     def plugin_pattern_array_valid?(key)
