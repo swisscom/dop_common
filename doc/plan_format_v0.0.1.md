@@ -812,9 +812,9 @@ Exclude nodes based on config values and matching patterns.
 
 Works exactly like exclude_nodes but excludes roles.
 
-### command
+### commands
 
-The command can either be directly a plugin name if no parameters are needed or a command hash which will be passed to the plugin. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depends on the plugin in use and how it will parse the hash.
+The commands can either be directly a plugin name if a simgle plugin and no parameters, a single command hash which will be passed to the plugin or an array of command hashes if multiple commands have to be executed in a single step. The only fixed variable here is the **plugin** variable. The rest of the variables in the command hash depends on the plugin in use and how it will parse the hash.
 
 For more documentation about the plugins and the variables available for configuring them, check the DOPi documentation.
 
