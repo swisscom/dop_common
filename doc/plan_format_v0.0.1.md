@@ -32,7 +32,7 @@ This option can be overwritten on step level
 
 ### ssh_root_pass (optional)
 
-__*DEPRECATED*__ This method to set an ssh password is depricated in DOPi Version >=0.4 . Please see __*Credentials*__ for more information about how to set it now.
+__*DEPRECATED*__ This method to set an ssh password is deprecated in DOPi Version >=0.4 . Please see __*Credentials*__ for more information about how to set it now.
 
 The default password the ssh plugin will use to login on remote hosts if password login is enabled and sshpass is installed. This value can be overwritten via Hiera. DOPi will always try to lookup the variable over Hiera first and use this default if it finds nothing.
 
@@ -91,12 +91,20 @@ Settings for a kerberos login
 And SSH key we can use to login
 
 1. __*username*__ (required)
-2. __*private_key*__ (required) - The file where the private key is (smething like /root/.ssh/id_rsa)
-3. __*public_key*__ (optional) - The file where the public key is (smething like /root/.ssh/id_rsa.pub)
+2. __*private_key*__ (optional)
+3. __*public_key*__ (optional)
+
+While the public_key and private_key are optional in general, they are required depending on the usage of the
+credential. If the credential is used in DOPi to login to ssh, a private key will be required and the parser will
+inform you of this. If the credential is used in DOPv to set the login credentials of a vm, a public_key will be
+required.
+
+public_key and private_key can both be specified inline or be read from a file. Check the documentation about
+[external secrets](#external-secrets) about how to specify this correctly.
 
 ### External secrets
 
-Secrets like passwords can be stored outside of the plan so you don't have to check them into version control.
+Secrets like passwords or keys can be stored outside of the plan so you don't have to check them into version control.
 Instead of the password you can specify a hash with only one key-value pair. The key is either :file or :exec.
 The value for :file is a simple file which will be read to get the password. For :exec it is an array of where
 the first entry is the executable and the rest is a bunch of options or arguments which will be joined together
