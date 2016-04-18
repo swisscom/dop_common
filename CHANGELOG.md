@@ -1,12 +1,17 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [0.7.0] - unreleased
+## [0.7.0] - 2016-04-18
 ### Added
 - Implemented `use_config_drive` infrastructure property, which is used to
   select a configuration backend of OpenStack providers. By default a config
   drive is used. A user should specify `false` should he require metadata
   service fo configuration.
+- Credentials support for the nodes class
+
+### Changed
+- Credentials can now all be specified inline or loaded from a file
+- Support multiple commands in a single step
 
 ## [0.6.1] - 2016-01-27
 ### Fixed

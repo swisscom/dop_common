@@ -26,6 +26,7 @@ namespace :vagrant do
     end
   end
 
+  desc 'execute the rspec tests in vagrant boxes'
   task :spec => ['vagrant:prep'] do
     test_machines.each_key do |machine|
       Bundler.with_clean_env do
