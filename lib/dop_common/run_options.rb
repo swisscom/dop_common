@@ -9,7 +9,7 @@ module DopCommon
 
     def valitdate_shared_options
       log_validation_method('max_in_flight_valid?')
-      log_validation_method('ssh_root_pass_valid?')
+      log_validation_method('max_per_role_valid?')
       log_validation_method('canary_host_valid?')
     end
 
@@ -18,9 +18,9 @@ module DopCommon
         @hash[:max_in_flight] : nil
     end
 
-    def ssh_root_pass
-      @ssh_root_pass ||= ssh_root_pass_valid? ?
-        @hash[:ssh_root_pass] : nil
+    def max_per_role
+      @max_per_role ||= max_per_role_valid? ?
+        @hash[:max_per_role] : nil
     end
 
     def canary_host
@@ -31,14 +31,6 @@ module DopCommon
   private
 
     def max_in_flight_valid?
-      ### START DEPRICATED KEY PARSING plan => max_in_flight
-      if @hash[:max_in_flight].nil?
-        return false if @hash[:plan].nil? # plan hash is optional
-        return false if @hash[:plan][:max_in_flight].nil? # max_in_flight is optional
-        @hash[:max_in_flight] = @hash[:plan][:max_in_flight]
-        DopCommon.log.warn('The max_in_flight key under "plan" in depricated. Please set max_in_flight as a global key')
-      end
-      ### END DEPRICATED KEY PARSING
       return false if @hash[:max_in_flight].nil? # max_in_flight is optional
       @hash[:max_in_flight].kind_of?(Fixnum) or
         raise PlanParsingError, 'Plan: max_in_flight has to be a number'
@@ -46,23 +38,13 @@ module DopCommon
         raise PlanParsingError, 'Plan: max_in_flight has to be greater than -1'
     end
 
-    ### START DEPRICATED KEY PARSING ssh_root_pass
-    def ssh_root_pass_valid?
-      ### START DEPRICATED KEY PARSING plan => ssh_root_pass
-      if @hash[:ssh_root_pass].nil? # ssh_root_pass is optional
-        return false if @hash[:plan].nil? # plan hash is optional
-        return false if @hash[:plan][:ssh_root_pass].nil? # ssh_root_pass is optional
-        @hash[:ssh_root_pass] = @hash[:plan][:ssh_root_pass]
-        DopCommon.log.warn('The ssh_root_pass key under "plan" in depricated. Please set ssh_root_pass as a global key')
-      end
-      ### END DEPRICATED KEY PARSING
-      return false if @hash[:ssh_root_pass].nil? # ssh_root_pass is optional
-      @hash[:ssh_root_pass].kind_of?(String) or
-        raise PlanParsingError, 'Plan: ssh_root_pass has to be a string'
-      DopCommon.log.warn("'ssh_root_pass' is depricated. Please use the 'credentials' hash to specify your login credentials")
-      true
+    def max_per_role_valid?
+      return false if @hash[:max_per_role].nil? # max_per_role is optional
+      @hash[:max_per_role].kind_of?(Fixnum) or
+        raise PlanParsingError, 'Plan: max_per_role has to be a number'
+      @hash[:max_per_role] > 0 or
+        raise PlanParsingError, 'Plan: max_per_role has to be greater than 0'
     end
-    ### END DEPRICATED KEY PARSING
 
     def canary_host_valid?
       return false if @hash[:canary_host].nil?
