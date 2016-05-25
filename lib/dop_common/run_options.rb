@@ -42,8 +42,8 @@ module DopCommon
       return false if @hash[:max_per_role].nil? # max_per_role is optional
       @hash[:max_per_role].kind_of?(Fixnum) or
         raise PlanParsingError, 'Plan: max_per_role has to be a number'
-      @hash[:max_per_role] > 0 or
-        raise PlanParsingError, 'Plan: max_per_role has to be greater than 0'
+      @hash[:max_per_role] >= -1 or
+        raise PlanParsingError, 'Plan: max_per_role has to be greater than -1'
     end
 
     def canary_host_valid?
