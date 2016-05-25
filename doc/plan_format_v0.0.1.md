@@ -30,11 +30,17 @@ There are also two special values:
 
 This option can be overwritten on step level
 
-### ssh_root_pass (optional)
+### max_per_role (optional)
 
-__*DEPRECATED*__ This method to set an ssh password is deprecated in DOPi Version >=0.4 . Please see __*Credentials*__ for more information about how to set it now.
+`default: -1`
 
-The default password the ssh plugin will use to login on remote hosts if password login is enabled and sshpass is installed. This value can be overwritten via Hiera. DOPi will always try to lookup the variable over Hiera first and use this default if it finds nothing.
+The amount of nodes per role DOPi will execute in parallel.
+
+There are also two special values:
+
+- The values "0" and "-1" will make DOPi ignore the roles.
+
+This option can be overwritten on step level
 
 ### canary_host (optional)
 
