@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.8.0] - 2016-05-25
+### Added
+- Parsing for max_per_role on step and plan level
+
+### Removed
+- Deprecated ssh_root_pass
+- Deprecated plan subhash for plan settings
+
 ## [0.7.0] - 2016-04-18
 ### Added
 - Implemented `use_config_drive` infrastructure property, which is used to
