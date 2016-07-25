@@ -12,15 +12,20 @@ describe DopCommon::Network do
   describe '#ip_defgw' do
     it 'will return a netmask object if the default gateway is correct' do
       network = DopCommon::Network.new('dummy', {})
-      expect(network.ip_defgw).to eq(nil)
+      expect(network.ip_defgw).to be_nil
       network = DopCommon::Network.new('dummy', good_net)
       expect(network.ip_defgw.to_s).to eq(good_net['ip_defgw'])
+    end
+    it 'will return a netmask object if the default gateway is nil' do
+      network = DopCommon::Network.new('dummy', good_net.merge('ip_defgw' => false))
+      expect(network.ip_defgw).to be_falsey
     end
     it 'will raise an error in case of invalid default gateway IP' do
       network = DopCommon::Network.new('dummy', {'ip_defgw' => :invalid})
       expect { network.ip_defgw }.to raise_error DopCommon::PlanParsingError
     end
   end
+
 
   describe '#ip_netmask' do
     it 'will return a netmask object if the netmask is correct' do

@@ -25,7 +25,7 @@ module DopCommon
     end
 
     def ip_defgw
-      @ip_defgw ||= ip_defgw_valid? ? IPAddr.new(@hash[:ip_defgw]) : nil
+      @ip_defgw ||= ip_defgw_valid? ? (@hash[:ip_defgw] == false ? false : IPAddr.new(@hash[:ip_defgw])) : nil
     end
 
     def ip_pool
@@ -44,6 +44,7 @@ module DopCommon
 
     def ip_defgw_valid?
       return false if @hash.empty?
+      return true if @hash[:ip_defgw] == false
       IPAddr.new(@hash[:ip_defgw])
       true
     rescue ArgumentError
@@ -61,12 +62,16 @@ module DopCommon
       ip_from = IPAddr.new(@hash[:ip_pool][:from])
       ip_to   = IPAddr.new(@hash[:ip_pool][:to])
       raise PlanParsingError, "Network #{@name}: The IP defined by 'from' must to be lower than the IP defined by in 'to'" unless ip_from < ip_to
-      # The IP of default gateway must be out of IP pool range
-      raise PlanParsingError, "Network #{@name}: The default gateway must be out of IP pool range" unless ip_defgw < ip_from || ip_defgw > ip_to
-      # IPs specified by IP pool and the default gateway must belong to the same network
-      net = ip_defgw.mask(ip_netmask.to_s)
-      raise PlanParsingError, "Network #{@name}: IPs specified by IP pool and the default gateway must belong to the same network" unless
-        net.include?(ip_from) && net.include?(ip_to)
+      if ip_defgw
+        # The IP of default gateway must be out of IP pool range
+        raise PlanParsingError, "Network #{@name}: The default gateway must be out of IP pool range" unless ip_defgw < ip_from || ip_defgw > ip_to
+        # IPs specified by IP pool and the default gateway must belong to the same network
+        net = ip_defgw.mask(ip_netmask.to_s)
+        raise PlanParsingError, "Network #{@name}: IPs specified by IP pool and the default gateway must belong to the same network" unless
+          net.include?(ip_from) && net.include?(ip_to)
+      elsif ip_defgw.nil?
+        raise PlanParsingError, "Network #{@name}: The default gateway must either be a valid IP or false if there is no default gateway"
+      end
       true
     rescue ArgumentError
       # Invalide IP/Netmasl definition

@@ -32,6 +32,12 @@ infrastructures:
                     to: 192.168.254.245
                 ip_netmask: 255.255.255.0
                 ip_defgw: 192.168.254.254
+            sync:
+                ip_pool:
+                  from: 192.168.253.1
+                  to: 192.168.253.2
+                ip_netmask: 255.255.255.252
+                ip_defgw: false
         affinity_groups:
             clu-lab1ch-ag_1:
                 positive: true
