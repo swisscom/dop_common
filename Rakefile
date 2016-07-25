@@ -15,8 +15,8 @@ end
 
 namespace :vagrant do
   test_machines = {
-    'rhel6.example.com' => ['ruby193'],
-    'rhel7.example.com' => [],
+    'rhel6.example.com' => ['system', 'ruby193', 'rh-ruby22'],
+    'rhel7.example.com' => ['system', 'ruby193', 'rh-ruby22'],
   }
 
   task :prep do
@@ -36,10 +36,12 @@ namespace :vagrant do
           'bundle exec rspec',
         ]
         # system ruby
-        sh "vagrant ssh #{machine} -c '#{commands.join(' && ')}'"
+        if test_machines[machine].delete('system')
+          sh "vagrant ssh #{machine} -c '#{commands.join(' && ')}'"
+        end
         # scl ruby
         test_machines[machine].each do |scl|
-          sh "vagrant ssh #{machine} -c 'scl enable ruby193 \"#{commands.join(' && ')}\"'"
+          sh "vagrant ssh #{machine} -c 'scl enable #{scl} \"#{commands.join(' && ')}\"'"
         end
       end
     end
