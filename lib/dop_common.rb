@@ -16,6 +16,7 @@ require 'dop_common/configuration'
 require 'dop_common/credential'
 require 'dop_common/command'
 require 'dop_common/plan_cache'
+require 'dop_common/state_store'
 
 module DopCommon
 end
