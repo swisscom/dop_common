@@ -442,17 +442,17 @@ describe DopCommon::Node do
   describe '#credentials' do
     before :all do
       @credentials = {
-        :test_up => DopCommon::Credential.new('test_up', {
+        'test_up' => DopCommon::Credential.new('test_up', {
           :type     => 'username_password',
           :username => 'alice',
           :password => 'abc123',
         }),
-        :test_ssh => DopCommon::Credential.new('test_ssh', {
+        'test_ssh' => DopCommon::Credential.new('test_ssh', {
           :type       => 'ssh_key',
           :username   => 'bob',
           :public_key => 'spec/fixtures/example_ssh_key.pub',
         }),
-        :test_ssh2 => DopCommon::Credential.new('test_ssh2', {
+        'test_ssh2' => DopCommon::Credential.new('test_ssh2', {
           :type        => 'ssh_key',
           :username    => 'bob',
           :private_key => 'spec/fixtures/example_ssh_key',

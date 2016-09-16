@@ -6,6 +6,14 @@ credentials:
         type: 'username_password'
         username: 'root'
         password: 'mypass'
+    'linux_root_ssh_pubkey':
+        type: 'ssh_key'
+        username: 'root'
+        public_key: 'AAAAdwejdi138124901809efjklfjlksjlj232390489023840sjdfdjql'
+    'windows_login':
+        type: 'username_password'
+        username: 'Administrator'
+        password: 'mypass'
     'api_login':
         type: 'username_password'
         username: 'root'
@@ -86,9 +94,8 @@ nodes:
                 network: rhevm
                 ip: 192.168.254.12
         credentials:
-            root_ssh_keys:
-                - key1
-                - key2
+            - linux_login
+            - linux_root_ssh_pubkey
 
     mssql01_mgt01:
         fqdn: mssql01.example.com
@@ -109,8 +116,7 @@ nodes:
             - name: db1
               pool: storage_pool3
               size: 256G
-        credentials:
-            root_password: a_password
+        credentials: windows_login
 
     mysql01.example.com:
         infrastructure: lamp
@@ -135,7 +141,7 @@ nodes:
               pool: storage_pool1
               size: 20G
         credentials:
-            root_password: a_password
+            - linux_login
 
     web01.example.com:
         infrastructure: lamp

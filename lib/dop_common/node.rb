@@ -68,8 +68,10 @@ module DopCommon
       log_validation_method('timezone_valid?')
       log_validation_method('product_id_valid?')
       log_validation_method('organization_name_valid?')
-      try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
-      try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
+      log_validation_method('credentials_valid?')
+      #try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
+      #try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
+      #try_validate_obj("Node: Can't validate the 'credentials' part because of a previous error"){credentials}
     end
 
     def digits
@@ -308,9 +310,9 @@ module DopCommon
       [@hash[:credentials]].flatten.each do |credential|
         [String, Symbol].include?(credential.class) or
           raise PlanParsingError, "Node #{name}: the 'credentials' array should only contain strings, symbols"
-        @parsed_credentials.keys.include?(credential.to_sym) or
+        @parsed_credentials.keys.include?(credential) or
           raise PlanParsingError, "Node #{name}: the credential #{credential.to_s} in 'credentials' does not exist"
-        real_credential = @parsed_credentials[credential.to_sym]
+        real_credential = @parsed_credentials[credential]
         case real_credential.type
         when :ssh_key
           real_credential.public_key or
@@ -373,7 +375,7 @@ module DopCommon
 
     def create_credentials
       [@hash[:credentials]].flatten.map do |credential|
-        @parsed_credentials[credential.to_sym]
+        @parsed_credentials[credential]
       end
     end
   end
