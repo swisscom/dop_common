@@ -31,23 +31,27 @@ describe DopCommon::InfrastructureProperties do
     end
   end
 
-  describe '#keep_ha' do
+  describe '#keep_ha?' do
     it "will return 'true' if not specified in input hash" do
-      infrastructure_properties = DopCommon::InfrastructureProperties.new({}, nil)
-      expect(infrastructure_properties.keep_ha).to eq true
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({}, infrastructure['ovirt'])
+      expect(infrastructure_properties.keep_ha?).to eq true
     end
 
     it "will return 'true' or 'false' if specified in input hash properly" do
       [true, false].each do |val|
-        infrastructure_properties = DopCommon::InfrastructureProperties.new({'keep_ha' => val}, nil)
-        expect(infrastructure_properties.keep_ha).to eq val
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'keep_ha' => val}, infrastructure['ovirt'])
+        expect(infrastructure_properties.keep_ha?).to eq val
       end
     end
 
+    it 'will raise an exception if used for non-openstack provider' do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'keep_ha' => true}, infrastructure['vsphere'])
+      expect { infrastructure_properties.keep_ha? }.to raise_error DopCommon::PlanParsingError
+    end
     it 'will raise an exception if not specified properly in input hash' do
       ['true', 'false', 1, 0, :invalid, {}].each do |val|
-        infrastructure_properties = DopCommon::InfrastructureProperties.new({'keep_ha' => val}, nil)
-        expect { infrastructure_properties.keep_ha }.to raise_error DopCommon::PlanParsingError
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'keep_ha' => val}, infrastructure['ovirt'])
+        expect { infrastructure_properties.keep_ha? }.to raise_error DopCommon::PlanParsingError
       end
     end
   end
