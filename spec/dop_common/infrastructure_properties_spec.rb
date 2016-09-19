@@ -117,23 +117,27 @@ describe DopCommon::InfrastructureProperties do
     end
   end
 
-  describe '#use_config_drive' do
-    it "will return 'true' if not specified in input hash" do
+  describe '#use_config_drive?' do
+    it "will return false if not specified in input hash" do
       infrastructure_properties = DopCommon::InfrastructureProperties.new({}, nil)
-      expect(infrastructure_properties.use_config_drive).to eq true
+      expect(infrastructure_properties.use_config_drive?).to eq false
     end
 
-    it "will return 'true' or 'false' if specified in input hash properly" do
+    it "will return true or false if specified in input hash properly" do
       [true, false].each do |val|
-        infrastructure_properties = DopCommon::InfrastructureProperties.new({'use_config_drive' => val}, nil)
-        expect(infrastructure_properties.use_config_drive).to eq val
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'use_config_drive' => val}, infrastructure['openstack'])
+        expect(infrastructure_properties.use_config_drive?).to eq val
       end
     end
 
+    it 'will raise an exception if used for non-openstack provider' do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'use_config_drive' => true}, infrastructure['ovirt'])
+      expect { infrastructure_properties.use_config_drive? }.to raise_error DopCommon::PlanParsingError
+    end
     it 'will raise an exception if not specified properly in input hash' do
       ['true', 'false', 1, 0, :invalid, {}].each do |val|
-        infrastructure_properties = DopCommon::InfrastructureProperties.new({'use_config_drive' => val}, nil)
-        expect { infrastructure_properties.use_config_drive }.to raise_error DopCommon::PlanParsingError
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'use_config_drive' => val}, infrastructure['openstack'])
+        expect { infrastructure_properties.use_config_drive? }.to raise_error DopCommon::PlanParsingError
       end
     end
   end
