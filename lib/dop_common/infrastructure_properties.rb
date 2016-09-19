@@ -27,9 +27,10 @@ module DopCommon
       @affinity_groups ||= affinity_groups_valid? ? @hash[:affinity_groups] : []
     end
 
-    def keep_ha
+    def keep_ha?
       @keep_ha ||= keep_ha_valid? ? @hash[:keep_ha] : true
     end
+    alias_method :keep_ha, :keep_ha?
 
     def datacenter
       @datacenter ||= datacenter_valid? ? @hash[:datacenter] : nil
@@ -70,6 +71,8 @@ module DopCommon
 
     def keep_ha_valid?
       return false if @hash[:keep_ha].nil?
+      raise PlanParsingError, "Infrastructure properties: The 'keep_ha' is valid only for OVirt/RHEVm infrastructure types" unless
+        @parsed_infrastructure.provides?(:ovirt)
       raise PlanParsingError, "Infrastructure properties: The 'keep_ha' must be boolean" unless
         @hash[:keep_ha].kind_of?(TrueClass) || @hash[:keep_ha].kind_of?(FalseClass)
       true
