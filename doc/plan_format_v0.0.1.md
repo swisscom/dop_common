@@ -300,6 +300,7 @@ a property name is actually a keyword of a node hash.
         indicates whether the VM should be highly available or not. By default,
         instances are set as highly available. If the provider also supports a
         migration priorities they are set to low by default.
+
     3. __*datacenter*__ and __*cluster*__ - Specify which datacenter and cluster
        should be the node deployed into.
 

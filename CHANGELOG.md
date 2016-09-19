@@ -5,6 +5,7 @@ All notable changes to dop_common will be documented in this file.
 ### Changed
 - Node credentials
 - Infrastructure properties -> config drive
+- Infrastructure properties -> keep_ha
 
 ## [0.8.0] - 2016-05-25
 ### Added

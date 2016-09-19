@@ -101,7 +101,7 @@ nodes:
         fqdn: mssql01.example.com
         infrastructure: management
         infrastructure_properties:
-            keep_ha: true
+            keep_ha: false
             datacenter: lab1ch
             cluster: clu-lab1ch
         image: win12r1_64
@@ -121,7 +121,6 @@ nodes:
     mysql01.example.com:
         infrastructure: lamp
         infrastructure_properties:
-            keep_ha: true
             tenant: lamp
         image: rhel6cloudinit
         flavor: medium
@@ -146,7 +145,6 @@ nodes:
     web01.example.com:
         infrastructure: lamp
         infrastructure_properties:
-            keep_ha: false
             tenant: lamp
         image: rhel6
         flavor: small
@@ -161,7 +159,6 @@ nodes:
     web02.example.com:
         infrastructure: lamp
         infrastructure_properties:
-            keep_ha: false
             tenant: lamp
         image: rhel6
         flavor: medium
@@ -177,7 +174,6 @@ nodes:
     haproxy01.example.com:
         infrastructure: lamp
         infrastructure_properties:
-            keep_ha: true
             tenant: lamp
         image: rhel6cloudinit
         flavor: small
