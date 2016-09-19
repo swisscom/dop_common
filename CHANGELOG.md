@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [unreleased]
+### Changed
+- Node credentials
+- Infrastructure properties -> config drive
+
 ## [0.8.0] - 2016-05-25
 ### Added
 - Parsing for max_per_role on step and plan level
