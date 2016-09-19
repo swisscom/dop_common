@@ -51,9 +51,10 @@ module DopCommon
       @tenant ||= tenant_valid? ? @hash[:tenant] : nil
     end
 
-    def use_config_drive
-      @use_config_drive ||= use_config_drive_valid? ? @hash[:use_config_drive] : true
+    def use_config_drive?
+      @use_config_drive ||= use_config_drive_valid? ? @hash[:use_config_drive] : false
     end
+    alias_method :use_config_drive, :use_config_drive?
 
     private
 
@@ -117,6 +118,7 @@ module DopCommon
 
     def use_config_drive_valid?
       return false if @hash[:use_config_drive].nil?
+      raise PlanParsingError, "Infrastructure properties: The 'use_config_drive' is valid only for OpenStack infrastructure types" unless @parsed_infrastructure.provides?(:openstack)
       raise PlanParsingError, "Infrastructure properties: The 'use_config_drive' must be boolean" unless
         @hash[:use_config_drive].kind_of?(TrueClass) || @hash[:use_config_drive].kind_of?(FalseClass)
       true

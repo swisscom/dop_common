@@ -69,9 +69,8 @@ module DopCommon
       log_validation_method('product_id_valid?')
       log_validation_method('organization_name_valid?')
       log_validation_method('credentials_valid?')
-      #try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
-      #try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
-      #try_validate_obj("Node: Can't validate the 'credentials' part because of a previous error"){credentials}
+      try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
+      try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
     end
 
     def digits
