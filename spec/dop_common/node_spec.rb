@@ -506,4 +506,27 @@ describe DopCommon::Node do
     end
 
   end
+
+  describe '#dns' do
+    #before :all do
+    #  @dns = {
+    #    'valid_name_server'   => { 'name_servers' => ['10.0.2.1'] }
+    #    'valid_search_domain' => { 'search_domains' => ['foo.bar'] }
+    #    'valid_dns' => { 'name_servers' => ['10.0.2.1', '172.16.0.1']
+    #  }
+    #end
+    it 'returns a dns object if properly defined' do
+      [{}, :dns => {:name_servers => ['10.0.1.1'], :search_domains => ['foo.bar']}].each do |dns|
+        node = DopCommon::Node.new('dummy', dns)
+        expect(node.dns).to be_an_instance_of DopCommon::DNS
+      end
+    end
+
+    it "will throw an exception if dns object isn't properly defined" do
+      [:dns => 'invalid', :dns => nil, :dns => []].each do |dns|
+        node = DopCommon::Node.new('dummy', dns)
+        expect{node.dns}.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
 end
