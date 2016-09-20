@@ -69,8 +69,10 @@ module DopCommon
       log_validation_method('product_id_valid?')
       log_validation_method('organization_name_valid?')
       log_validation_method('credentials_valid?')
+      log_validation_method('dns_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
       try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
+      try_validate_obj("Node: Can't validate the 'dns' part because of a previous error"){dns}
     end
 
     def digits
@@ -154,6 +156,10 @@ module DopCommon
 
     def credentials
       @credentials ||= credentials_valid? ? create_credentials : []
+    end
+
+    def dns
+      @dns ||= dns_valid? ? create_dns : nil
     end
 
   protected
@@ -320,6 +326,12 @@ module DopCommon
       end
     end
 
+    def dns_valid?
+      raise PlanParsingError, "Node #{@name}: The 'dns', if specified, must be a hash" if
+        @hash.has_key?(:dns) && !@hash[:dns].kind_of?(Hash)
+      true
+    end
+
     def create_fqdn
       nodename = (@hash[:fqdn] || @name)
       nodename[-1] == '.'[0] ? nodename[0...-1] : nodename
@@ -376,6 +388,10 @@ module DopCommon
       [@hash[:credentials]].flatten.map do |credential|
         @parsed_credentials[credential]
       end
+    end
+
+    def create_dns
+      DopCommon::DNS.new(@hash[:dns])
     end
   end
 end
