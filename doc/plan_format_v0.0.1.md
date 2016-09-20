@@ -461,6 +461,12 @@ a property name is actually a keyword of a node hash.
      customization property that specifies the organization name of the
      administrator user.
 
+ 16. __*dns*__ - an optional property that specifies name servers and search
+	 domains for further node customization. If specified, it has to be a hash
+	 with any of the following items:
+	 1. __*name_servers*__ - a list of valid IP addresses.
+	 2. __*search_domains*__ - a list of valid domains.
+
 The example bellow shows a specification for a database backend and a web node:
 ```yaml
 nodes:

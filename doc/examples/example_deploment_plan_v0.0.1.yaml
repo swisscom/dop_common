@@ -141,6 +141,11 @@ nodes:
               size: 20G
         credentials:
             - linux_login
+        dns:
+          name_servers:
+            - 10.0.3.3
+          search_domains:
+            - example.com
 
     web01.example.com:
         infrastructure: lamp
@@ -155,6 +160,13 @@ nodes:
             eth1:
                 network: production
                 ip: dhcp
+        dns:
+          name_servers:
+            - 10.0.3.3
+            - 172.16.0.1
+          search_domains:
+            - example.com
+            - ext.example.com
 
     web02.example.com:
         infrastructure: lamp

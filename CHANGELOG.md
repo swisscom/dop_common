@@ -2,6 +2,9 @@
 All notable changes to dop_common will be documented in this file.
 
 ## [unreleased]
+### Added
+- DNS parser
+
 ### Changed
 - Node credentials
 - Infrastructure properties -> config drive
