@@ -516,7 +516,7 @@ describe DopCommon::Node do
     #  }
     #end
     it 'returns a dns object if properly defined' do
-      [{}, :dns => {:name_servers => ['10.0.1.1'], :search_domains => ['foo.bar']}].each do |dns|
+      [{}, {:dns => {:name_servers => ['10.0.1.1'], :search_domains => ['foo.bar']}}].each do |dns|
         node = DopCommon::Node.new('dummy', dns)
         expect(node.dns).to be_an_instance_of DopCommon::DNS
       end
