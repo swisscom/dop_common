@@ -12,11 +12,7 @@ module DopCommon
     include HashParser
     include RunOptions
 
-    attr_reader :version
-
     def initialize(hash)
-      @version = DopCommon::VERSION
-      # fix hash key names (convert them to symbols)
       @hash = symbolize_keys(hash)
     end
 
