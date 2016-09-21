@@ -57,5 +57,22 @@ describe DopCommon::Infrastructure do
       expect { infrastructure.affinity_groups }.to raise_error ::DopCommon::PlanParsingError
     end
   end
+
+  describe '#default_security_groups' do
+    it 'will return an empty array if not defines' do
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
+      expect(infrastructure.default_security_groups).to eq([])
+    end
+    it 'will return an array of security groups if specified correctly' do
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'default_security_groups' => ['sg1', 'sg2']})
+      expect(infrastructure.default_security_groups).to eq(['sg1', 'sg2'])
+    end
+    it 'will raise an error if the security groups is not specified correctly' do
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'default_security_groups' => 1})
+      expect { infrastructure.default_security_groups }.to raise_error ::DopCommon::PlanParsingError
+      infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev', 'default_security_groups' => [ 1, 2 ]})
+      expect { infrastructure.default_security_groups }.to raise_error ::DopCommon::PlanParsingError
+    end
+  end
 end
 

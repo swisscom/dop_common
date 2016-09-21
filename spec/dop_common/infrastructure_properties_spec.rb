@@ -145,4 +145,36 @@ describe DopCommon::InfrastructureProperties do
       end
     end
   end
+
+  describe '#security_groups' do
+    infra = DopCommon::Infrastructure.new('openstack', {'type' => 'openstack', 'default_security_groups' => ['sg1', 'sg2']})
+    it 'will return the default_security_groups if nothing is specified' do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({}, infra)
+      expect(infrastructure_properties.security_groups).to eq(['sg1', 'sg2'])
+    end
+    it 'will return the security_groups array if security_groups is specified' do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'security_groups' => ['sg3']}, infra)
+      expect(infrastructure_properties.security_groups).to eq(['sg3'])
+    end
+    it 'will return a merged array of defaults and additional_security_groups if additional_security_groups is defined' do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'additional_security_groups' => ['sg3']}, infra)
+      expect(infrastructure_properties.security_groups).to eq(['sg1', 'sg2', 'sg3'])
+    end
+    it 'will raise an error if security_groups is not properly specified' do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'security_groups' => 'sg3'}, infra)
+      expect { infrastructure_properties.security_groups }.to raise_error DopCommon::PlanParsingError
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'security_groups' => [1, 2]}, infra)
+      expect { infrastructure_properties.security_groups }.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an error if additional_security_groups is not properly specified' do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'additional_security_groups' => 'sg3'}, infra)
+      expect { infrastructure_properties.security_groups }.to raise_error DopCommon::PlanParsingError
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'additional_security_groups' => [1, 2]}, infra)
+      expect { infrastructure_properties.security_groups }.to raise_error DopCommon::PlanParsingError
+    end
+    it 'will raise an error if both security_groups and additional_security_groups are specified' do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({'additional_security_groups' => ['sg3'], 'security_groups' => ['sg3']}, infra)
+      expect { infrastructure_properties.security_groups }.to raise_error DopCommon::PlanParsingError
+    end
+  end
 end
