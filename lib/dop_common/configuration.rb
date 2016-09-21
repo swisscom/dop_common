@@ -13,15 +13,24 @@ module DopCommon
     end
 
     def lookup(source, key, scope)
-      begin
-        element = @hash
-        source.split('/').each do |level|
-          element = element[level]
-        end
-        element[key] or raise ConfigurationValueNotFound 
-      rescue Exception => e
-        raise ConfigurationValueNotFound
+      element = traverse_hash(source)
+      if element.has_key?(key)
+        element[key]
+      else
+        raise DopCommon::ConfigurationValueNotFound
       end
+    rescue => e
+      raise DopCommon::ConfigurationValueNotFound
+    end
+
+  private
+
+    def traverse_hash(source)
+      element = @hash
+      source.split('/').each do |level|
+        element = element[level]
+      end
+      element
     end
 
   end
