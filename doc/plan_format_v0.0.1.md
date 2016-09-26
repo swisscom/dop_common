@@ -385,16 +385,16 @@ a property name is actually a keyword of a node hash.
        associated with the interface.
 
  7. __*disks*__ - an optional property to define additional disks that should
-    persist accross deployments. It is of an array type. A persistant disk itself
-	is described by a so-called *"disk hash"* with following keywords:
-    1. __*name*__ - disk name. It is required.
-    2. __*pool*__ - the name of the storage pool that should be used as a backing
+    persist accross deployments. It is of hash type. The key represents a disk
+	name. A persistant disk itself is described by a so-called *"disk hash"*
+	with following keywords:
+    1. __*pool*__ - the name of the storage pool that should be used as a backing
        store for a disk. It is required for OVirt/RHEVm and VSphere providers,
        unless the __*default_pool*__ is specified in
        __*infrastructure_properties*__.
-    3. __*size*__ - the size of the disk in megabytes (when the value has a
+    2. __*size*__ - the size of the disk in megabytes (when the value has a
        suffix *M*) or gigabytes (when the value has a suffix *G*).
-    4. __*thin*__ - an optional boolean flag that indicates whether the disk will be
+    3. __*thin*__ - an optional boolean flag that indicates whether the disk will be
        thin provisioned. Its default  value is *true*, meaning the disks are
        thin-provisioned by default. Please use *false* as the value if you need to
        thick provision a disk.
@@ -508,7 +508,7 @@ nodes:
         network: management
         ip: 192.168.254.13
     disks:
-      - name: db1
+      db1:
         pool: storage_pool3
         size: 256G
 		thin: false
@@ -530,10 +530,11 @@ nodes:
         ip: 192.168.2.102
 		floating_network: ext-net0
     disks:
-      - name: rdo
+      rdo:
         pool: storage_pool1
         size: 4000M
-      - name: db1
+		thin: false
+      db1:
         size: 20G
 
   mssql01.example.com:
@@ -542,6 +543,7 @@ nodes:
       dest_folder: sql
       datacenter: dc01
       cluster: cl01
+	  default_pool: sql_pool
     image: w12r2
     flavor: medium
     interfaces:
@@ -553,11 +555,11 @@ nodes:
         network: db
         ip: 192.168.3.109
     disks:
-      - name: rdo
+      rdo:
         pool: storage_pool3
         size: 4000M
-      - name: db1
-        pool: storage_pool3
+		thin: false
+      db1:
         size: 20G
     credentials:
       administrator_password: ASecurePassw0rd

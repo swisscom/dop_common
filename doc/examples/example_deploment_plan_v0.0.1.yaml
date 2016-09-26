@@ -61,7 +61,7 @@ infrastructures:
                 cluster: clu-lab1ch
 
     lamp:
-        type: openstack
+        type: rhos
         endpoint: https://openstack.example.com/api
         credentials: api_login
         networks:
@@ -104,6 +104,7 @@ nodes:
             keep_ha: false
             datacenter: lab1ch
             cluster: clu-lab1ch
+            default_pool: ssd_pool
         image: win12r1_64
         cores: 6
         memory: 64G
@@ -113,9 +114,12 @@ nodes:
                 network: rhevm
                 ip: 192.168.254.13
         disks:
-            - name: db1
-              pool: storage_pool3
-              size: 256G
+            db1:
+                pool: storage_pool3
+                size: 256G
+            log1:
+                size: 1024m
+                thin: false
         credentials: windows_login
 
     mysql01.example.com:
@@ -133,12 +137,12 @@ nodes:
                 ip: 192.168.1.102
                 set_gateway: false
         disks:
-            - name: rdo
-              pool: storage_pool1
-              size: 4000M
-            - name: db1
-              pool: storage_pool1
-              size: 20G
+            rdo:
+                pool: storage_pool1
+                size: 4000M
+                thin: false
+            db1:
+                size: 20G
         credentials:
             - linux_login
         dns:
@@ -187,6 +191,7 @@ nodes:
         infrastructure: lamp
         infrastructure_properties:
             tenant: lamp
+            default_pool: sas_pool
         image: rhel6cloudinit
         flavor: small
         interfaces:
@@ -196,6 +201,10 @@ nodes:
             eth1:
                 network: production
                 ip: dhcp
+        disks:
+            logs:
+                size: 265g
+                thin: false
 
     storage01.example.com:
       infrastructure: baremetal
