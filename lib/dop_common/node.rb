@@ -6,6 +6,7 @@ module DopCommon
   class Node
     include Validator
     include HashParser
+    include Utils
 
     attr_reader :name
 
@@ -70,9 +71,11 @@ module DopCommon
       log_validation_method('organization_name_valid?')
       log_validation_method('credentials_valid?')
       log_validation_method('dns_valid?')
+      log_validation_method('data_disks_valid?')
       try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
       try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
       try_validate_obj("Node: Can't validate the 'dns' part because of a previous error"){dns}
+      try_validate_obj("Node: Can't validate the 'data_disks' part because of a previous error"){data_disks}
     end
 
     def digits
@@ -160,6 +163,10 @@ module DopCommon
 
     def dns
       @dns ||= dns_valid? ? create_dns : nil
+    end
+
+    def data_disks
+      @data_disks ||= data_disks_valid? ? create_data_disks : []
     end
 
   protected
@@ -332,6 +339,15 @@ module DopCommon
       true
     end
 
+    def data_disks_valid?
+      return false unless @hash.has_key?(:disks)
+      raise PlanParsingError, "Node #{@name}: The 'disks', if specified, must be a hash" unless
+        @hash[:disks].kind_of?(Hash)
+      raise PlanParsingError, "Node #{@name}: Each value of 'disks' must be a hash" unless
+        @hash[:disks].values.all? { |d| d.kind_of?(Hash) }
+      true
+    end
+
     def create_fqdn
       nodename = (@hash[:fqdn] || @name)
       nodename[-1] == '.'[0] ? nodename[0...-1] : nodename
@@ -359,21 +375,6 @@ module DopCommon
       @hash[:flavor].nil? ? @hash[:cores] : VALID_FLAVOR_TYPES[flavor.to_sym][:cores]
     end
 
-    # Expects valid input -> to be used after validation
-    def to_bytes(str)
-      value, unit = str.downcase.scan(/\d+|[mg]/).collect do |tok|
-        case tok
-        when /\d+/
-          tok.to_i
-        when 'm'
-          1048576
-        else
-          1073741824
-        end
-      end
-      value * unit
-    end
-
     def create_memory
       return nil if infrastructure.provides?(:openstack)
       @hash[:flavor].nil? ? to_bytes(@hash[:memory]) : VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
@@ -392,6 +393,17 @@ module DopCommon
 
     def create_dns
       DopCommon::DNS.new(@hash[:dns])
+    end
+
+    def create_data_disks
+      @hash[:disks].map do |disk_name, disk_hash|
+        DopCommon::DataDisk.new(
+          disk_name,
+          disk_hash,
+          :parsed_infrastructure => infrastructure,
+          :parsed_infrastructure_properties => infrastructure_properties
+        )
+      end
     end
   end
 end
