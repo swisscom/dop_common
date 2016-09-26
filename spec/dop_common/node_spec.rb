@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 describe DopCommon::Node do
-  infrastructures = [
-    DopCommon::Infrastructure.new('rhev', {'type' => 'rhev'}),
-    DopCommon::Infrastructure.new('rhos', {'type' => 'rhos'}),
-    DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'}),
-    DopCommon::Infrastructure.new('vsphere', {'type' => 'vsphere'})
-  ]
+  before(:each) do
+    @infrastructures = [
+      DopCommon::Infrastructure.new('rhev', {'type' => 'rhev'}),
+      DopCommon::Infrastructure.new('rhos', {'type' => 'rhos'}),
+      DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'}),
+      DopCommon::Infrastructure.new('vsphere', {'type' => 'vsphere'})
+    ]
+  end
 
   describe '#range' do
     it 'will return nil if the node is not inflatable' do
@@ -99,7 +101,7 @@ describe DopCommon::Node do
           'infrastructure' => 'rhev',
           'infrastructure_properties' => { 'datacenter' => 'foo', 'cluster' => 'bar' }
         },
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.infrastructure_properties).to be_an_instance_of DopCommon::InfrastructureProperties
     end
@@ -110,7 +112,7 @@ describe DopCommon::Node do
           'infrastructure' => 'rhev',
           'infrastructure_properties' => 'foo'
         },
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect{node.infrastructure_properties}.to raise_error DopCommon::PlanParsingError
     end
@@ -121,13 +123,13 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'image' => 'dummy'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.image).to eq 'dummy'
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'baremetal'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.image).to eq nil
     end
@@ -136,7 +138,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'image' => :invalid},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect{node.image}.to raise_error DopCommon::PlanParsingError
     end
@@ -147,7 +149,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.full_clone).to be true
     end
@@ -155,13 +157,13 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'full_clone' => true},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.full_clone).to be true
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'full_clone' => false},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.full_clone).to be false
     end
@@ -170,7 +172,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'baremetal'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.full_clone).to be true
     end
@@ -178,7 +180,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'full_clone' => :invalid},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect{node.full_clone}.to raise_error DopCommon::PlanParsingError
     end
@@ -213,7 +215,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.flavor).to eq ""
     end
@@ -221,7 +223,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhos'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.flavor).to eq DopCommon::Node::DEFAULT_OPENSTACK_FLAVOR
     end
@@ -229,7 +231,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhos', 'flavor' => 'anyflavor'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.flavor).to eq 'anyflavor'
     end
@@ -237,7 +239,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'flavor' => 'tiny'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.flavor).to eq 'tiny'
     end
@@ -245,7 +247,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'flavor' => :invalid},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect{node.flavor}.to raise_error DopCommon::PlanParsingError
     end
@@ -253,7 +255,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'flavor' => 'invalid'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect{node.flavor}.to raise_error DopCommon::PlanParsingError
     end
@@ -265,7 +267,7 @@ describe DopCommon::Node do
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => 'rhev', 'cores' => cores},
-          {:parsed_infrastructures => infrastructures}
+          {:parsed_infrastructures => @infrastructures}
         )
         expect(node.cores).to eq cores.nil? ? DopCommon::Node::DEFAULT_CORES : cores
       end
@@ -274,7 +276,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhos', 'cores' => 2},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect{node.cores}.to raise_error DopCommon::PlanParsingError
     end
@@ -283,7 +285,7 @@ describe DopCommon::Node do
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => 'rhev', 'cores' => cores},
-          {:parsed_infrastructures => infrastructures}
+          {:parsed_infrastructures => @infrastructures}
         )
         expect{node.cores}.to raise_error DopCommon::PlanParsingError
       end
@@ -296,7 +298,7 @@ describe DopCommon::Node do
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => 'rhev', 'memory' => memory},
-          {:parsed_infrastructures => infrastructures}
+          {:parsed_infrastructures => @infrastructures}
         )
         expect(node.memory).to eq memory.nil? ? DopCommon::Node::DEFAULT_MEMORY : node.send(:to_bytes, memory)
       end
@@ -306,7 +308,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'flavor' => flavor},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.memory).to eq DopCommon::Node::VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
     end
@@ -315,7 +317,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'flavor' => flavor, 'memory' => '100G'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.memory).to eq DopCommon::Node::VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
     end
@@ -323,7 +325,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhos', 'memory' => '1G'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect{node.memory}.to raise_error DopCommon::PlanParsingError
     end
@@ -332,7 +334,7 @@ describe DopCommon::Node do
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => 'rhev', 'memory' => memory},
-          {:parsed_infrastructures => infrastructures}
+          {:parsed_infrastructures => @infrastructures}
         )
         expect{node.memory}.to raise_error DopCommon::PlanParsingError
       end
@@ -345,7 +347,7 @@ describe DopCommon::Node do
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => 'rhev', 'storage' => storage},
-          {:parsed_infrastructures => infrastructures}
+          {:parsed_infrastructures => @infrastructures}
         )
         expect(node.storage).to eq storage.nil? ? DopCommon::Node::DEFAULT_STORAGE : node.send(:to_bytes, storage)
       end
@@ -355,7 +357,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'flavor' => flavor},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.storage).to eq DopCommon::Node::VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
     end
@@ -364,7 +366,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhev', 'flavor' => flavor, 'storage' => '1000G'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect(node.storage).to eq DopCommon::Node::VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
     end
@@ -372,7 +374,7 @@ describe DopCommon::Node do
       node = DopCommon::Node.new(
         'dummy',
         {'infrastructure' => 'rhos', 'storage' => '1G'},
-        {:parsed_infrastructures => infrastructures}
+        {:parsed_infrastructures => @infrastructures}
       )
       expect{node.storage}.to raise_error DopCommon::PlanParsingError
     end
@@ -381,7 +383,7 @@ describe DopCommon::Node do
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => 'rhev', 'storage' => storage},
-          {:parsed_infrastructures => infrastructures}
+          {:parsed_infrastructures => @infrastructures}
         )
         expect{node.storage}.to raise_error DopCommon::PlanParsingError
       end
@@ -390,12 +392,11 @@ describe DopCommon::Node do
 
   describe '#timezone' do
     it "will return a parsed 'timezone' property" do
-      property_values = {'rhev' => nil, 'vsphere' => '095'}
-      property_values.each do |infrastructure, property_val|
+      {'rhev' => nil, 'vsphere' => '095'}.each do |infrastructure, property_val|
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => infrastructure, 'timezone' => property_val },
-          {:parsed_infrastructures => infrastructures}
+          {:parsed_infrastructures => @infrastructures}
         )
         expect(node.timezone).to eq property_val
       end
@@ -406,7 +407,7 @@ describe DopCommon::Node do
         node = DopCommon::Node.new(
           'dummy',
           {'infrastructure' => 'vsphere', 'timezone' => property_val},
-          {:parsed_infrastructures => infrastructures}
+          {:parsed_infrastructures => @infrastructures}
         )
         expect{node.timezone}.to raise_error DopCommon::PlanParsingError
       end
@@ -523,9 +524,51 @@ describe DopCommon::Node do
     end
 
     it "will throw an exception if dns object isn't properly defined" do
-      [:dns => 'invalid', :dns => nil, :dns => []].each do |dns|
+      [{:dns => 'invalid'}, {:dns => nil}, {:dns => []}].each do |dns|
         node = DopCommon::Node.new('dummy', dns)
         expect{node.dns}.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
+
+  describe '#data_disks' do
+    it 'returns an empty array if nothing is defined' do
+      node = DopCommon::Node.new('dummy', {:parsed_infrastructures => @infrastructures})
+      expect(node.data_disks).to be_an Array
+      expect(node.data_disks.empty?).to be true
+    end
+
+    it 'returns a list of data disk objects if properly defined' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {
+          'infrastructure' => 'rhev',
+          'infrastructure_properties' => {'default_pool' => 'test4'},
+          'disks' => {
+            'd1' => {'pool' => 'test1', 'size' => '1024M', 'thin' => true},
+            'd2' => {'pool' => 'test2', 'size' => '1024G', 'thin' => false},
+            'd3' => {'pool' => 'test3', 'size' => '1024K'},
+            'd4' => {'size' => '1024K'}
+          }
+        },
+        {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node).to have_exactly(4).data_disks
+      expect(node.data_disks.all?{|d| d.kind_of?(DopCommon::DataDisk)}).to be true
+    end
+
+    it 'will throw an error if a data disk specification is invalid' do
+      [nil, :invalid, [], {'d1' => nil}, {'d1' => :invalid}].each do |disks|
+        node = DopCommon::Node.new(
+          'dummy',
+          {
+            :infrastructure => 'rhev',
+            :infrastructure_properties => {'datacenter' => 'test'},
+            :disks => disks
+          },
+          {:parsed_infrastructures => @infrastructures}
+        )
+        expect{node.data_disks}.to raise_error DopCommon::PlanParsingError
       end
     end
   end
