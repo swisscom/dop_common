@@ -27,6 +27,10 @@ module DopCommon
       @affinity_groups ||= affinity_groups_valid? ? @hash[:affinity_groups] : []
     end
 
+    def security_groups
+      @security_groups ||= security_groups_valid? ? create_security_groups : @parsed_infrastructure.default_security_groups
+    end
+
     def keep_ha?
       @keep_ha ||= keep_ha_valid? ? @hash[:keep_ha] : true
     end
@@ -66,6 +70,18 @@ module DopCommon
         !ags.kind_of?(Array) || ags.empty?
       raise PlanParsingError, "Infrastructure properties: Each affinity group must be a non-empty string" if
         ags.any? { |ag| !ag.kind_of?(String) || ag.empty? }
+      true
+    end
+
+    def security_groups_valid?
+      return false unless @hash[:security_groups] or @hash[:additional_security_groups]
+      raise PlanParsingError, "Infrastructure properties: security_groups and additional_security_groups are mutually exclusive" if
+        @hash[:security_groups] and @hash[:additional_security_groups]
+      sgs = @hash[:security_groups] || @hash[:additional_security_groups]
+      raise PlanParsingError, "Infrastructure properties: (additional_)security_groups must be non-empty arrays" if
+        !sgs.kind_of?(Array) || sgs.empty?
+      raise PlanParsingError, "Infrastructure properties: (additional_)security_groups must be non-empty strings" if
+        sgs.any? {|sg| !sg.kind_of?(String) || sg.empty? }
       true
     end
 
@@ -125,6 +141,11 @@ module DopCommon
       raise PlanParsingError, "Infrastructure properties: The 'use_config_drive' must be boolean" unless
         @hash[:use_config_drive].kind_of?(TrueClass) || @hash[:use_config_drive].kind_of?(FalseClass)
       true
+    end
+
+    def create_security_groups
+      sgs = @hash[:security_groups]
+      sgs ? sgs : (@parsed_infrastructure.default_security_groups + @hash[:additional_security_groups]).uniq
     end
   end
 end

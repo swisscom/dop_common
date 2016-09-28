@@ -65,6 +65,10 @@ module DopCommon
       @affinity_groups ||= affinity_groups_valid? ? create_affinity_groups : []
     end
 
+    def default_security_groups
+      @defalut_security_groups ||= default_security_groups_valid? ? create_default_security_groups : []
+    end
+
     private
 
     def provider_valid?
@@ -123,6 +127,14 @@ module DopCommon
         raise PlanParsingError, "Infrastructure #{@name}: affinity groups have to be defined as hash"
     end
 
+    def default_security_groups_valid?
+      return false if @hash[:default_security_groups].nil?
+      @hash[:default_security_groups].kind_of?(Array) or
+        raise PlanParsingError, "Infrastructure #{@name}: default_security_groups must be an array"
+      @hash[:default_security_groups].all? { |name| name.kind_of?(String) } or
+        raise PlanParsingError, "Infrastructure #{@name}: security group names have to be strings"
+    end
+
     def create_endpoint
       ::URI.parse(@hash[:endpoint])
     end
@@ -138,5 +150,10 @@ module DopCommon
     def create_affinity_groups
       @hash[:affinity_groups].collect { |name,hash| ::DopCommon::AffinityGroup.new(name, hash) }
     end
+
+    def create_default_security_groups
+      @hash[:default_security_groups]
+    end
+
   end
 end
