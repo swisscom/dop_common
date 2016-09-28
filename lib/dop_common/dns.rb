@@ -39,9 +39,7 @@ module DopCommon
     end
 
     def search_domains_valid?
-      regex = RUBY_VERSION < '1.9' ?
-        /.*/ :
-        /(^[a-z0-9]+(-[a-z0-9]+)*{1,63}$)|(^((?=[a-z0-9-]{1,63}\.)[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}$)/
+      regex = /((^[a-z0-9]+(-[a-z0-9]+)*){1,63}$)|(^((?=[a-z0-9-]{1,63}\.)[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}$)/
       return false unless @hash.has_key?(:search_domains)
       raise PlanParsingError, "DNS: search_domains must be an array of search domains" if
         !@hash[:search_domains].kind_of?(Array) || @hash[:search_domains].empty?

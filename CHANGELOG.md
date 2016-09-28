@@ -5,6 +5,7 @@ All notable changes to dop_common will be documented in this file.
 ### Added
 - DNS parser
 - Data disks
+- Security groups
 
 ### Changed
 - Node credentials
