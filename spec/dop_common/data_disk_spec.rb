@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'byebug'
 
 describe DopCommon::DataDisk do
   before(:all) do
