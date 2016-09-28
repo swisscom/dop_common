@@ -31,6 +31,10 @@ Gem::Specification.new do |spec|
   else
     spec.add_development_dependency "rake"
   end
+
+  if RUBY_VERSION < '2.0'
+    spec.add_dependency 'json', '< 2.0'
+  end
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-legacy_formatters"
   spec.add_development_dependency "rspec-mocks"
