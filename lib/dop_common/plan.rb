@@ -73,8 +73,6 @@ module DopCommon
         raise PlanParsingError, 'The plan name has to be a String'
       @hash[:name][/^[\w-]+$/,0] or
         raise PlanParsingError, 'The plan name may only contain letters, numbers and underscores'
-      !@hash[:name][/_plan$/,0] or
-        raise PlanParsingError, 'The plan name can not end in _plan. This is used internally.'
     end
 
     def infrastructures_valid?
