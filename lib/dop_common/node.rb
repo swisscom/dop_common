@@ -9,6 +9,7 @@ module DopCommon
     include Utils
 
     attr_reader :name
+    alias_method :nodename, :name
 
     DEFAULT_DIGITS = 2
 
@@ -106,6 +107,14 @@ module DopCommon
       @fqdn ||= fqdn_valid? ? create_fqdn : nil
     end
 
+    def hostname
+      @hostname ||= fqdn.split('.').first
+    end
+
+    def domainname
+      @domainname ||= fqdn.split('.', 2).last
+    end
+
     def infrastructure
       @infrastructure ||= infrastructure_valid? ? create_infrastructure : nil
     end
@@ -119,10 +128,10 @@ module DopCommon
       @image ||= image_valid? ? @hash[:image] : nil
     end
 
-    def full_clone
+    def full_clone?
       @full_clone ||= full_clone_valid? ? @hash[:full_clone] : true
     end
-    alias_method :full_clone?, :full_clone
+    alias_method :full_clone, :full_clone?
 
     def interfaces
       @interfaces ||= interfaces_valid? ? create_interfaces : []
@@ -349,8 +358,8 @@ module DopCommon
     end
 
     def create_fqdn
-      nodename = (@hash[:fqdn] || @name)
-      nodename[-1] == '.'[0] ? nodename[0...-1] : nodename
+      node_name = (@hash[:fqdn] || @name)
+      node_name[-1] == '.'[0] ? node_name[0...-1] : node_name
     end
 
     def create_interfaces
