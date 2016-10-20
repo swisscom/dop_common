@@ -3,10 +3,37 @@ require 'spec_helper'
 describe DopCommon::Node do
   before(:each) do
     @infrastructures = [
-      DopCommon::Infrastructure.new('rhev', {'type' => 'rhev'}),
-      DopCommon::Infrastructure.new('rhos', {'type' => 'rhos'}),
+      DopCommon::Infrastructure.new(
+        'rhev',
+        {
+          'type' => 'rhev',
+          'networks' => {
+            'net0' => {},
+            'net1' => {}
+          }
+        }
+      ),
+      DopCommon::Infrastructure.new(
+        'rhos',
+        {
+          'type' => 'rhos',
+          'networks' => {
+            'net0' => {},
+            'net1' => {}
+          }
+        }
+      ),
+      DopCommon::Infrastructure.new(
+        'vsphere',
+        {
+          'type' => 'vsphere',
+          'networks' => {
+            'net0' => {},
+            'net1' => {}
+          }
+        }
+      ),
       DopCommon::Infrastructure.new('baremetal', {'type' => 'baremetal'}),
-      DopCommon::Infrastructure.new('vsphere', {'type' => 'vsphere'})
     ]
   end
 
@@ -188,7 +215,14 @@ describe DopCommon::Node do
 
   describe '#interfaces' do
     it 'will return an array of interfaces if specified correctly' do
-      node = DopCommon::Node.new('foo', {:interfaces => {'eth0' => {}, 'eth1' => {}}})
+      node = DopCommon::Node.new(
+        'foo',
+        {
+          'infrastructure' => 'rhev',
+          'interfaces' => {'eth0' => {'network' => 'net0'}, 'eth1' => {'network' => 'net1'}}
+        },
+        {:parsed_infrastructures => @infrastructures}
+      )
       expect(node.interfaces.length).to eq 2
       expect(node.interfaces.all?{|i| i.kind_of?(DopCommon::Interface)}).to be true
     end

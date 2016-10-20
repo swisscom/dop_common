@@ -252,13 +252,14 @@ module DopCommon
     end
 
     def interfaces_valid?
-      return false if @hash[:interfaces].nil? # TODO: interfaces should only be optional for baremetal
+      return false if @hash[:interfaces].nil?
       @hash[:interfaces].kind_of?(Hash) or
-        raise PlanParsingError, "Node #{@name}: The value for 'interfaces' has to be a hash"
+        raise PlanParsingError, "Node #{@name}: The value of 'interfaces' has to be a hash"
       @hash[:interfaces].keys.all?{|i| i.kind_of?(String)} or
         raise PlanParsingError, "Node #{@name}: The keys in the 'interface' hash have to be strings"
       @hash[:interfaces].values.all?{|v| v.kind_of?(Hash)} or
         raise PlanParsingError, "Node #{@name}: The values in the 'interface' hash have to be hashes"
+      true
     end
 
     def flavor_valid?
@@ -364,7 +365,11 @@ module DopCommon
 
     def create_interfaces
       @hash[:interfaces].map do |interface_name, interface_hash|
-        DopCommon::Interface.new(interface_name, interface_hash)
+        DopCommon::Interface.new(
+          interface_name,
+          interface_hash,
+          :parsed_networks => infrastructure.networks
+        )
       end
     end
 
