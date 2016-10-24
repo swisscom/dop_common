@@ -1,0 +1,19 @@
+name: "simple_plan"
+max_in_flight: 1
+
+infrastructures:
+  'test':
+    type: 'baremetal'
+
+nodes:
+  'linux01.example.com':
+    infrastructure: 'test'
+
+steps:
+  - name: 'write hello world'
+    nodes: 'all'
+    command:
+      plugin: 'custom'
+      exec: 'echo'
+      arguments: '"hello world"'
+

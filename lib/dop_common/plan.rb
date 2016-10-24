@@ -12,11 +12,7 @@ module DopCommon
     include HashParser
     include RunOptions
 
-    attr_reader :version
-
     def initialize(hash)
-      @version = DopCommon::VERSION
-      # fix hash key names (convert them to symbols)
       @hash = symbolize_keys(hash)
     end
 
@@ -77,8 +73,6 @@ module DopCommon
         raise PlanParsingError, 'The plan name has to be a String'
       @hash[:name][/^[\w-]+$/,0] or
         raise PlanParsingError, 'The plan name may only contain letters, numbers and underscores'
-      !@hash[:name][/_plan$/,0] or
-        raise PlanParsingError, 'The plan name can not end in _plan. This is used internally.'
     end
 
     def infrastructures_valid?

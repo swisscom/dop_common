@@ -24,7 +24,9 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 1.8.7'
 
-  spec.add_development_dependency "bundler", "~> 1.3"
+  spec.add_dependency 'hashdiff'
+  spec.add_dependency 'lockfile'
+  spec.add_dependency 'rb-inotify'
 
   if RUBY_VERSION <= '1.8.7'
     spec.add_development_dependency "rake", '~> 10.5'
@@ -35,6 +37,8 @@ Gem::Specification.new do |spec|
   if RUBY_VERSION < '2.0'
     spec.add_dependency 'json', '< 2.0'
   end
+
+  spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-legacy_formatters"
   spec.add_development_dependency "rspec-mocks"
