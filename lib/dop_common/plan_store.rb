@@ -90,17 +90,24 @@ module DopCommon
       Dir[versions_dir + '/*.yaml'].map {|yaml_file| File.basename(yaml_file, '.yaml')}.sort
     end
 
-    # return the hash for the plan in the store for a specific
-    # version. Returns the latest version if no version is specified
-    def get_plan_hash(plan_name, version = :latest)
+    # returns the yaml file content for the specified plan and version
+    # Returns the latest version if no version is specified
+    def get_plan_yaml(plan_name, version = :latest)
       raise StandardError, "Plan #{plan_name} does not exist" unless plan_exists?(plan_name)
 
       versions = show_versions(plan_name)
       version = versions.last if version == :latest
       raise StandardError, "Version #{version} of plan #{plan_name} not found" unless versions.include?(version)
 
-      yaml = File.join(@plan_store_dir, plan_name, 'versions', version + '.yaml')
-      YAML.load_file(yaml)
+      yaml_file = File.join(@plan_store_dir, plan_name, 'versions', version + '.yaml')
+      File.read(yaml_file)
+    end
+
+    # return the hash for the plan in the store for a specific
+    # version. Returns the latest version if no version is specified
+    def get_plan_hash(plan_name, version = :latest)
+      yaml = get_plan_yaml(plan_name, version)
+      YAML.load(yaml)
     end
 
     # Get the plan object for the specified version directly
