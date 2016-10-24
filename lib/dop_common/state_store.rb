@@ -73,7 +73,7 @@ module DopCommon
       notifier.watch(@state_file, :modify) do
         yield
       end
-      notifier.process
+      notifier.run
     end
 
   private
