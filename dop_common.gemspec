@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'hashdiff'
   spec.add_dependency 'lockfile'
+  spec.add_dependency 'rb-inotify'
 
   if RUBY_VERSION <= '1.8.7'
     spec.add_development_dependency "rake", '~> 10.5'

@@ -3,14 +3,16 @@
 # and updating easier.
 #
 require 'yaml/store'
+require 'rb-inotify'
 
 module DopCommon
   class StateStore < YAML::Store
 
     def initialize(state_file, plan_name, plan_cache)
-      @plan_name  = plan_name
-      @plan_cache = plan_cache
-      @state_file = state_file
+      @plan_name   = plan_name
+      @plan_cache  = plan_cache
+      @state_file  = state_file
+      @write_mutex = Mutex.new
       super(@state_file)
     end
 
@@ -20,14 +22,16 @@ module DopCommon
       if read_only
         super(read_only, &block)
       else
-        if @plan_cache.run_lock?(@plan_name)
-          # save the version on first write
-          super do
-            self[:version] = latest_version if self[:version].nil?
+        @write_mutex.synchronize do
+          if @plan_cache.run_lock?(@plan_name)
+            # save the version on first write
+            super do
+              self[:version] = latest_version if self[:version].nil?
+            end
+            super(&block)
+          else
+            raise StandardError, "Not possible to write to #{@state_file} because we have no run lock"
           end
-          super(&block)
-        else
-          raise StandardError, "Not possible to write to #{@state_file} because we have no run lock"
         end
       end
     end
@@ -60,6 +64,16 @@ module DopCommon
         yield(@plan_cache.get_plan_hash_diff(@plan_name, ver, latest_version))
         self[:version] = latest_version
       end
+    end
+
+    # This method will take a block which will be executet every time the
+    # state file changes.
+    def on_change
+      notifier = INotify::Notifier.new
+      notifier.watch(@state_file, :modify) do
+        yield
+      end
+      notifier.process
     end
 
   private
