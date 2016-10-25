@@ -41,6 +41,10 @@ module DopCommon
       @plugin ||= plugin_valid? ? parse_plugin : nil
     end
 
+    def title
+      @title ||= title_valid? ? @hash[:title] : plugin
+    end
+
     def plugin_timeout
       @plugin_timeout = plugin_timeout_valid? ? @hash[:plugin_timeout] : @defaults[:plugin_timeout]
     end
@@ -79,6 +83,13 @@ module DopCommon
         when String then @hash
         when Hash   then @hash[:plugin]
       end
+    end
+
+    def title_valid?
+      return false unless @hash.kind_of?(Hash)
+      return false if @hash[:title].nil?
+      @hash[:title].kind_of?(String) or
+        raise PlanParsingError, "The command title has to be a string"
     end
 
     def plugin_timeout_valid?
