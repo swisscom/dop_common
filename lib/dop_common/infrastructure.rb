@@ -92,7 +92,7 @@ module DopCommon
       ::URI.parse(@hash[:endpoint])
       true
     rescue URI::InvalidURIError
-      raise PlanParsingError, "Interface #{@name}: the specified endpoint URL is invalid"
+      raise PlanParsingError, "Infrastructure #{@name}: the specified endpoint URL is invalid"
     end
 
     def credentials_valid?
