@@ -15,8 +15,9 @@ module DopCommon
 
     def validate
       log_validation_method(:pool_valid?)
-      log_validation_method(:size_valid?)
       log_validation_method(:thin_valid?)
+      log_validation_method(:size_valid?)
+      try_validate_obj("Can't validate the 'data_disk' #{@name} because of previous error"){size}
     end
 
     def pool
@@ -24,7 +25,7 @@ module DopCommon
     end
 
     def size
-      @size ||= size_valid? ? to_bytes(@hash[:size]) : nil
+      @size ||= size_valid? ? DopCommon::Utils::DataSize.new(@hash[:size]) : nil
     end
 
     def thin?
@@ -45,14 +46,10 @@ module DopCommon
     end
 
     def size_valid?
-      raise PlanParsingError, "Data disk #{@name}: size must be specified" unless
-        @hash.has_key?(:size)
-      raise PlanParsingError, "Data disk #{@name}: size must be an integer or a string" unless
-        [Fixnum, String].include?(@hash[:size].class)
-      to_bytes(@hash[:size])
+      raise PlanParsingError, "Data disk #{@name}: 'size' is required" if @hash[:size].nil?
+      raise PlanParsingError, "Data disk #{@name}: 'size' must be of string type" unless
+        @hash[:size].kind_of?(String)
       true
-    rescue PlanParsingError => e
-      raise PlanParsingError, "Data disk #{@name}: #{e}"
     end
 
     def thin_valid?

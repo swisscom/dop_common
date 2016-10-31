@@ -85,10 +85,10 @@ describe DopCommon::DataDisk do
   end
 
   describe '#size' do
-    [1024*1024, "#{1024*124}k", "1024m", "100G"].each do |size_val|
-      it 'will return size in bytes if specified properly' do
+    ['1000K', '1000M', '10G', '1000KB', '1000MB', '1000GB'].each do |size|
+      it 'will return DopCommon::Utils::DataSize object if specified properly' do
         data_disk = DopCommon::DataDisk.new('foo',
-          { 'size' => size_val },
+          { 'size' => size },
           {
             :parsed_infrastructure => @infrastructures['baremetal'],
             :parsed_infrastructure_properties => DopCommon::InfrastructureProperties.new(
@@ -97,14 +97,13 @@ describe DopCommon::DataDisk do
             )
           }
         )
-        expect(data_disk.size).to be_kind_of(Fixnum)
-        expect(data_disk.size).to eq(data_disk.send(:to_bytes, size_val))
+        expect(data_disk.size).to be_an_instance_of(DopCommon::Utils::DataSize)
       end
     end
-    [nil, [], {}, :'256m', :'256'].each do |size_val|
-      it 'will return size in bytes if specified properly' do
+    [nil, [], {}].each do |size|
+      it 'will raise an exception if not specified properly' do
         data_disk = DopCommon::DataDisk.new('foo',
-          { 'size' => size_val },
+          { 'size' => size },
           {
             :parsed_infrastructure => @infrastructures['baremetal'],
             :parsed_infrastructure_properties => DopCommon::InfrastructureProperties.new(
