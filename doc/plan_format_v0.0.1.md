@@ -411,9 +411,6 @@ a property name is actually a keyword of a node hash.
     * __*root_password*__ - super user password that is set for cloud init phase,
     * __*root_ssh_keys*__ - an array of OpenSSH public keys that are recorded
       into `/root/.ssh/authorized_keys` by cloud init.
-    * __*administrator_fullname*__ - an optional property that specifies the full
-      name of the administrator user for VSphere-based windows-guests
-      customization. It defaults to `Administrator`,
     * __*administrator_password*__ - an optional property that specifies the
       password of the administrator user for VSphere-based windows-guests
       customization. it defaults to an empty password which in turn leads to an
