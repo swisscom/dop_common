@@ -181,7 +181,8 @@ module DopCommon
     end
 
     def new_version_string
-      Time.now.utc.strftime('%Y%m%d%H%M%S%L')
+      time = Time.now.utc
+      time.strftime("%Y%m%d%H%M%S#{time.usec/1000}")
     end
 
     def run_lockfile(plan_name)

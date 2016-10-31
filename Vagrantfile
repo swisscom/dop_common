@@ -16,7 +16,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define 'rhel7.example.com' do |machine|
     machine.vm.box = 'puppetlabs/centos-7.0-64-nocm'
-    machine.vm.provision 'shell', inline: 'yum install -y gcc git'
+    machine.vm.provision 'shell', inline: 'yum install -y gcc git centos-release-scl'
     machine.vm.provision 'shell', inline: 'yum install -y ruby ruby-devel rubygem-bundler'
     machine.vm.provision 'shell', inline: 'yum install -y ruby193 ruby193-ruby-devel ruby193-rubygem-bundler'
     machine.vm.provision 'shell', inline: 'yum install -y rh-ruby22 rh-ruby22-ruby-devel rh-ruby22-rubygem-bundler'
