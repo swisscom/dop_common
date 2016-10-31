@@ -416,28 +416,44 @@ a property name is actually a keyword of a node hash.
       customization. it defaults to an empty password which in turn leads to an
       automatic logon upon windows guest startup.
 
- 9. __*cores*__ - an optional integer that sets the number of cores for a given
- node. It is `2` by default.
-
- 10. __*memory*__ - an optional string of numbers followed by one of `M`/`m`
- (mega) or `G`/`g` (giga) character. It is used to set the amount of
- provisioned memory. The default is `4G`.
-
- 11. __*storage*__ - an optional string of numbers followed by one of `M`/`m`
-     (mega) or `G`/`g` (giga) character. It is used to set the amount of
-     provisioned *root* disk space. Please note that some infrastructure providers
-     disregard this value, especially when the node is provisioned from a template.
-     The default value is `10G`.
-
- 12. __*flavor*__ - an optional property that specifies how to set the amount of
-     CPU cores, memory and to specify the size of the *root* disk. Please consult
+ 9. __*flavor*__ - an optional property that specifies how to set the amount of
+     CPU cores, memory and the size of the *root* disk. Please consult
      [OpenStack
      flavors](http://docs.openstack.org/openstack-ops/content/flavors.html) for
      their definition. In case the infrastructure does not support flavors feature,
      it is emulated.
 
-     __IMPORTANT:__ The usage of __flavor__ always overrides the values explicitly
-     set by either of __cores__, __memory__ or __storage__ properties.
+     __IMPORTANT:__ The __flavor__ property is mutually exclusive with any of
+	 __cores__, __memory__ or __storage__ properties. Having said that, an
+	 exception will logged if __flavor__ is specified along with one or more
+	 of __cores__, __memory__ and/or __storage__ properties.
+
+ 10. __*cores*__ - an optional positive integer that sets the number of cores
+    for a given node.
+	
+	It is `2` by default.
+
+ 11. __*memory*__ - an optional value that is used to set the amount of
+     provisioned memory for a given node.
+
+	 The format of an input value is a positive number followed by one of:
+     * `K` for kibibytes,
+	 * `M` for mebibytes,
+	 * `G` for gibibytes,
+	 * `KB` for kilobytes,
+	 * `MB` for megabytes,
+	 * `GB` for gigabytes.
+
+	 The default is `4G`.
+
+ 12. __*storage*__ - an that specifies the size of the root volume.
+
+     Please note that some infrastructure providers disregard this value,
+	 especially when the node is provisioned from a template.
+
+	 Please have a look to __*memory*__ for formatting of input value.
+     
+	 The default value is `10G`.
 
  13. __*timezone*__ - a property that specifies the timezone of the guest
      operating system. Please make sure that:
