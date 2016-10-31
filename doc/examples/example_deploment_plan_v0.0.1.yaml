@@ -118,7 +118,7 @@ nodes:
                 pool: storage_pool3
                 size: 256G
             log1:
-                size: 1024m
+                size: 1024M
                 thin: false
         credentials: windows_login
 
@@ -127,7 +127,7 @@ nodes:
         infrastructure_properties:
             tenant: lamp
         image: rhel6cloudinit
-        flavor: medium
+        flavor: m1.medium
         interfaces:
             eth0:
                 network: management
@@ -203,7 +203,7 @@ nodes:
                 ip: dhcp
         disks:
             logs:
-                size: 265g
+                size: 265G
                 thin: false
 
     storage01.example.com:

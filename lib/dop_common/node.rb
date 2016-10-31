@@ -73,10 +73,13 @@ module DopCommon
       log_validation_method('credentials_valid?')
       log_validation_method('dns_valid?')
       log_validation_method('data_disks_valid?')
-      try_validate_obj("Node: Can't validate the interfaces part because of a previous error"){interfaces}
-      try_validate_obj("Node: Can't validate the 'infrastructure_properties' part because of a previous error"){infrastructure_properties}
-      try_validate_obj("Node: Can't validate the 'dns' part because of a previous error"){dns}
-      try_validate_obj("Node: Can't validate the 'data_disks' part because of a previous error"){data_disks}
+      try_validate_obj("Node #{@name}: Can't validate the interfaces part because of a previous error"){interfaces}
+      try_validate_obj("Node #{@name}: Can't validate the infrastructure_properties part because of a previous error"){infrastructure_properties}
+      try_validate_obj("Node #{@name}: Can't validate the dns part because of a previous error"){dns}
+      try_validate_obj("Node #{@name}: Can't validate data_disks part because of a previous error"){data_disks}
+      # Memory and storage may be to nil.
+      try_validate_obj("Node #{@name}: Can't validate the memory part because of a previous error"){memory} unless @hash[:memory].nil?
+      try_validate_obj("Node #{@name}: Can't validate storage part because of a previous error"){storage} unless @hash[:storage].nil?
     end
 
     def digits
@@ -138,20 +141,19 @@ module DopCommon
     end
 
     def flavor
-      @flavor ||= flavor_valid? ?
-        @hash[:flavor] : (infrastructure.provides?(:openstack) ? DEFAULT_OPENSTACK_FLAVOR : "")
+      @flavor ||= flavor_valid? ? create_flavor : nil
     end
 
     def cores
-      @cores ||= cores_valid? ? create_cores : DEFAULT_CORES
+      @cores ||= cores_valid? ? create_cores : nil
     end
 
     def memory
-      @memory ||= memory_valid? ? create_memory : DEFAULT_MEMORY
+      @memory ||= memory_valid? ? create_memory : nil
     end
 
     def storage
-      @storage ||= storage_valid? ? create_storage : DEFAULT_STORAGE
+      @storage ||= storage_valid? ? create_storage : nil
     end
 
     def timezone
@@ -263,42 +265,43 @@ module DopCommon
     end
 
     def flavor_valid?
-      return false if @hash[:flavor].nil?
-      raise PlanParsingError, "Node #{@name}: Flavor must be string" unless @hash[:flavor].kind_of?(String)
-      raise PlanParsingError, "Node #{@name}: Invalid flavor" unless
-        infrastructure.provides?(:openstack) || VALID_FLAVOR_TYPES.has_key?(@hash[:flavor].to_sym)
+      raise PlanParsingError, "Node #{@name}: flavor is mutually exclusive with any of cores, memory and storage" if
+        @hash.has_key?(:flavor) && @hash.keys.any? { |k| [:cores, :memory, :storage].include?(k) }
+      raise PlanParsingError, "Node #{@name}: flavor must be a string" if
+        @hash.has_key?(:flavor) && !@hash[:flavor].kind_of?(String)
+      return true if infrastructure.provides?(:openstack)
+      raise PlanParsingError, "Node #{@name}: Invalid flavor '#{@hash[:flavor]}'" if
+        !@hash[:flavor].nil? && !VALID_FLAVOR_TYPES.has_key?(@hash[:flavor].to_sym)
+      false
+    end
+
+    def cores_valid?
+      if infrastructure.provides?(:openstack)
+        raise PlanParsingError, "Node #{@name}: cores can't be specified if openstack is a provider" if
+          @hash.has_key?(:cores)
+        return false
+      end
+      raise PlanParsingError, "Node #{@name}: cores must be a non-zero positive number" if
+        @hash.has_key?(:cores) && !(@hash[:cores].kind_of?(Fixnum) && @hash[:cores] > 0)
       true
     end
 
-    def device_spec_valid?(device)
-      return false if @hash[device].nil? && @hash[:flavor].nil?
-      unless @hash[device].nil?
-        raise PlanParsingError, "Node #{@name}: specification of '#{device.to_s}' is not allowed for OpenStack provider type" if
-          infrastructure.provides?(:openstack)
-        case device
-        when :memory, :storage
-          raise PlanParsingError, "Node #{@name}: #{device.to_s} must be a string of numbers followed by M,m,G or g character" unless
-            @hash[device].kind_of?(String) && @hash[device] =~ /^\d+[GgMm]$/
-        when :cores
-          raise PlanParsingError, "Node #{@name}: CPU cores must be positive non-zero integer" unless
-            @hash[device].kind_of?(Integer) && @hash[device] > 0
-        else
-          raise PlanParsingError, "Node #{name}: Invalid virtual device"
-        end
+    def memory_valid?
+      if infrastructure.provides?(:openstack)
+        raise PlanParsingError, "Node #{@name}: memory can't be specified if openstack is a provider" if
+          @hash.has_key?(:memory)
+        return false
       end
       true
     end
 
-    def cores_valid?
-      device_spec_valid?(:cores)
-    end
-
-    def memory_valid?
-      device_spec_valid?(:memory)
-    end
-
     def storage_valid?
-      device_spec_valid?(:storage)
+      if infrastructure.provides?(:openstack)
+        raise PlanParsingError, "Node #{@name}: storage can't be specified if openstack is a provider" if
+          @hash.has_key?(:storage)
+        return false
+      end
+      true
     end
 
     # TODO: Do a better format validation
@@ -384,19 +387,27 @@ module DopCommon
       )
     end
 
+    def create_flavor
+      @hash[:flavor].nil? ? DEFAULT_OPENSTACK_FLAVOR : @hash[:flavor]
+    end
+
     def create_cores
-      return nil if infrastructure.provides?(:openstack)
-      @hash[:flavor].nil? ? @hash[:cores] : VALID_FLAVOR_TYPES[flavor.to_sym][:cores]
+      @hash.has_key?(:cores) ? @hash[:cores] : @hash.has_key?(:flavor) ?
+        VALID_FLAVOR_TYPES[@hash[:flavor].to_sym][:cores] : DEFAULT_CORES
     end
 
     def create_memory
-      return nil if infrastructure.provides?(:openstack)
-      @hash[:flavor].nil? ? to_bytes(@hash[:memory]) : VALID_FLAVOR_TYPES[flavor.to_sym][:memory]
+      DopCommon::Utils::DataSize.new(
+        @hash.has_key?(:memory) ? @hash[:memory] : @hash.has_key?(:flavor) ?
+          VALID_FLAVOR_TYPES[@hash[:flavor].to_sym][:memory] : DEFAULT_MEMORY
+      )
     end
 
     def create_storage
-      return nil if infrastructure.provides?(:openstack)
-      @hash[:flavor].nil? ? to_bytes(@hash[:storage]) : VALID_FLAVOR_TYPES[flavor.to_sym][:storage]
+      DopCommon::Utils::DataSize.new(
+        @hash.has_key?(:storage) ? @hash[:storage] : @hash.has_key?(:flavor) ?
+          VALID_FLAVOR_TYPES[@hash[:flavor].to_sym][:storage] : DEFAULT_STORAGE
+      )
     end
 
     def create_credentials

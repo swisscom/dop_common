@@ -11,6 +11,7 @@ All notable changes to dop_common will be documented in this file.
 - Node credentials
 - Infrastructure properties -> config drive
 - Infrastructure properties -> keep_ha
+- Utils -> redesign of data sizing
 
 ## [0.8.0] - 2016-05-25
 ### Added
