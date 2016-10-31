@@ -28,20 +28,19 @@ namespace :vagrant do
 
   desc 'execute the rspec tests in vagrant boxes'
   task :spec => ['vagrant:prep'] do
-    test_machines.each_key do |machine|
-      Bundler.with_clean_env do
+    test_machines.each do |machine, scls|
+      scls.each do |scl|
         commands = [
           'cd /vagrant',
-          'bundle install',
+          "bundle install --path ~/.bundle_#{scl}",
           'bundle exec rspec',
         ]
-        # system ruby
-        if test_machines[machine].delete('system')
-          sh "vagrant ssh #{machine} -c '#{commands.join(' && ')}'"
-        end
-        # scl ruby
-        test_machines[machine].each do |scl|
-          sh "vagrant ssh #{machine} -c 'scl enable #{scl} \"#{commands.join(' && ')}\"'"
+        Bundler.with_clean_env do
+          if scl == 'system'
+            sh "vagrant ssh #{machine} -c '#{commands.join(' && ')}'"
+          else
+            sh "vagrant ssh #{machine} -c 'scl enable #{scl} \"#{commands.join(' && ')}\"'"
+          end
         end
       end
     end
