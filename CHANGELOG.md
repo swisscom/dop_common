@@ -6,6 +6,7 @@ All notable changes to dop_common will be documented in this file.
 - DNS parser
 - Data disks
 - Security groups
+- Support for V3 identity API
 
 ### Changed
 - Node credentials

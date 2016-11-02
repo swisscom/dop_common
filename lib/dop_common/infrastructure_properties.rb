@@ -21,6 +21,8 @@ module DopCommon
       log_validation_method(:dest_folder_valid?)
       log_validation_method(:tenant_valid?)
       log_validation_method(:use_config_drive_valid?)
+      log_validation_method(:domain_id_valid?)
+      log_validation_method(:endpoint_type_valid?)
     end
 
     def affinity_groups
@@ -60,6 +62,14 @@ module DopCommon
       @use_config_drive ||= use_config_drive_valid? ? @hash[:use_config_drive] : false
     end
     alias_method :use_config_drive, :use_config_drive?
+
+    def domain_id
+      @domain_id ||= domain_id_valid? ? create_domain_id : nil
+    end
+
+    def endpoint_type
+      @endpoint_type ||= endpoint_type_valid? ? create_endpoint_type : nil
+    end
 
     private
 
@@ -135,6 +145,22 @@ module DopCommon
       true
     end
 
+    def domain_id_valid?
+      return false unless @parsed_infrastructure.provides?(:openstack)
+      return true if @hash[:domain_id].nil?
+      raise PlanParsingError, "Infrastructure properties: The domain_id must be a non-empty string" if
+        !@hash[:domain_id].kind_of?(String) || @hash[:domain_id].empty?
+      true
+    end
+
+    def endpoint_type_valid?
+      return false unless @parsed_infrastructure.provides?(:openstack)
+      return true if @hash[:endpoint_type].nil?
+      raise PlanParsingError, "Infrastructure properties: The endpoint must be 'publicURL', 'internalURL' or 'adminURL'" unless
+      @hash[:endpoint_type].kind_of?(String) && %w(publicURL internalURL adminURL).include?(@hash[:endpoint_type])
+      true
+    end
+
     def use_config_drive_valid?
       return false if @hash[:use_config_drive].nil?
       raise PlanParsingError, "Infrastructure properties: The 'use_config_drive' is valid only for OpenStack infrastructure types" unless @parsed_infrastructure.provides?(:openstack)
@@ -146,6 +172,14 @@ module DopCommon
     def create_security_groups
       sgs = @hash[:security_groups]
       sgs ? sgs : (@parsed_infrastructure.default_security_groups + @hash[:additional_security_groups]).uniq
+    end
+
+    def create_domain_id
+      @hash[:domain_id].nil? ? 'default' : @hash[:domain_id]
+    end
+    
+    def create_endpoint_type
+      @hash[:endpoint_type].nil? ? 'publicURL' : @hash[:endpoint_type]
     end
   end
 end

@@ -177,4 +177,48 @@ describe DopCommon::InfrastructureProperties do
       expect { infrastructure_properties.security_groups }.to raise_error DopCommon::PlanParsingError
     end
   end
+
+  describe '#domain_id' do
+    providers.each do |p|
+      it "will return the 'domain_id' name if specified properly" do
+        domain_id = "domain_id_#{p}"
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'domain_id' => domain_id}, infrastructure[p])
+        expect(infrastructure_properties.domain_id).to eq(p == 'openstack' ? domain_id : nil)
+      end
+    end
+    it "will return the 'default' if domain_id name isn't specified " do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({}, infrastructure['openstack'])
+      expect(infrastructure_properties.domain_id).to eq 'default'
+    end
+
+    it "will raise an exception if provider is 'openstack' and 'domain_id' is not a non-empty string" do
+      [1, :invalid, "", {}, []].each do |prop_val|
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'domain_id' => prop_val}, infrastructure['openstack'])
+        expect { infrastructure_properties.domain_id }.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
+
+  describe '#endpoint_type' do
+    providers.each do |p|
+      %w(publicURL internalURL adminURL).each do |endpoint_type|
+        it "will return the 'endpoint_type' name if specified properly" do
+          infrastructure_properties = DopCommon::InfrastructureProperties.new({'endpoint_type' => endpoint_type}, infrastructure[p])
+          expect(infrastructure_properties.endpoint_type).to eq(p == 'openstack' ? endpoint_type : nil)
+        end
+      end
+    end
+    it "will return the 'publicURL' if endpoint_type name isn't specified " do
+      infrastructure_properties = DopCommon::InfrastructureProperties.new({}, infrastructure['openstack'])
+      expect(infrastructure_properties.endpoint_type).to eq 'publicURL'
+    end
+
+    it "will raise an exception if provider is 'openstack' and 'endpoint_type' is not publicURL, internalURL or adminURL literal " do
+      [1, :invalid, "", {}, [], 'foo'].each do |prop_val|
+        infrastructure_properties = DopCommon::InfrastructureProperties.new({'endpoint_type' => prop_val}, infrastructure['openstack'])
+        expect { infrastructure_properties.endpoint_type }.to raise_error DopCommon::PlanParsingError
+      end
+    end
+  end
 end
+

@@ -322,6 +322,13 @@ a property name is actually a keyword of a node hash.
 	   that specifies whether a config drive should be used for VM
 	   provisioning. If set to `false` or indefined, metadata service is
 	   used. If set to `true` config drive is used.
+    
+	8. __*domain_id*__ an optional property specifies the name of the domain ID
+	   for OpenStack infrastructures. It defaults to `default`.
+	
+	9. __*endpoint_type*__ an optional property specifies the endpoint type
+	   for OpenStack infrastructures. Accepted values are `publicURL`,
+	   `internalURL` and `adminURL`. It defaults to `publicURL`.
 
     __IMPORTANT__: Infrastructure properties may differ across different
     provider types.

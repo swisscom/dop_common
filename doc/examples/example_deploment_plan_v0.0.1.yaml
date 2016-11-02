@@ -126,6 +126,8 @@ nodes:
         infrastructure: lamp
         infrastructure_properties:
             tenant: lamp
+            endpoint_type: adminURL
+            domain_id: lamp
         image: rhel6cloudinit
         flavor: m1.medium
         interfaces:
