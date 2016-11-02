@@ -73,7 +73,7 @@ module DopCommon
       plan    = @plan_store.get_plan(plan_name)
       @plans[plan_name] = plan
       @versions[plan] = version
-      plan.nodes do |node|
+      plan.nodes.each do |node|
         @nodes[node.name] = plan
       end
     end
