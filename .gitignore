@@ -17,3 +17,7 @@ tmp
 *.swp
 *.swo
 .vagrant/
+vendor
+tags
+TAGS
+.byebug*
