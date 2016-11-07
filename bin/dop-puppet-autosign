@@ -15,7 +15,7 @@ option_parser = OptionParser.new do |opts|
     options[:verbosity] = v
   end
 
-  options[:plan_cache] = '/var/lib/dop/plans'
+  options[:plan_cache] = '/var/lib/dop/cache'
   opts.on("-p", "--plan_cache PLAN_CACHE_DIR", "Set the dop plan cache dir. Default is #{options[:plan_cache]}") do |p|
     options[:plan_cache] = p
   end
@@ -50,12 +50,7 @@ end
 DopCommon.logger = Logger.new(STDERR)
 DopCommon.log.level = ::Logger.const_get(options[:verbosity].upcase)
 
-plan_cache = DopCommon::PlanCache.new(options[:plan_cache])
-plan_cache.list.each do |plan_name|
-  DopCommon.log.debug("Checking plan #{plan_name} for node")
-  if plan_cache.get(plan_name).find_node(node_name)
-    DopCommon.log.debug("Found node #{node_name} in plan #{plan_name}")
-    exit(0)
-  end
-end
-exit(1)
+plan_store = DopCommon::PlanStore.new(options[:plan_cache])
+plan_cache = DopCommon::PlanCache.new(plan_store)
+
+plan_cache.plan_by_node(node_name) ? exit(0) : exit(1)
