@@ -59,7 +59,7 @@ class Hiera
               break
             end
 
-          rescue ConfigurationValueNotFound
+          rescue DopCommon::ConfigurationValueNotFound
             next
           end
         end
