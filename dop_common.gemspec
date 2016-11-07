@@ -28,21 +28,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'lockfile'
   spec.add_dependency 'rb-inotify'
 
-  if RUBY_VERSION <= '1.8.7'
-    spec.add_development_dependency "rake", '~> 10.5'
-  else
-    spec.add_development_dependency "rake"
-  end
-
-  if RUBY_VERSION < '2.0'
-    spec.add_dependency 'json', '< 2.0'
-  end
-
-  spec.add_development_dependency "bundler", "~> 1.3"
+  spec.add_development_dependency "bundler"
+  spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-legacy_formatters"
   spec.add_development_dependency "rspec-mocks"
   spec.add_development_dependency "rspec-collection_matchers"
+  # no ruby 1.8.7 support
+  #spec.add_development_dependency "rspec-command"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-doc"

@@ -1,4 +1,11 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in dop_common.gemspec
+if Gem::Version.new(RUBY_VERSION.dup) <= Gem::Version.new('1.8.7')
+  gem 'rake', '~> 10'
+end
+
+if Gem::Version.new(RUBY_VERSION.dup) <= Gem::Version.new('1.9.3')
+  gem 'json', '~> 1'
+end
+
 gemspec

@@ -32,6 +32,7 @@ namespace :vagrant do
       scls.each do |scl|
         commands = [
           'cd /vagrant',
+          'rm -rf Gemfile.lock',
           "bundle install --path ~/.bundle_#{scl}",
           'bundle exec rspec',
         ]
