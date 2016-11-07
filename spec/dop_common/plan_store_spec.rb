@@ -69,11 +69,19 @@ describe DopCommon::PlanStore do
 
   describe '#remove' do
     before { @plan_store.add(plan) }
-    subject { @plan_store.remove(plan_name) }
+    subject { @plan_store.remove(plan_name, remove_state) }
+    let(:remove_state) { false }
 
-    context 'plan exists' do
+    context 'plan exists and remove with state' do
+      let(:remove_state) { true }
       it { is_expected.to eq('simple_plan') }
       it { subject; expect(File.exists?(plan_dir)).to be false }
+      it { subject; expect(File.exists?(versions_dir)).to be false }
+    end
+    context 'plan exists and keep state' do
+      it { is_expected.to eq('simple_plan') }
+      it { subject; expect(File.exists?(plan_dir)).to be true }
+      it { subject; expect(File.exists?(versions_dir)).to be false }
     end
     context 'plan does not exist' do
       let(:plan_name) { 'not_existing_plan' }
