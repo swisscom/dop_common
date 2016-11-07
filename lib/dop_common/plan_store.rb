@@ -57,7 +57,7 @@ module DopCommon
     end
 
     # remove a plan from the plan store
-    def remove(plan_name)
+    def remove(plan_name, remove_state = false)
       raise StandardError, "Plan #{plan_name} does not exist" unless plan_exists?(plan_name)
       plan_dir = File.join(@plan_store_dir, plan_name)
       versions_dir = File.join(plan_dir, 'versions')
@@ -67,7 +67,9 @@ module DopCommon
       run_lock(plan_name) do
         FileUtils.remove_entry_secure(versions_dir)
       end
-      FileUtils.remove_entry_secure(plan_dir)
+      if remove_state
+        FileUtils.remove_entry_secure(plan_dir)
+      end
       DopCommon.log.info("Plan #{plan_name} was removed")
       plan_name
     end

@@ -6,6 +6,9 @@ require 'yaml/store'
 require 'rb-inotify'
 
 module DopCommon
+  class UnknownVersionError < StandardError
+  end
+
   class StateStore < YAML::Store
 
     def initialize(state_file, plan_name, plan_cache)
@@ -45,7 +48,7 @@ module DopCommon
     def pending_updates?
       case version
       when :new, latest_version then false
-      else false
+      else true
       end
     end
 
@@ -59,6 +62,7 @@ module DopCommon
     def update
       ver = version
       return if ver == latest_version
+      raise UnknownVersionError.new(ver) unless version_exists?(ver)
       DopCommon.log.info("Updating plan #{@plan_name} from version #{ver} to #{latest_version}")
       transaction do
         yield(@plan_cache.get_plan_hash_diff(@plan_name, ver, latest_version))
@@ -80,6 +84,10 @@ module DopCommon
 
     def latest_version
       @plan_cache.show_versions(@plan_name).last
+    end
+
+    def version_exists?(version)
+      @plan_cache.show_versions(@plan_name).include?(version)
     end
 
   end
