@@ -1,18 +1,22 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [unreleased]
+## [0.9.0] - 2016-11-07
 ### Added
 - DNS parser
 - Data disks
 - Security groups
 - Support for V3 identity API
+- Implementation of an actual plan cache
+- Implementation of a general state store with locking and transactions
 
 ### Changed
 - Node credentials
 - Infrastructure properties -> config drive
 - Infrastructure properties -> keep_ha
 - Utils -> redesign of data sizing
+- Reimplementation of the plan store
+- Reimplementation of the Hiera plugin and update to the latest Backend API
 
 ## [0.8.0] - 2016-05-25
 ### Added
