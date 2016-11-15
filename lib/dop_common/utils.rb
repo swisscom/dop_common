@@ -1,5 +1,12 @@
 module DopCommon
   module Utils
+    def sanitize_env(additional_env_vars = {})
+      {
+        'HOME' => ENV['HOME'],
+        'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+      }.merge(additional_env_vars)
+    end
+    module_function :sanitize_env
 
     class DataSize
       include Validator

@@ -2,6 +2,8 @@
 # DOP Common Hash Parser Helper Functions
 #
 
+require 'open3'
+
 module DopCommon
   module HashParser
 
@@ -175,7 +177,9 @@ module DopCommon
         end
         case method
         when :file then File.read(file).chomp
-        when :exec then %x[#{file}].chomp
+        when :exec
+          stdout, status = Open3.capture2(Utils::sanitize_env, params.join(' '), :unsetenv_others => true)
+          stdout.chomp
         end
       else
         value
