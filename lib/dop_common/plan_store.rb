@@ -184,7 +184,8 @@ module DopCommon
 
     def new_version_string
       time = Time.now.utc
-      time.strftime("%Y%m%d%H%M%S#{time.usec/1000}")
+      usec = time.usec.to_s.rjust(6, '0')
+      time.strftime("%Y%m%d%H%M%S#{usec}")
     end
 
     def run_lockfile(plan_name)
