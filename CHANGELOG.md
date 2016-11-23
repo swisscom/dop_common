@@ -4,6 +4,7 @@ All notable changes to dop_common will be documented in this file.
 ## [unreleased] - unreleased
 ### Fixed
 - Add zero padding to the version string for the plan store
+- Removed a misleading error message when a plan was updated and the state was still new
 
 ## [0.9.0] - 2016-11-07
 ### Added
