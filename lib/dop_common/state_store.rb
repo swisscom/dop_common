@@ -62,6 +62,7 @@ module DopCommon
     def update
       ver = version
       return if ver == latest_version
+      return if ver == :new
       raise UnknownVersionError.new(ver) unless version_exists?(ver)
       DopCommon.log.info("Updating plan #{@plan_name} from version #{ver} to #{latest_version}")
       transaction do
