@@ -1,10 +1,15 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [unreleased] - unreleased
+## [0.9.2] - 2016-11-28
 ### Fixed
 - Add zero padding to the version string for the plan store
 - Removed a misleading error message when a plan was updated and the state was still new
+- Add lower version boundry for hashdiff to make sure the fixed version is used
+
+## [0.9.1] - 2016-11-15
+### Fixed
+- Sanitize shell environment before command(s) execution
 
 ## [0.9.0] - 2016-11-07
 ### Added
