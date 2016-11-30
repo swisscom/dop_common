@@ -177,13 +177,13 @@ is optional in deployment plan.
     - `post_create_vm` - a set of hooks (scripts, programs) executed after a
 	  node is created.
     - `pre_update_vm` - a set of hooks (scripts, programs) executed before a
-	  node is update.
+	  node is updated.
     - `post_update_vm` - a set of hooks (scripts, programs) executed after a
 	  node is updated.
     - `pre_destroy_vm` - a set of hooks (scripts, programs) executed before a
-	  node is update.
+	  node is destroyed.
     - `post_destroy_vm` - a set of hooks (scripts, programs) executed after a
-	  node is updated.
+	  node is destroyed.
 	
 	__IMPORTANT__:
 	- FQDN of the given node is passed to a program as the first argument.
