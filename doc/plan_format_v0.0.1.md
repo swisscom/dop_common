@@ -192,7 +192,7 @@ is optional in deployment plan.
 	  indicates that there were some changes.
 	- Programs are executed in the order of their definition in the deployment
 	  plan.
-    - Each hook type definition is optional, however, when `hooks` must contain
+    - Each hook type definition is optional, however, `hooks` must contain
 	  at least one hook type. 
 
 The following snippet is an example infrastructures configuration:
