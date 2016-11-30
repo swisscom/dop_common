@@ -21,6 +21,7 @@ require 'dop_common/plan_cache'
 require 'dop_common/state_store'
 require 'dop_common/dns'
 require 'dop_common/data_disk'
+require 'dop_common/node_filter'
 
 module DopCommon
 end
