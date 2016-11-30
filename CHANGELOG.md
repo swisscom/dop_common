@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.9.3] - unreleased
+### Addes
+- Hooks parser
+
 ## [0.9.2] - 2016-11-28
 ### Fixed
 - Add zero padding to the version string for the plan store
