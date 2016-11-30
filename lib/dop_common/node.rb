@@ -180,36 +180,28 @@ module DopCommon
       @data_disks ||= data_disks_valid? ? create_data_disks : []
     end
 
-    def config(variable)
-      raise StandardError, 'The config method is currently not implemented in DopCommon::Node'
-    end
-
     def has_config?(variable, pattern)
-      raise StandardError, 'The has_config? method is currently not implemented in DopCommon::Node'
+      DopCommon.log.warn('The has_config? method is currently not implemented in DopCommon::Node')
+      false
     end
 
     def config_includes?(variable, pattern)
-      raise StandardError, 'The config_includes? method is currently not implemented in DopCommon::Node'
-    end
-
-    def fact(variable)
-      raise StandardError, 'The fact method is currently not implemented in DopCommon::Node'
+      DopCommon.log.warn('The config_includes? method is currently not implemented in DopCommon::Node')
+      false
     end
 
     def has_fact?(variable, pattern)
-      raise StandardError, 'The has_fact? method is currently not implemented in DopCommon::Node'
+      DopCommon.log.warn('The has_fact? method is currently not implemented in DopCommon::Node')
+      false
     end
 
     def has_name?(pattern)
       pattern_match?(name, pattern)
     end
 
-    def role
-      raise StandardError, 'The role method is currently not implemented in DopCommon::Node'
-    end
-
     def has_role?(pattern)
-      raise StandardError, 'The has_role? method is currently not implemented in DopCommon::Node'
+      DopCommon.log.warn('The has_role? method is currently not implemented in DopCommon::Node')
+      false
     end
 
   protected
