@@ -1,9 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [0.9.3] - unreleased
+## [0.10.0] - 2016-11-30
 ### Added
 - Hooks parser
+- Move the node parser code from Dopi to DopCommon
 
 ## [0.9.2] - 2016-11-28
 ### Fixed
