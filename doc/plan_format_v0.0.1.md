@@ -269,9 +269,7 @@ infrastructures:
   db:
     type: vsphere
     endpoint: https://vsphere.example.com/api/
-    credentials:
-      username: myuser
-      password: mypass
+    credentials: vsphere_api_login
     networks:
       management:
         ip_pool:
