@@ -72,7 +72,7 @@ module DopCommon
     end
 
     def pre_destroy_vm_valid?
-      hook_valid?(:pre_destory_vm)
+      hook_valid?(:pre_destroy_vm)
     end
 
     def post_destroy_vm_valid?
