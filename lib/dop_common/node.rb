@@ -181,17 +181,17 @@ module DopCommon
     end
 
     def has_config?(variable, pattern)
-      DopCommon.log.warn('The has_config? method is currently not implemented in DopCommon::Node')
+      DopCommon.log.warn('Node filtering by config is currently not implemented')
       false
     end
 
     def config_includes?(variable, pattern)
-      DopCommon.log.warn('The config_includes? method is currently not implemented in DopCommon::Node')
+      DopCommon.log.warn('Node filtering by config is currently not implemented')
       false
     end
 
     def has_fact?(variable, pattern)
-      DopCommon.log.warn('The has_fact? method is currently not implemented in DopCommon::Node')
+      DopCommon.log.warn('Node filtering by facts is currently not implemeted')
       false
     end
 
@@ -200,7 +200,7 @@ module DopCommon
     end
 
     def has_role?(pattern)
-      DopCommon.log.warn('The has_role? method is currently not implemented in DopCommon::Node')
+      DopCommon.log.warn('Node filtering by role is currently not implemented')
       false
     end
 
