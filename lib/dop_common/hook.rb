@@ -1,7 +1,6 @@
 #
 # DOP common hooks hash parser
 #
-
 module DopCommon
   class Hook
     include Validator
@@ -38,7 +37,7 @@ module DopCommon
     end
 
     def pre_destroy_vm
-      @pre_destroy_vm ||= pre_destoy_vm_valid? ? @hash[:pre_destroy_vm] : []
+      @pre_destroy_vm ||= pre_destroy_vm_valid? ? @hash[:pre_destroy_vm] : []
     end
 
     def post_destroy_vm
@@ -70,6 +69,7 @@ module DopCommon
 
     def post_update_vm_valid?
       hook_valid?(:post_update_vm)
+    end
 
     def pre_destroy_vm_valid?
       hook_valid?(:pre_destory_vm)
@@ -77,7 +77,6 @@ module DopCommon
 
     def post_destroy_vm_valid?
       hook_valid?(:post_destroy_vm)
-    end
     end
   end
 end
