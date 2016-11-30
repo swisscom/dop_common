@@ -173,7 +173,7 @@ module DopCommon
     end
 
     def create_hooks
-      ::DopCommon::Hook.new(name, @hash[:hooks])
+      ::DopCommon::Hooks.new(name, @hash[:hooks])
     end
   end
 end

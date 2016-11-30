@@ -2,7 +2,7 @@
 # DOP common hooks hash parser
 #
 module DopCommon
-  class Hook
+  class Hooks
     include Validator
     include HashParser
 
