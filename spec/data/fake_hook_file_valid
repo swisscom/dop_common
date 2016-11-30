@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# A fake hook file that is , i.e. with executable permissions.
+
+uname -a

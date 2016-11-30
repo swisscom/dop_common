@@ -166,6 +166,34 @@ specific. For instance, OVirt/RHEVm infrastructure must define __*name*__,
 __*cluster*__, __*positive*__ and __*enforced*__ properties. Please note
 that some providers may not have affinities implemented, hence this feature
 is optional in deployment plan.
+ 
+ 6. __*hooks*__ - an optional hash of hooks that will be called before and/or
+	after a node is created and/or updated and/or destroyed. Each hook's value,
+	if defined, consists of an array of strings that represent a path to given
+	program that should be executed during given stage of deployment.
+	Following is a list of supported hooks: 
+    - `pre_create_vm` - a set of hooks (scripts, programs) executed before a
+	  node is created.
+    - `post_create_vm` - a set of hooks (scripts, programs) executed after a
+	  node is created.
+    - `pre_update_vm` - a set of hooks (scripts, programs) executed before a
+	  node is updated.
+    - `post_update_vm` - a set of hooks (scripts, programs) executed after a
+	  node is updated.
+    - `pre_destroy_vm` - a set of hooks (scripts, programs) executed before a
+	  node is destroyed.
+    - `post_destroy_vm` - a set of hooks (scripts, programs) executed after a
+	  node is destroyed.
+	
+	__IMPORTANT__:
+	- FQDN of the given node is passed to a program as the first argument.
+	- `0` or `1` is passed to a program as the second argument. `0` is passed
+	  if there were no changes of the node during deployment, while `1`
+	  indicates that there were some changes.
+	- Programs are executed in the order of their definition in the deployment
+	  plan.
+    - Each hook type definition is optional, however, `hooks` must contain
+	  at least one hook type. 
 
 The following snippet is an example infrastructures configuration:
 ```yaml
@@ -173,9 +201,7 @@ infrastructures:
   management:
     type: rhev
     endpoint: https://rhev.example.com/api/
-    credentials:
-      username: myuser
-      password: mypass
+    credentials: rhev_api_login
     networks:
       management:
         ip_pool:
@@ -202,11 +228,26 @@ infrastructures:
         positive: false
         enforce: true
         cluster: clu-lab1ch
+      hooks:
+        pre_create_vm:
+          - /path/to/pre_create_program_1
+          - /path/to/pre_create_program_2
+        post_create_vm:
+          - /path/to/post_create_program_1
+        pre_update_vm:
+          - /path/to/pre_update_program_1
+        post_update_vm:
+          - /path/to/post_update_program_2
+        pre_destroy_vm:
+          - /path/to/pre_destroy_program_1
+          - /path/to/pre_destroy_program_2
+          - /path/to/pre_destroy_program_3
+        post_destroy_vm:
+          - /path/to/post_destroy_program_1
   lamp:
     type: openstack
     endpoint: https://openstack.example.com/api/
-    credentials:
-      username: myuser
+    credentials: openstack_api_login
     networks:
       management-subnet:
         ip_pool:
@@ -220,12 +261,15 @@ infrastructures:
           to: 192.168.2.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.2.254
+      hooks:
+        pre_create_vm:
+          - /path/to/pre_create_program_x
+        post_destroy_vm:
+          - /path/to/post_destroy_program_y
   db:
     type: vsphere
     endpoint: https://vsphere.example.com/api/
-    credentials:
-      username: myuser
-      password: mypass
+    credentials: vsphere_api_login
     networks:
       management:
         ip_pool:
@@ -507,10 +551,8 @@ nodes:
         network: management
           ip: dhcp
     credentials:
-      root_password: a_password
-      root_ssh_keys:
-        - OpenSSH key 1
-        - OpenSSH key 2
+	  - root_password
+	  - root_ssh_pubkey
 
   mssql01_mgt01:
     fqdn: mssql01.example.com
@@ -533,7 +575,7 @@ nodes:
         size: 256G
 		thin: false
     credentials:
-      root_password: a_password
+      - admin_password
 
   mysql01.example.com:
     infrastructure: lamp
@@ -582,7 +624,7 @@ nodes:
       db1:
         size: 20G
     credentials:
-      administrator_password: ASecurePassw0rd
+	  - admin_password
 	timezone: 100
     organization_name: Acme
 

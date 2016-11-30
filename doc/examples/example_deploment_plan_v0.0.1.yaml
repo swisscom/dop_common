@@ -59,7 +59,19 @@ infrastructures:
                 positive: false
                 enforce: true
                 cluster: clu-lab1ch
-
+        hooks:
+          pre_create_vm:
+            - spec/data/fake_hook_file_valid
+          post_create_vm:
+            - spec/data/fake_hook_file_valid
+          pre_update_vm:
+            - spec/data/fake_hook_file_valid
+          post_update_vm:
+            - spec/data/fake_hook_file_valid
+          pre_destroy_vm:
+            - spec/data/fake_hook_file_valid
+          post_destroy_vm:
+            - spec/data/fake_hook_file_valid
     lamp:
         type: rhos
         endpoint: https://openstack.example.com/api
@@ -77,6 +89,9 @@ infrastructures:
                     to: 192.168.1.245
                 ip_netmask: 255.255.255.0
                 ip_defgw: 192.168.1.254
+        hooks:
+          pre_create_vm:
+            - spec/data/fake_hook_file_valid
 
 nodes:
     mgt01.example.com:

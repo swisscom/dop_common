@@ -32,8 +32,10 @@ module DopCommon
       log_validation_method(:networks_valid?)
       log_validation_method(:affinity_groups_valid?)
       log_validation_method(:credentials_valid?)
+      log_validation_method(:hooks_valid?)
       try_validate_obj("Infrastructure #{name}: Can't validate the networks part because of a previous error") { networks }
       try_validate_obj("Infrastructure #{name}: Can't validate the affinity groups part because of a previous error") { affinity_groups }
+      try_validate_obj("Infrastructure #{name}: Can't validate hooks part because of a previous error") { hooks }
     end
 
     def provider
@@ -67,6 +69,10 @@ module DopCommon
 
     def default_security_groups
       @defalut_security_groups ||= default_security_groups_valid? ? create_default_security_groups : []
+    end
+
+    def hooks
+      @hooks ||= hooks_valid? ? create_hooks : {}
     end
 
     private
@@ -135,6 +141,17 @@ module DopCommon
         raise PlanParsingError, "Infrastructure #{@name}: security group names have to be strings"
     end
 
+    def hooks_valid?
+      return false unless @hash.has_key?(:hooks)
+      raise PlanParsingError, "Infrastructure #{@name}: hooks must be a non-empty hash" if
+        !@hash[:hooks].kind_of?(Hash) || @hash[:hooks].empty?
+      @hash[:hooks].keys.each do |h|
+        raise PlanParsingError, "Infrastructure #{@name} invalid hook name #{h}" unless
+          h.to_s =~ /^(pre|post)_(create|update|destroy)_vm$/
+      end
+      true
+    end
+
     def create_endpoint
       ::URI.parse(@hash[:endpoint])
     end
@@ -155,5 +172,8 @@ module DopCommon
       @hash[:default_security_groups]
     end
 
+    def create_hooks
+      ::DopCommon::Hooks.new(name, @hash[:hooks])
+    end
   end
 end
