@@ -114,4 +114,16 @@ describe DopCommon::Plan do
     end
   end
 
+  describe '#hooks' do
+    it 'will return an empty array if not defined' do
+      plan = ::DopCommon::Plan.new({})
+      expect(plan.hooks).to eq({})
+    end
+    it 'will raise an error if not specified correctly' do
+      plan = ::DopCommon::Plan.new({'hooks' => {}})
+      expect { plan.hooks }.to raise_error ::DopCommon::PlanParsingError
+      plan = ::DopCommon::Plan.new({'hooks' => {'invalid' => ['/foo/bar/baz']}})
+      expect { plan.hooks }.to raise_error ::DopCommon::PlanParsingError
+    end
+  end
 end
