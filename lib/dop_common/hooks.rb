@@ -6,8 +6,7 @@ module DopCommon
     include Validator
     include HashParser
 
-    def initialize(name, hash)
-      @name = name
+    def initialize(hash)
       @hash = symbolize_keys(hash)
     end
 
