@@ -52,6 +52,7 @@ module DopCommon
       @hash = symbolize_keys(hash)
       @parsed_infrastructures = parent[:parsed_infrastructures]
       @parsed_credentials     = parent[:parsed_credentials]
+      @parsed_hooks           = parent[:parsed_hooks]
     end
 
     def validate
@@ -202,6 +203,10 @@ module DopCommon
     def has_role?(pattern)
       DopCommon.log.warn('Node filtering by role is currently not implemented')
       false
+    end
+
+    def hooks
+      @parsed_hooks
     end
 
   protected
