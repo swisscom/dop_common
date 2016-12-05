@@ -24,10 +24,12 @@ module DopCommon
       log_validation_method('step_sets_valid?')
       log_validation_method('configuration_valid?')
       log_validation_method('credentials_valid?')
+      log_validation_method(:hooks_valid?)
       try_validate_obj("Plan: Can't validate the infrastructures part because of a previous error"){infrastructures}
       try_validate_obj("Plan: Can't validate the nodes part because of a previous error"){nodes}
       try_validate_obj("Plan: Can't validate the steps part because of a previous error"){step_sets}
       try_validate_obj("Plan: Can't validate the credentials part because of a previous error"){credentials}
+      try_validate_obj("Infrastructure #{name}: Can't validate hooks part because of a previous error") { hooks }
     end
 
     def name
@@ -63,6 +65,10 @@ module DopCommon
 
     def find_node(name)
       nodes.find{|node| node.name == name}
+    end
+
+    def hooks
+      @hooks ||= hooks_valid? ? create_hooks : {}
     end
 
   private
@@ -160,11 +166,25 @@ module DopCommon
         raise PlanParsingError, "Plan: all values in the 'credentials' hash have to be hashes"
     end
 
+    def hooks_valid?
+      return false unless @hash.has_key?(:hooks)
+      raise PlanParsingError, "Plan: hooks, if specified, must be a non-empty hash" if
+        !@hash[:hooks].kind_of?(Hash) || @hash[:hooks].empty?
+      @hash[:hooks].keys.each do |h|
+        raise PlanParsingError, "Plan: invalid hook name '#{h}'" unless
+          h.to_s =~ /^(pre|post)_(create|update|destroy)_vm$/
+      end
+      true
+    end
+
     def create_credentials
       Hash[@hash[:credentials].map do |name, hash|
         [name, ::DopCommon::Credential.new(name, hash)]
       end]
     end
 
+    def create_hooks
+      ::DopCommon::Hooks.new(@hash[:hooks])
+    end
   end
 end

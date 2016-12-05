@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.10.1] - 2016-12-03
+### CHanged
+- Hooks parser moved to global context
+
 ## [0.10.0] - 2016-11-30
 ### Added
 - Hooks parser

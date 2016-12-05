@@ -128,6 +128,51 @@ and passed to the executable on the command line.
         password:
           exec: ['/path/to/my_external_secret', '--some-option', 'arg1']
 
+## Hooks
+Hooks can be defined as a hash of programs that will be called before and/or
+after a node is created and/or updated and/or destroyed.
+
+A hook consists of an array of strings that represent paths to programs to be
+be executed at particular deployment stage.
+
+Following is a list of supported hooks:
+ - `pre_create_vm` - a set of programs executed before node creation.
+ - `post_create_vm` - a set of programs executed after node creation.
+ - `pre_update_vm` - a set programs executed before node update.
+ - `post_update_vm` - a set of programs executed after node is update.
+ - `pre_destroy_vm` - a set of programs executed before node removal.
+ - `post_destroy_vm` - a set of programs executed after node removal.
+
+__IMPORTANT__:
+ - FQDN of the given node is passed to program(s) as the first argument.
+ - `0` or `1` is passed to program(s) as the second argument. More
+   specifically, `0` is passed if there were no changes of the node during
+   deployment, while `1` indicates that there were some changes.
+ - Programs are executed in the order of their definition in the deployment
+   plan.
+ - Each hook type definition is optional, however, `hooks` hash must contain
+   at least one hook type.
+
+Following is an example of hooks definition
+```yaml
+hooks:
+  pre_create_vm:
+    - /path/to/pre_create_program_1
+    - /path/to/pre_create_program_2
+  post_create_vm:
+    - /path/to/post_create_program_1
+  pre_update_vm:
+    - /path/to/pre_update_program_1
+  post_update_vm:
+    - /path/to/post_update_program_2
+  pre_destroy_vm:
+    - /path/to/pre_destroy_program_1
+    - /path/to/pre_destroy_program_2
+    - /path/to/pre_destroy_program_3
+  post_destroy_vm:
+    - /path/to/post_destroy_program_1
+```
+
 ## Infrastructures
 The infrastructures hash holds information about cloud providers. Each entry in
 an infrastructures hash describes a certain infrastructure or cloud if you want.
@@ -166,34 +211,6 @@ specific. For instance, OVirt/RHEVm infrastructure must define __*name*__,
 __*cluster*__, __*positive*__ and __*enforced*__ properties. Please note
 that some providers may not have affinities implemented, hence this feature
 is optional in deployment plan.
- 
- 6. __*hooks*__ - an optional hash of hooks that will be called before and/or
-	after a node is created and/or updated and/or destroyed. Each hook's value,
-	if defined, consists of an array of strings that represent a path to given
-	program that should be executed during given stage of deployment.
-	Following is a list of supported hooks: 
-    - `pre_create_vm` - a set of hooks (scripts, programs) executed before a
-	  node is created.
-    - `post_create_vm` - a set of hooks (scripts, programs) executed after a
-	  node is created.
-    - `pre_update_vm` - a set of hooks (scripts, programs) executed before a
-	  node is updated.
-    - `post_update_vm` - a set of hooks (scripts, programs) executed after a
-	  node is updated.
-    - `pre_destroy_vm` - a set of hooks (scripts, programs) executed before a
-	  node is destroyed.
-    - `post_destroy_vm` - a set of hooks (scripts, programs) executed after a
-	  node is destroyed.
-	
-	__IMPORTANT__:
-	- FQDN of the given node is passed to a program as the first argument.
-	- `0` or `1` is passed to a program as the second argument. `0` is passed
-	  if there were no changes of the node during deployment, while `1`
-	  indicates that there were some changes.
-	- Programs are executed in the order of their definition in the deployment
-	  plan.
-    - Each hook type definition is optional, however, `hooks` must contain
-	  at least one hook type. 
 
 The following snippet is an example infrastructures configuration:
 ```yaml
@@ -228,22 +245,6 @@ infrastructures:
         positive: false
         enforce: true
         cluster: clu-lab1ch
-      hooks:
-        pre_create_vm:
-          - /path/to/pre_create_program_1
-          - /path/to/pre_create_program_2
-        post_create_vm:
-          - /path/to/post_create_program_1
-        pre_update_vm:
-          - /path/to/pre_update_program_1
-        post_update_vm:
-          - /path/to/post_update_program_2
-        pre_destroy_vm:
-          - /path/to/pre_destroy_program_1
-          - /path/to/pre_destroy_program_2
-          - /path/to/pre_destroy_program_3
-        post_destroy_vm:
-          - /path/to/post_destroy_program_1
   lamp:
     type: openstack
     endpoint: https://openstack.example.com/api/
@@ -261,11 +262,6 @@ infrastructures:
           to: 192.168.2.245
         ip_netmask: 255.255.255.0
         ip_defgw: 192.168.2.254
-      hooks:
-        pre_create_vm:
-          - /path/to/pre_create_program_x
-        post_destroy_vm:
-          - /path/to/post_destroy_program_y
   db:
     type: vsphere
     endpoint: https://vsphere.example.com/api/
@@ -363,16 +359,16 @@ a property name is actually a keyword of a node hash.
        infrastructures. It is required for OpenStack infrastructures.
 
 	7. __*use_config_drive*__ an optional OpenStack-specific boolean property
-	   that specifies whether a config drive should be used for VM
-	   provisioning. If set to `false` or indefined, metadata service is
-	   used. If set to `true` config drive is used.
-    
+       that specifies whether a config drive should be used for VM
+       provisioning. If set to `false` or indefined, metadata service is
+       used. If set to `true` config drive is used.
+
 	8. __*domain_id*__ an optional property specifies the name of the domain ID
-	   for OpenStack infrastructures. It defaults to `default`.
-	
+       for OpenStack infrastructures. It defaults to `default`.
+
 	9. __*endpoint_type*__ an optional property specifies the endpoint type
-	   for OpenStack infrastructures. Accepted values are `publicURL`,
-	   `internalURL` and `adminURL`. It defaults to `publicURL`.
+       for OpenStack infrastructures. Accepted values are `publicURL`,
+       `internalURL` and `adminURL`. It defaults to `publicURL`.
 
     __IMPORTANT__: Infrastructure properties may differ across different
     provider types.
@@ -475,36 +471,32 @@ a property name is actually a keyword of a node hash.
      it is emulated.
 
      __IMPORTANT:__ The __flavor__ property is mutually exclusive with any of
-	 __cores__, __memory__ or __storage__ properties. Having said that, an
-	 exception will logged if __flavor__ is specified along with one or more
-	 of __cores__, __memory__ and/or __storage__ properties.
+     __cores__, __memory__ or __storage__ properties. Having said that, an
+     exception will logged if __flavor__ is specified along with one or more
+     of __cores__, __memory__ and/or __storage__ properties.
 
  10. __*cores*__ - an optional positive integer that sets the number of cores
-    for a given node.
-	
-	It is `2` by default.
+    for a given node. It is `2` by default.
 
  11. __*memory*__ - an optional value that is used to set the amount of
-     provisioned memory for a given node.
+     provisioned memory for a given node. The default is `4G`.
 
-	 The format of an input value is a positive number followed by one of:
+     The format of an input value is a positive number followed by one of:
      * `K` for kibibytes,
-	 * `M` for mebibytes,
-	 * `G` for gibibytes,
-	 * `KB` for kilobytes,
-	 * `MB` for megabytes,
-	 * `GB` for gigabytes.
+     * `M` for mebibytes,
+     * `G` for gibibytes,
+     * `KB` for kilobytes,
+     * `MB` for megabytes,
+     * `GB` for gigabytes.
 
-	 The default is `4G`.
-
- 12. __*storage*__ - an that specifies the size of the root volume.
+ 12. __*storage*__ - an that specifies the size of the root volume. The
+     default value is `10G`.
 
      Please note that some infrastructure providers disregard this value,
-	 especially when the node is provisioned from a template.
+     especially when the node is provisioned from a template.
 
-	 Please have a look to __*memory*__ for formatting of input value.
-     
-	 The default value is `10G`.
+     Please have a look to __*memory*__ for formatting of input value.
+
 
  13. __*timezone*__ - a property that specifies the timezone of the guest
      operating system. Please make sure that:
@@ -526,10 +518,10 @@ a property name is actually a keyword of a node hash.
      administrator user.
 
  16. __*dns*__ - an optional property that specifies name servers and search
-	 domains for further node customization. If specified, it has to be a hash
-	 with any of the following items:
-	 1. __*name_servers*__ - a list of valid IP addresses.
-	 2. __*search_domains*__ - a list of valid domains.
+     domains for further node customization. If specified, it has to be a hash
+     with any of the following items:
+     1. __*name_servers*__ - a list of valid IP addresses.
+     2. __*search_domains*__ - a list of valid domains.
 
 The example bellow shows a specification for a database backend and a web node:
 ```yaml
@@ -551,8 +543,8 @@ nodes:
         network: management
           ip: dhcp
     credentials:
-	  - root_password
-	  - root_ssh_pubkey
+      - root_password
+      - root_ssh_pubkey
 
   mssql01_mgt01:
     fqdn: mssql01.example.com
@@ -605,7 +597,7 @@ nodes:
       dest_folder: sql
       datacenter: dc01
       cluster: cl01
-	  default_pool: sql_pool
+      default_pool: sql_pool
     image: w12r2
     flavor: medium
     interfaces:
@@ -624,7 +616,7 @@ nodes:
       db1:
         size: 20G
     credentials:
-	  - admin_password
+      - admin_password
 	timezone: 100
     organization_name: Acme
 

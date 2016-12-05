@@ -59,7 +59,7 @@ describe DopCommon::Infrastructure do
   end
 
   describe '#default_security_groups' do
-    it 'will return an empty array if not defines' do
+    it 'will return an empty array if not defined' do
       infrastructure = ::DopCommon::Infrastructure.new('dummy', {'type' => 'rhev'})
       expect(infrastructure.default_security_groups).to eq([])
     end
@@ -75,4 +75,3 @@ describe DopCommon::Infrastructure do
     end
   end
 end
-
