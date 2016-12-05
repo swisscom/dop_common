@@ -35,6 +35,13 @@ module DopCommon
       run_lock(plan.name) do
         save_plan_yaml(plan.name, yaml)
       end
+
+      # make sure the state files are present
+      dopi_state = File.join(@plan_store_dir, plan.name, 'dopi.yaml')
+      dopv_state = File.join(@plan_store_dir, plan.name, 'dopv.yaml')
+      FileUtils.touch(dopi_state)
+      FileUtils.touch(dopv_state)
+
       DopCommon.log.info("New plan #{plan.name} was added")
       plan.name
     end
@@ -57,7 +64,7 @@ module DopCommon
     end
 
     # remove a plan from the plan store
-    def remove(plan_name, remove_state = false)
+    def remove(plan_name, remove_dopi_state = true, remove_dopv_state = false)
       raise StandardError, "Plan #{plan_name} does not exist" unless plan_exists?(plan_name)
       plan_dir = File.join(@plan_store_dir, plan_name)
       versions_dir = File.join(plan_dir, 'versions')
@@ -67,7 +74,17 @@ module DopCommon
       run_lock(plan_name) do
         FileUtils.remove_entry_secure(versions_dir)
       end
-      if remove_state
+      info_file = File.join(plan_dir, 'run_lock_info')
+      FileUtils.remove_entry_secure(info_file)
+      if remove_dopi_state
+        dopi_state = File.join(plan_dir, 'dopi.yaml')
+        FileUtils.remove_entry_secure(dopi_state)
+      end
+      if remove_dopv_state
+        dopv_state = File.join(plan_dir, 'dopv.yaml')
+        FileUtils.remove_entry_secure(dopv_state)
+      end
+      if (Dir.entries(plan_dir) - [ '.', '..' ]).empty?
         FileUtils.remove_entry_secure(plan_dir)
       end
       DopCommon.log.info("Plan #{plan_name} was removed")

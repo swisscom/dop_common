@@ -68,20 +68,35 @@ describe DopCommon::PlanStore do
   end
 
   describe '#remove' do
-    before { @plan_store.add(plan) }
-    subject { @plan_store.remove(plan_name, remove_state) }
-    let(:remove_state) { false }
-
-    context 'plan exists and remove with state' do
-      let(:remove_state) { true }
-      it { is_expected.to eq('simple_plan') }
-      it { subject; expect(File.exists?(plan_dir)).to be false }
-      it { subject; expect(File.exists?(versions_dir)).to be false }
+    before :example do
+      @plan_store.add(plan)
     end
-    context 'plan exists and keep state' do
+    let(:dopi_state) { File.join(plan_dir, 'dopi.yaml') }
+    let(:dopv_state) { File.join(plan_dir, 'dopv.yaml') }
+
+    context 'plan exists and default state remove options' do
+      subject { @plan_store.remove(plan_name) }
       it { is_expected.to eq('simple_plan') }
-      it { subject; expect(File.exists?(plan_dir)).to be true }
       it { subject; expect(File.exists?(versions_dir)).to be false }
+      it { subject; expect(File.exists?(dopi_state)).to be false }
+      it { subject; expect(File.exists?(dopv_state)).to be true }
+      it { subject; expect(File.exists?(plan_dir)).to be true }
+    end
+    context 'plan exists and keep dopi state' do
+      subject { @plan_store.remove(plan_name, false) }
+      it { is_expected.to eq('simple_plan') }
+      it { subject; expect(File.exists?(versions_dir)).to be false }
+      it { subject; expect(File.exists?(dopi_state)).to be true }
+      it { subject; expect(File.exists?(dopv_state)).to be true }
+      it { subject; expect(File.exists?(plan_dir)).to be true }
+    end
+    context 'plan exists and remove dopv state' do
+      subject { @plan_store.remove(plan_name, true, true) }
+      it { is_expected.to eq('simple_plan') }
+      it { subject; expect(File.exists?(versions_dir)).to be false }
+      it { subject; expect(File.exists?(dopi_state)).to be false }
+      it { subject; expect(File.exists?(dopv_state)).to be false }
+      it { subject; expect(File.exists?(plan_dir)).to be false }
     end
     context 'plan does not exist' do
       let(:plan_name) { 'not_existing_plan' }
