@@ -112,6 +112,7 @@ module DopCommon
         ::DopCommon::Node.new(name.to_s, hash, {
           :parsed_infrastructures => infrastructures,
           :parsed_credentials     => credentials,
+          :parsed_hooks           => hooks,
         })
       end
     end
