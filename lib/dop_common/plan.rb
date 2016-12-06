@@ -68,7 +68,7 @@ module DopCommon
     end
 
     def hooks
-      @hooks ||= hooks_valid? ? create_hooks : {}
+      @hooks ||= ::DopCommon::Hooks.new(hooks_valid? ? @hash[:hooks] : {})
     end
 
   private
@@ -182,10 +182,6 @@ module DopCommon
       Hash[@hash[:credentials].map do |name, hash|
         [name, ::DopCommon::Credential.new(name, hash)]
       end]
-    end
-
-    def create_hooks
-      ::DopCommon::Hooks.new(@hash[:hooks])
     end
   end
 end

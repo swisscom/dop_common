@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.10.3] - 2016-12-06
+- Create valid hooks even if they are not present in the deployment file
+
 ## [0.10.2] - 2016-12-05
 ### Fixed
 - Make hooks available to node subparser as this is required by DOPv

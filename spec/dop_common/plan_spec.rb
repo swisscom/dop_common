@@ -115,9 +115,16 @@ describe DopCommon::Plan do
   end
 
   describe '#hooks' do
-    it 'will return an empty array if not defined' do
+    it 'will return hooks object if specified properly' do
       plan = ::DopCommon::Plan.new({})
-      expect(plan.hooks).to eq({})
+      expect(plan.hooks).to be_a(::DopCommon::Hooks)
+      %w(create update destroy).each do |action|
+        %w(pre post).each do |prefix|
+          hook_name = "#{prefix}_#{action}_vm"
+          plan = ::DopCommon::Plan.new({'hooks' => {hook_name => []}})
+          expect(plan.hooks).to be_an_instance_of(::DopCommon::Hooks)
+        end
+      end
     end
     it 'will raise an error if not specified correctly' do
       plan = ::DopCommon::Plan.new({'hooks' => {}})
