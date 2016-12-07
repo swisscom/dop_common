@@ -1,7 +1,12 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [unreleased] - unreleased
+### Changed
+- Remove Dopi and keep Dopv state per default to avoid confusion for the user
+
 ## [0.10.3] - 2016-12-06
+### Fixed
 - Create valid hooks even if they are not present in the deployment file
 
 ## [0.10.2] - 2016-12-05
