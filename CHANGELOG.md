@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [unreleased] - unreleased
+## [0.11.0] - 2016-12-07
 ### Changed
 - Remove Dopi and keep Dopv state per default to avoid confusion for the user
 
