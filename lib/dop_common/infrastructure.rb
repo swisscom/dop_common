@@ -8,6 +8,7 @@ module DopCommon
   class Infrastructure
     include Validator
     include HashParser
+    include RunOptions
 
     attr_reader :name
 
@@ -27,6 +28,7 @@ module DopCommon
     end
 
     def validate
+      valitdate_shared_options
       log_validation_method(:provider_valid?)
       log_validation_method(:endpoint_valid?)
       log_validation_method(:networks_valid?)
