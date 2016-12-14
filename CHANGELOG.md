@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [unreleased] - unreleased
+## [0.11.1] - 2016-12-14
 ### Changed
 - will raise a specific exeption if the plan already exists when adding
 
