@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [unreleased] - unreleased
+### Changed
+- will raise a specific exeption if the plan already exists when adding
+
 ## [0.11.0] - 2016-12-07
 ### Changed
 - Remove Dopi and keep Dopv state per default to avoid confusion for the user
