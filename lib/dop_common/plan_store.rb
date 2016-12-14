@@ -10,6 +10,9 @@ require 'hashdiff'
 require 'lockfile'
 
 module DopCommon
+  class PlanExistsError < StandardError
+  end
+
   class PlanStore
 
     def initialize(plan_store_dir)
@@ -26,7 +29,7 @@ module DopCommon
       yaml = raw_plan.kind_of?(Hash) ? raw_plan.to_yaml : File.read(raw_plan)
       plan = DopCommon::Plan.new(hash)
 
-      raise StandardError, "There is already a plan with the name #{plan.name}. Unable to add" if plan_exists?(plan.name)
+      raise PlanExistsError, "There is already a plan with the name #{plan.name}" if plan_exists?(plan.name)
       raise StandardError, 'Plan not valid. Unable to add' unless plan.valid?
       raise StandardError, 'Some Nodes already exist. Unable to add' if node_duplicates?(plan)
 
