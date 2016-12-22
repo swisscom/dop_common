@@ -178,8 +178,17 @@ module DopCommon
         case method
         when :file then File.read(file).chomp
         when :exec
-          stdout, status = Open3.capture2(Utils::sanitize_env, params.join(' '), :unsetenv_others => true)
-          stdout.chomp
+          prog = params.first
+          args = params[1, params.length].join(' ')
+          o, e, s = Open3.capture3(Utils::sanitize_env, "#{prog} #{args}", :unsetenv_others => true)
+
+          unless s.success?
+            DopCommon.log.error("Standard error output of '#{prog} #{args}':\n#{e.chomp}")
+            DopCommon.log.error("Standard output of '#{prog} #{args}':\n#{o.chomp}")
+            raise PlanParsingError, "Program '#{prog}' returned non-zero exit status #{s.exitstatus}"
+          end
+
+          o.chomp
         end
       else
         value
