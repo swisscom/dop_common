@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.11.2] - 2016-12-22
+### Added
+-  Add `max_in_flight` options into `infrastructure` 
+
+### Fixed
+- Raise an exception in case a program that generates credentials fails
+
 ## [0.11.1] - 2016-12-14
 ### Changed
 - will raise a specific exeption if the plan already exists when adding
