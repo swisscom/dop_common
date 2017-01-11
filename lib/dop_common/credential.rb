@@ -34,31 +34,31 @@ module DopCommon
     end
 
     def username
-      username_valid? ? @hash[:username] : nil
+      @username ||= username_valid? ? @hash[:username] : nil
     end
 
     def password
-      password_valid? ? load_content(@hash[:password]) : nil
+      @password ||= password_valid? ? load_content(@hash[:password]) : nil
     end
 
     def realm
-      realm_valid? ? @hash[:realm] : nil
+      @realm ||= realm_valid? ? @hash[:realm] : nil
     end
 
     def service
-      service_valid? ? @hash[:service] : nil
+      @service ||= service_valid? ? @hash[:service] : nil
     end
 
     def keytab
-      keytab_valid? ? load_content(@hash[:keytab]) : nil
+      @keytab ||= keytab_valid? ? load_content(@hash[:keytab]) : nil
     end
 
     def private_key
-      private_key_valid? ? load_content(@hash[:private_key]) : nil
+      @private_key ||= private_key_valid? ? load_content(@hash[:private_key]) : nil
     end
 
     def public_key
-      public_key_valid? ? load_content(@hash[:public_key]) : nil
+      @public_key ||= public_key_valid? ? load_content(@hash[:public_key]) : nil
     end
 
   private
