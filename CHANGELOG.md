@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.11.3] - 2017-01-11
+### Changed
+- Add caching to the credential lookups
+
 ## [0.11.2] - 2016-12-22
 ### Added
 -  Add `max_in_flight` options into `infrastructure` 
