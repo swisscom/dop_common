@@ -5,6 +5,10 @@ All notable changes to dop_common will be documented in this file.
 ### Added
 - Configuration class moved and reworked from Dopi
 
+### Changed
+- The roles and config selection for nodes should now work in all tools since the
+  hiera part was moved to dop_common from DOPi
+
 ## [0.11.3] - 2017-01-11
 ### Changed
 - Add caching to the credential lookups
