@@ -113,6 +113,7 @@ module DopCommon
           :parsed_infrastructures => infrastructures,
           :parsed_credentials     => credentials,
           :parsed_hooks           => hooks,
+          :parsed_configuration   => configuration,
         })
       end
     end

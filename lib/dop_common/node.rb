@@ -1,12 +1,14 @@
 #
 # DOP common node hash parser
 #
+require 'dop_common/node/config'
 
 module DopCommon
   class Node
     include Validator
     include HashParser
     include Utils
+    include Node::Config
 
     attr_reader :name
     alias_method :nodename, :name
@@ -53,6 +55,7 @@ module DopCommon
       @parsed_infrastructures = parent[:parsed_infrastructures]
       @parsed_credentials     = parent[:parsed_credentials]
       @parsed_hooks           = parent[:parsed_hooks]
+      @parsed_configuration   = parent[:parsed_configuration]
     end
 
     def validate
@@ -181,30 +184,6 @@ module DopCommon
       @data_disks ||= data_disks_valid? ? create_data_disks : []
     end
 
-    def has_config?(variable, pattern)
-      DopCommon.log.warn('Node filtering by config is currently not implemented')
-      false
-    end
-
-    def config_includes?(variable, pattern)
-      DopCommon.log.warn('Node filtering by config is currently not implemented')
-      false
-    end
-
-    def has_fact?(variable, pattern)
-      DopCommon.log.warn('Node filtering by facts is currently not implemeted')
-      false
-    end
-
-    def has_name?(pattern)
-      pattern_match?(name, pattern)
-    end
-
-    def has_role?(pattern)
-      DopCommon.log.warn('Node filtering by role is currently not implemented')
-      false
-    end
-
     def hooks
       @parsed_hooks
     end
@@ -214,13 +193,6 @@ module DopCommon
     attr_writer :name
 
   private
-
-    def pattern_match?(value, pattern)
-      case pattern
-      when Regexp then value =~ pattern
-      else value == pattern
-      end
-    end
 
     def digits_valid?
       return false unless inflatable?

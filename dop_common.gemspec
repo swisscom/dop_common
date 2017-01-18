@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hashdiff', '~> 0.3', '>= 0.3.1'
   spec.add_dependency 'lockfile', '~> 2'
   spec.add_dependency 'rb-inotify', '~> 0.9'
+  spec.add_dependency 'hiera', '~> 3'
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
