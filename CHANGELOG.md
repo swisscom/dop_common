@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.12.0] - unreleased
+### Added
+- Configuration class moved and reworked from Dopi
+
 ## [0.11.3] - 2017-01-11
 ### Changed
 - Add caching to the credential lookups
