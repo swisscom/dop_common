@@ -23,7 +23,8 @@ module DopCommon
         position = (line =~ REGEXP)
         if position
           position += 1 if position > 0
-          new_file = absolute_filepath(file, line[REGEXP, 1])
+          filtered_name = filter_name(line[REGEXP, 1])
+          new_file = absolute_filepath(file, filtered_name)
           spacer = ' ' * position
           content += parse_file(new_file).map {|l| spacer + l}
         else
@@ -40,6 +41,12 @@ module DopCommon
         base_dir = Pathname.new(file).expand_path.dirname
         File.join(base_dir, new_file)
       end
+    end
+
+    def self.filter_name(file)
+      file[/^"(.*)"$/, 1] or
+      file[/^'(.*)'$/, 1] or
+      file
     end
 
     def self.validate_file(file)
