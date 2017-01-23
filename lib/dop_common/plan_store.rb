@@ -25,8 +25,7 @@ module DopCommon
 
     # Add a new plan to the plan store
     def add(raw_plan)
-      hash = raw_plan.kind_of?(Hash) ? raw_plan : YAML.load_file(raw_plan)
-      yaml = raw_plan.kind_of?(Hash) ? raw_plan.to_yaml : File.read(raw_plan)
+      hash, yaml = read_plan_file(raw_plan)
       plan = DopCommon::Plan.new(hash)
 
       raise PlanExistsError, "There is already a plan with the name #{plan.name}" if plan_exists?(plan.name)
@@ -51,8 +50,7 @@ module DopCommon
 
     # Update a plan already in the plan store
     def update(raw_plan)
-      hash = raw_plan.kind_of?(Hash) ? raw_plan : YAML.load_file(raw_plan)
-      yaml = raw_plan.kind_of?(Hash) ? raw_plan.to_yaml : File.read(raw_plan)
+      hash, yaml = read_plan_file(raw_plan)
       plan = DopCommon::Plan.new(hash)
 
       raise StandardError, "No plan with the name #{plan.name} found. Unable to update" unless plan_exists?(plan.name)
@@ -175,6 +173,16 @@ module DopCommon
     def plan_exists?(plan_name)
       versions_dir = File.join(@plan_store_dir, plan_name, 'versions')
       Dir[versions_dir + '/*.yaml'].any?
+    end
+
+    # returns an array with [hash, yaml] of the plan
+    def read_plan_file(raw_plan)
+      if raw_plan.kind_of?(Hash)
+        [raw_plan, raw_plan.to_yaml]
+      else
+        parsed_plan = PreProcessor.load_plan(raw_plan)
+        [YAML.load(parsed_plan), parsed_plan]
+      end
     end
 
     # returns true if a node in the plan is already present
