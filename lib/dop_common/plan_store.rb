@@ -166,8 +166,6 @@ module DopCommon
       DopCommon::StateStore.new(state_file, plan_name, self)
     end
 
-    private
-
     # Returns true if a plan with that name already exists
     # in the plan store.
     def plan_exists?(plan_name)
@@ -175,7 +173,9 @@ module DopCommon
       Dir[versions_dir + '/*.yaml'].any?
     end
 
-    # returns an array with [hash, yaml] of the plan
+    # returns an array with [hash, yaml] of the plan. The plans should always be
+    # loaded with this method to make sure the plan is parsed with the
+    # pre_processor
     def read_plan_file(raw_plan)
       if raw_plan.kind_of?(Hash)
         [raw_plan, raw_plan.to_yaml]
@@ -184,6 +184,8 @@ module DopCommon
         [YAML.load(parsed_plan), parsed_plan]
       end
     end
+
+    private
 
     # returns true if a node in the plan is already present
     # in an other plan already in the store.

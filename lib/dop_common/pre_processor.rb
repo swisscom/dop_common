@@ -3,6 +3,7 @@
 # together.
 #
 require 'yaml'
+require 'pathname'
 
 module DopCommon
   class PreProcessor
@@ -22,7 +23,7 @@ module DopCommon
         position = (line =~ REGEXP)
         if position
           position += 1 if position > 0
-          new_file = line[REGEXP, 1]
+          new_file = absolute_filepath(file, line[REGEXP, 1])
           spacer = ' ' * position
           content += parse_file(new_file).map {|l| spacer + l}
         else
@@ -30,6 +31,15 @@ module DopCommon
         end
       end
       content
+    end
+
+    def self.absolute_filepath(file, new_file)
+      if Pathname.new(new_file).absolute?
+        new_file
+      else
+        base_dir = Pathname.new(file).expand_path.dirname
+        File.join(base_dir, new_file)
+      end
     end
 
     def self.validate_file(file)
