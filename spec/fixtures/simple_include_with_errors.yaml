@@ -1,0 +1,4 @@
+name: 'simple_include_test'
+
+include: 'incl/non_existing.yaml'
+

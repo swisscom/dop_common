@@ -1,0 +1,6 @@
+name: 'simple_include_test'
+
+include: 'incl/root_part.yaml'
+
+some_key:
+  include: 'incl/some_list.yaml'
