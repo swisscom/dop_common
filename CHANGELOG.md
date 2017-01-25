@@ -4,6 +4,7 @@ All notable changes to dop_common will be documented in this file.
 ## [0.12.0] - unreleased
 ### Added
 - Configuration class moved and reworked from Dopi
+- Support import of external files in plans
 
 ### Changed
 - The roles and config selection for nodes should now work in all tools since the
