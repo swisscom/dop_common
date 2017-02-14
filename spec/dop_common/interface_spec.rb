@@ -178,11 +178,11 @@ describe DopCommon::Interface do
       expect(interface.floating_network).to eq(nil)
     end
     it 'will return an IP network if specified properly' do
-      interface = DopCommon::Interface.new('eth0', {'floating_network' => '172.16.3.0'})
-      expect(interface.floating_network).to eq('172.16.3.0')
+      interface = DopCommon::Interface.new('eth0', {'floating_network' => 'floating-network'})
+      expect(interface.floating_network).to eq('floating-network')
     end
     it 'will raise an error if not specified correctly' do
-      [{}, [], 'foo', '300.0.1.25', '', 1].each do |n|
+      [{}, [], '', 1].each do |n|
         interface = DopCommon::Interface.new('eth0', {'floating_network' => n})
         expect{interface.floating_network}.to raise_error DopCommon::PlanParsingError
       end
