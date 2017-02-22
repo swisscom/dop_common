@@ -103,10 +103,7 @@ module DopCommon
       return false if @hash[:floating_network].nil?
       raise PlanParsingError, "Interface #{@name}: the floating network must be a non-empty string" if
         !@hash[:floating_network].kind_of?(String) || @hash[:floating_network].empty?
-      IPAddr.new(@hash[:floating_network])
       true
-    rescue ArgumentError
-      raise PlanParsingError, "Interface #{@name}: the specified floating network is not valid"
     end
 
     def network_obj

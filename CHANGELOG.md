@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.12.1] - unreleased
+### Fixed
+- Floating IP network should refer to a network name rather than to IP
+
 ## [0.12.0] - 2017-01-25
 ### Added
 - Configuration class moved and reworked from Dopi
