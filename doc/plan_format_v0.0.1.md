@@ -4,6 +4,31 @@ The DOP Plan file consists out of series of hashes and arrays which describe
 system of nodes that should be created and a list of steps that need to be
 performed on this nodes in order.
 
+## Includes
+
+From DOPi >= 0.16, DOPv >= 0.8 on the DOP plan format supports includes. Before
+DOP will parse the plan there is now a preprocessor step which will replace all
+"include: <file>" statements with the content of the file.
+
+Example:
+
+    name: 'my_plan'
+    include: '/etc/dop_deployments/credentials.yaml'
+    include: 'nodes.yaml'
+
+    steps:
+      default:
+        include: 'openstack_deploy_steps.yaml'
+      patch:
+        include: '/etc/dop_deployments/generic_patch_maintenance_steps.yaml'
+
+The file path can either be a relative or an absolute path. Relative paths mean
+that the preprocessor will look for the file relative to the path of the file
+which is including it. Included files can itself include files.
+
+The content of the included file will be placed at the position where the include
+statement begins with the exact same identation for every line.
+
 ## Global settings
 
 Settings that influence the whole plan
@@ -21,14 +46,14 @@ as a name (you will not be able to update such a plan).
 
 `default: 3`
 
-The amount of nodes DOP will be executing commands on in parallel.
+The amount of nodes DOPi will be executing commands on and DOPv will depoly in parallel.
 
 There are also two special values:
 
 - The value "0" will disable thread spawning for debug purposes.
 - The value "-1" will spawn as many threads as there are nodes.
 
-This option can be overwritten on step level
+This option can be overwritten on step level for DOPi and on infrastructure level for DOPv
 
 ### max_per_role (optional)
 
