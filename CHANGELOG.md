@@ -1,7 +1,12 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [0.12.1] - unreleased
+## [0.12.1] - 2017-03-06
+### Fixed
+- Added stale lockfile detection to the plan store which detects if the locking
+  process is still running.
+
+## [0.12.1] - 2017-02-14
 ### Fixed
 - Floating IP network should refer to a network name rather than to IP
 
