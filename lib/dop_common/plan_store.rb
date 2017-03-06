@@ -146,7 +146,7 @@ module DopCommon
     def run_lock(plan_name)
       lockfile = run_lockfile(plan_name)
       lockfile.lock
-      write_run_lock_info(plan_name)
+      write_run_lock_info(plan_name, lockfile)
       yield
     rescue Lockfile::TimeoutLockError
       info_file = File.join(@plan_store_dir, plan_name, 'run_lock_info')
@@ -224,14 +224,15 @@ module DopCommon
       @lockfiles[plan_name] ||= Lockfile.new(lockfile, options)
     end
 
-    def write_run_lock_info(plan_name)
+    def write_run_lock_info(plan_name, lockfile)
       info_file = File.join(@plan_store_dir, plan_name, 'run_lock_info')
       user = Etc.getpwuid(Process.uid)
       File.open(info_file, 'w') do |f|
         f.puts "A run lock for the plan #{plan_name} is in place!"
-        f.puts "Time : #{Time.now}"
-        f.puts "User : #{user.name}"
-        f.puts "Pid  : #{Process.pid}"
+        f.puts "Time     : #{Time.now}"
+        f.puts "User     : #{user.name}"
+        f.puts "Pid      : #{Process.pid}"
+        f.puts "Lockfile : #{lockfile.path}"
       end
     end
 
