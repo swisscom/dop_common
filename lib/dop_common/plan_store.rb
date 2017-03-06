@@ -144,14 +144,13 @@ module DopCommon
 
     # A run lock is used in all operations which change plans in the plan store.
     def run_lock(plan_name)
+      remove_stale_lock(plan_name)
       lockfile = run_lockfile(plan_name)
       lockfile.lock
       write_run_lock_info(plan_name, lockfile)
       yield
     rescue Lockfile::TimeoutLockError
-      info_file = File.join(@plan_store_dir, plan_name, 'run_lock_info')
-      locked_message = File.read(info_file)
-      raise StandardError, locked_message
+      raise StandardError, read_run_lock_info(plan_name)
     ensure
       lockfile.unlock if run_lock?(plan_name)
     end
@@ -220,20 +219,44 @@ module DopCommon
 
     def run_lockfile(plan_name)
       lockfile = File.join(@plan_store_dir, plan_name, 'run_lock')
-      options = {:retry => 0, :timeout => 1, :max_age => 86400}
+      options = {:retry => 0, :timeout => 1, :max_age => 60}
       @lockfiles[plan_name] ||= Lockfile.new(lockfile, options)
+    end
+
+    def stale_lock?(plan_name)
+      runlock_info = YAML.load(read_run_lock_info(plan_name))
+      pid = runlock_info['PID'].to_i
+      begin
+        Process.getpgid(pid)
+        false
+      rescue Errno::ESRCH
+        true
+      end
+    end
+
+    def remove_stale_lock(plan_name)
+      lockfile = run_lockfile(plan_name)
+      if File.exists?(lockfile.path) and stale_lock?(plan_name)
+        DopCommon.log.warn("Removing stale lockfile '#{lockfile.path}'")
+        File.delete(lockfile.path)
+      end
     end
 
     def write_run_lock_info(plan_name, lockfile)
       info_file = File.join(@plan_store_dir, plan_name, 'run_lock_info')
       user = Etc.getpwuid(Process.uid)
       File.open(info_file, 'w') do |f|
-        f.puts "A run lock for the plan #{plan_name} is in place!"
-        f.puts "Time     : #{Time.now}"
-        f.puts "User     : #{user.name}"
-        f.puts "Pid      : #{Process.pid}"
-        f.puts "Lockfile : #{lockfile.path}"
+        f.puts "# A run lock for the plan #{plan_name} is in place!"
+        f.puts "Time: #{Time.now}"
+        f.puts "User: #{user.name}"
+        f.puts "PID: #{Process.pid}"
+        f.puts "Lockfile: #{lockfile.path}"
       end
+    end
+
+    def read_run_lock_info(plan_name)
+      info_file = File.join(@plan_store_dir, plan_name, 'run_lock_info')
+      File.read(info_file)
     end
 
   end
