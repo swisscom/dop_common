@@ -7,6 +7,9 @@ All notable changes to dop_common will be documented in this file.
   easier to understand.
 - Some common global cli options for all clis
 
+### Fixed
+- Include loops are now detected
+
 ## [0.12.1] - 2017-03-06
 ### Fixed
 - Added stale lockfile detection to the plan store which detects if the locking
