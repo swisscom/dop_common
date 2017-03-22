@@ -1,6 +1,7 @@
 require "dop_common/version"
 require "dop_common/config"
 require "dop_common/log"
+require "dop_common/thread_context_logger"
 require "dop_common/validator"
 require "dop_common/hash_parser"
 require "dop_common/utils"
