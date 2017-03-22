@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.13.0] - unreleased
+### Added
+- Moved thread context logger from dopi to dop_common and reworked it so it is
+  easier to understand.
+- Some common global cli options for all clis
+
 ## [0.12.1] - 2017-03-06
 ### Fixed
 - Added stale lockfile detection to the plan store which detects if the locking
