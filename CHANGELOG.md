@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [0.13.0] - unreleased
+## [0.13.0] - 2017-03-28
 ### Added
 - Moved thread context logger from dopi to dop_common and reworked it so it is
   easier to understand.
