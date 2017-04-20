@@ -213,6 +213,56 @@ describe DopCommon::Node do
     end
   end
 
+  describe '#thin_clone' do
+    it 'will return nil for VSphere provider if unspecified' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'vsphere'},
+        {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.thin_clone).to be_nil
+    end
+    it 'will return a boolean value if specified properly' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'vsphere', 'thin_clone' => true},
+        {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.thin_clone).to be true
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'vsphere', 'thin_clone' => false},
+        {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.thin_clone).to be false
+    end
+    it 'will raise an error if "thin_clone" is of invalid type' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'vsphere', 'thin_clone' => :invalid},
+        {:parsed_infrastructures => @infrastructures}
+      )
+      expect{node.thin_clone}.to raise_error DopCommon::PlanParsingError
+    end
+
+    it 'will return nil in case of invalid provider type' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev'},
+        {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.thin_clone).to be_nil
+    end
+    it 'will raise an error if "thin_clone" specified in case of invalid provider type' do
+      node = DopCommon::Node.new(
+        'dummy',
+        {'infrastructure' => 'rhev', 'thin_clone' => false},
+        {:parsed_infrastructures => @infrastructures}
+      )
+      expect{node.thin_clone}.to raise_error DopCommon::PlanParsingError
+    end
+  end
+
   describe '#interfaces' do
     it 'will return an array of interfaces if specified correctly' do
       node = DopCommon::Node.new(

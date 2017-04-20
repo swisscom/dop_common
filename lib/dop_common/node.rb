@@ -66,6 +66,7 @@ module DopCommon
       log_validation_method('infrastructure_properties_valid?')
       log_validation_method('image_valid?')
       log_validation_method('full_clone_valid?')
+      log_validation_method('thin_clone_valid?')
       log_validation_method('interfaces_valid?')
       log_validation_method('flavor_valid?')
       log_validation_method('cores_valid?')
@@ -139,6 +140,11 @@ module DopCommon
       @full_clone ||= full_clone_valid? ? @hash[:full_clone] : true
     end
     alias_method :full_clone, :full_clone?
+
+    def thin_clone?
+      @thin_clone ||= thin_clone_valid? ? @hash[:thin_clone] : nil
+    end
+    alias_method :thin_clone, :thin_clone?
 
     def interfaces
       @interfaces ||= interfaces_valid? ? create_interfaces : []
@@ -258,6 +264,15 @@ module DopCommon
         infrastructure.provides?(:ovirt)
       raise PlanParsingError, "Node #{@node}: The 'full_clone', if defined, must be true or false" unless
         @hash.has_key?(:full_clone) && (@hash[:full_clone].kind_of?(TrueClass) || @hash[:full_clone].kind_of?(FalseClass))
+      true
+    end
+
+    def thin_clone_valid?
+      return false if @hash[:thin_clone].nil?
+      raise PlanParsingError, "Node #{@node}: The 'thin_clone' can be used only for VSphere provider" unless
+        (infrastructure.provides?(:vsphere) || infrastructure.provides?(:vmware))
+      raise PlanParsingError, "Node #{@node}: The 'thin_clone', if defined, must be true or false" unless
+        @hash.has_key?(:thin_clone) && (@hash[:thin_clone].kind_of?(TrueClass) || @hash[:thin_clone].kind_of?(FalseClass))
       true
     end
 
