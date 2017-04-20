@@ -554,7 +554,7 @@ a property name is actually a keyword of a node hash.
 
      The default (unset) leaves disks as defined in given template (no explicit transformation).
 
-     __IMPORTANT__: Other providers silently disregard this property.
+     __IMPORTANT__: Do not use this property for other cloud provider types than VSphere.
 
 The example bellow shows a specification for a database backend and a web node:
 ```yaml
