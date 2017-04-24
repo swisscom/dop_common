@@ -548,6 +548,14 @@ a property name is actually a keyword of a node hash.
      1. __*name_servers*__ - a list of valid IP addresses.
      2. __*search_domains*__ - a list of valid domains.
 
+ 17. __*thin_clone*__ - an optional, VSphere-specific boolean property that instructs the VSphere provider:
+     1. To transform all disks from a template as thin provision (sparse) if set to `true`.
+     2. To transform all disks from a template as thick provision (flat) if set to `false`.
+
+     The default (unset) leaves disks as defined in given template (no explicit transformation).
+
+     __IMPORTANT__: Do not use this property for other cloud provider types than VSphere.
+
 The example bellow shows a specification for a database backend and a web node:
 ```yaml
 nodes:
