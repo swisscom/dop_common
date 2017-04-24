@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.14.0] - 2017-04-24
+### Added
+- Add node property thin_clone for vmware
+
 ## [0.13.0] - 2017-03-28
 ### Added
 - Moved thread context logger from dopi to dop_common and reworked it so it is
