@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.14.1] - 2017-04-26
+### Changed
+- Remove hiera dependency in gem to avoid problems with the RPM form the
+  Puppetlabs repo
+
 ## [0.14.0] - 2017-04-24
 ### Added
 - Add node property thin_clone for vmware
