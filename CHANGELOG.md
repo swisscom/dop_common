@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.14.2] - 2017-05-01
+### Fixed
+- Some errors in the config class when using ruby 1.8.7
+
 ## [0.14.1] - 2017-04-26
 ### Changed
 - Remove hiera dependency in gem to avoid problems with the RPM form the
