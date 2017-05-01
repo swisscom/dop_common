@@ -33,33 +33,33 @@ module DopCommon
     include DopCommon::Config::Helper
 
 		conf_var :trace,
-			default: false
+			:default => false
 		conf_var :config_file,
-			default: is_root? ? '/etc/dop/dop.conf' : File.join(dop_home, 'dop.conf')
+			:default => is_root? ? '/etc/dop/dop.conf' : File.join(dop_home, 'dop.conf')
 		conf_var :plan_store_dir,
-			default: is_root? ? '/var/lib/dop/cache' : File.join(dop_home, 'cache')
+			:default => is_root? ? '/var/lib/dop/cache' : File.join(dop_home, 'cache')
 		conf_var :use_hiera,
-			default: true
+			:default => true
 		conf_var :hiera_yaml,
-			default: is_root? ? '/etc/puppet/hiera.yaml' : File.join(user.dir, '.puppet', 'hiera.yaml')
+			:default => is_root? ? '/etc/puppet/hiera.yaml' : File.join(user.dir, '.puppet', 'hiera.yaml')
     conf_var :load_facts,
-      default: false
+      :default => false
     conf_var :facts_dir,
-      default: is_root? ? '/var/lib/puppet/yaml/facts' : File.join(user.dir, '.puppet', 'var', 'yaml', 'facts')
+      :default => is_root? ? '/var/lib/puppet/yaml/facts' : File.join(user.dir, '.puppet', 'var', 'yaml', 'facts')
 		conf_var :role_variable,
-			default: 'role'
+			:default => 'role'
 		conf_var :role_default,
-			default: nil
+			:default => nil
 		conf_var :connection_check_timeout,
-			default: 5
+			:default => 5
 		conf_var :mco_config,
-			default: is_root? ? '/etc/mcollective/client.cfg' : File.join(user.dir, '.mcollective')
+			:default => is_root? ? '/etc/mcollective/client.cfg' : File.join(user.dir, '.mcollective')
 		conf_var :mco_dopi_logger,
-			default: true
+			:default => true
 		conf_var :log_dir,
-			default: is_root? ? '/var/log/dop/' : File.join(dop_home, 'log')
+			:default => is_root? ? '/var/log/dop/' : File.join(dop_home, 'log')
     conf_var :log_level,
-      default: 'DEBUG'
+      :default => 'DEBUG'
 
   end
 
