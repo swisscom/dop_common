@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.15.0]
+### Added
+- Some small API addition to the log stuff to get the current log file
+
 ## [0.14.2] - 2017-05-01
 ### Fixed
 - Some errors in the config class when using ruby 1.8.7
