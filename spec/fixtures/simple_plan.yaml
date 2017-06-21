@@ -9,6 +9,11 @@ nodes:
   'linux01.example.com':
     infrastructure: 'test'
 
+configuration:
+  nodes:
+    'linux01.example.com':
+      somevar: 'someval'
+
 steps:
   - name: 'write hello world'
     nodes: 'all'

@@ -19,20 +19,21 @@ class Hiera
         if Config[:dop].kind_of?(Hash)
           @plan_store_dir ||= Config[:dop][:plan_store_dir]
         end
-        @plan_store_dir ||= '/var/lib/dop/plans'
+        @plan_store_dir ||= DopCommon.config.plan_store_dir
 
         @plan_store = DopCommon::PlanStore.new(@plan_store_dir)
         @plan_cache = DopCommon::PlanCache.new(@plan_store)
         Hiera.debug('DOP Plan Cache Loaded')
       end
 
-      def lookup(key, scope, order_override, resolution_type, context)
+      def lookup(key, scope, order_override, resolution_type, context = {})
         node_name = scope['::clientcert']
         plan = @plan_cache.plan_by_node(node_name)
 
         if plan.nil?
           Hiera.debug("Node #{node_name} not found in any plan")
-          throw(:no_such_key)
+          #throw(:no_such_key)
+          return nil
         else
           Hiera.debug("Node #{node_name} found in plan #{plan.name}")
           plan_lookup(plan, key, scope, order_override, resolution_type, context)
@@ -48,7 +49,11 @@ class Hiera
           Hiera.debug("Looking for data source #{source}")
           begin
             data = plan.configuration.lookup(source, key, scope)
-            new_answer = Hiera::Backend.parse_answer(data, scope, extra_data, context)
+            if Hiera::Backend.method(:parse_answer).arity == -4
+              new_answer = Hiera::Backend.parse_answer(data, scope, extra_data, context)
+            else
+              new_answer = Hiera::Backend.parse_answer(data, scope, extra_data)
+            end
             found = true
 
             case resolution_type.is_a?(Hash) ? :hash : resolution_type
@@ -63,7 +68,7 @@ class Hiera
             next
           end
         end
-        throw(:no_such_key) unless found
+        #throw(:no_such_key) unless found
         return answer
       end
 
