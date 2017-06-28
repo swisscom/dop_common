@@ -1,7 +1,11 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
-## [0.15.0]
+## [0.15.1]
+### Fixed
+- Fix the default plan store path for the hiera plugin and add some more tests
+
+## [0.15.0] - 2017-05-26
 ### Added
 - Some small API addition to the log stuff to get the current log file
 
