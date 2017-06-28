@@ -19,7 +19,10 @@ class Hiera
         if Config[:dop].kind_of?(Hash)
           @plan_store_dir ||= Config[:dop][:plan_store_dir]
         end
-        @plan_store_dir ||= DopCommon.config.plan_store_dir
+        # this is the fixed default path since the puppet master runs with the
+        # puppet user but wants to read from the default dop cache and not from
+        # the user specific one.
+        @plan_store_dir ||= '/var/lib/dop/cache/'
 
         @plan_store = DopCommon::PlanStore.new(@plan_store_dir)
         @plan_cache = DopCommon::PlanCache.new(@plan_store)
