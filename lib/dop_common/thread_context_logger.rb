@@ -39,11 +39,19 @@ module DopCommon
       end
     end
 
+    def current_log_file
+      context = @threads[Thread.current.object_id.to_s]
+      log_file(context)
+    end
+
     private
 
+    def log_file(context)
+      File.join(@log_path, context)
+    end
+
     def add(context)
-      log_file = File.join(@log_path, context)
-      logger = Logger.new(log_file)
+      logger = Logger.new(log_file(context))
       if context == 'all'
         logger.formatter = Logger::Formatter.new
       else

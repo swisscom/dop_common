@@ -1,3 +1,3 @@
 module DopCommon
-  VERSION = '0.14.2'
+  VERSION = '0.15.1'
 end

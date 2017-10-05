@@ -8,4 +8,6 @@ if Gem::Version.new(RUBY_VERSION.dup) <= Gem::Version.new('1.9.3')
   gem 'json', '~> 1'
 end
 
+gem 'hiera'
+
 gemspec

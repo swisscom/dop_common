@@ -1,0 +1,6 @@
+:backends:
+    - dop
+:hierarchy:
+    - nodes/%{::clientcert}
+    - roles/%{::role}
+    - defaults
