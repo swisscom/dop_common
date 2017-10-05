@@ -478,9 +478,9 @@ a property name is actually a keyword of a node hash.
 
  8. __*credentials*__ - an optional property to define credentials for
     administrator user (root, Administrator). This information is passed to
-	the customization tool (cloud-init, VSphere customization, etc.). Following
+	the customization tool (cloud-init, VSphere-based windows-guests customization, etc.). Following
 	data can be specified:
-    * __*root_password*__ - super user password that is set for cloud init phase,
+    * __*root_password*__ - super user password that is set for cloud init phase (IMPORTANT: not supported in VSphere).
     * __*root_ssh_keys*__ - an array of OpenSSH public keys that are recorded
       into `/root/.ssh/authorized_keys` by cloud init.
     * __*administrator_password*__ - an optional property that specifies the
