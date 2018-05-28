@@ -535,7 +535,7 @@ a property name is actually a keyword of a node hash.
      __IMPORTANT:__ This property is required when customizing guest on *VSPhere* provider.
 
  14. __*product_id*__ - an optional, VSphere-specific windows-only guest customization
-     property that specifies a serial number. Its default value is
+     property that specifies a serial number. The default value is
      undefined which leaves the guest OS in an evaluation/trial mode.
 
  15. __*organization_name*__ - a required, VSphere-specific windows-only guest
@@ -555,6 +555,14 @@ a property name is actually a keyword of a node hash.
      The default (unset) leaves disks as defined in given template (no explicit transformation).
 
      __IMPORTANT__: Do not use this property for other cloud provider types than VSphere.
+
+ 18. __*tags*__ - a optional, VSphere-specific, property that instructs the VSphere provider
+     to associate the given node with the listed tags
+
+     __IMPORTANT__: Do not use this property for other cloud provider types than VSphere.
+     __IMPORTANT__: Requires minimum version 6.0.0 of VSphere.
+     __IMPORTANT__: Raises an error if the tag does not exist.
+
 
 The example bellow shows a specification for a database backend and a web node:
 ```yaml

@@ -670,4 +670,55 @@ describe DopCommon::Node do
       end
     end
   end
+
+
+  describe '#tags' do
+    it 'will return nil if tags not specified' do
+      node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'vsphere'},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.tags).to be_nil
+    end
+    it 'will return a value if specified properly' do
+      node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'vsphere', 'tags' => ['tag_a', 'tag_c']},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.tags).to eq(['tag_a', 'tag_c'])
+      node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'vsphere', 'tags' => [:tag_b]},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.tags).to eq(['tag_b'])
+    end
+    it 'will raise an error if "tags" is of invalid type' do
+      node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'vsphere', 'tags' => false},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect{node.tags}.to raise_error DopCommon::PlanParsingError
+    end
+
+    it 'will return nil in case of invalid provider type' do
+      node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'rhev'},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.tags).to be_nil
+    end
+    it 'will raise an error if "tags" specified in case of invalid provider type' do
+      node = DopCommon::Node.new(
+          'dummy',
+          {'infrastructure' => 'rhev', 'tags' => ['tag_a']},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect{node.tags}.to raise_error DopCommon::PlanParsingError
+    end
+  end
 end

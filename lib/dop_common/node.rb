@@ -78,6 +78,7 @@ module DopCommon
       log_validation_method('credentials_valid?')
       log_validation_method('dns_valid?')
       log_validation_method('data_disks_valid?')
+      log_validation_method('tags_valid?')
       try_validate_obj("Node #{@name}: Can't validate the interfaces part because of a previous error"){interfaces}
       try_validate_obj("Node #{@name}: Can't validate the infrastructure_properties part because of a previous error"){infrastructure_properties}
       try_validate_obj("Node #{@name}: Can't validate the dns part because of a previous error"){dns}
@@ -192,6 +193,10 @@ module DopCommon
 
     def hooks
       @parsed_hooks
+    end
+
+    def tags
+      @tags ||= tags_valid? ? create_tags : nil
     end
 
   protected
@@ -451,6 +456,25 @@ module DopCommon
           :parsed_infrastructure => infrastructure,
           :parsed_infrastructure_properties => infrastructure_properties
         )
+      end
+    end
+
+    def tags_valid?
+      return false if @hash[:tags].nil?
+      raise PlanParsingError, "Node #{@node}: The 'thin_clone' can be used only for VSphere provider" unless
+          (infrastructure.provides?(:vsphere) || infrastructure.provides?(:vmware))
+      [String, Symbol, Array].include?(@hash[:tags].class) or
+          raise PlanParsingError, "Node #{name}: 'tags' has to be a string, symbol or array"
+      [@hash[:tags]].flatten.each do |tag|
+        [String, Symbol].include?(tag.class) or
+            raise PlanParsingError, "Node #{name}: the 'tags' array should only contain strings, symbols"
+      end
+    end
+
+
+    def create_tags
+      [@hash[:tags]].flatten.map do |tag|
+        tag.to_s
       end
     end
   end
