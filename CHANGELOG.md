@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.15.2]
+### Added
+- Add node list property tags for vmware / vsphere
+
 ## [0.15.1]
 ### Fixed
 - Fix the default plan store path for the hiera plugin and add some more tests
