@@ -562,6 +562,9 @@ a property name is actually a keyword of a node hash.
      __IMPORTANT__: Do not use this property for other cloud provider types than VSphere.
      __IMPORTANT__: Requires minimum version 6.0.0 of VSphere.
      __IMPORTANT__: Raises an error if the tag does not exist.
+     
+ 17. __*force_stop*__ - an optional boolean property to force shutdown e.g. during undeploying.
+     It is `false` by default.     
 
 
 The example bellow shows a specification for a database backend and a web node:

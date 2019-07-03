@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to dop_common will be documented in this file.
 
+## [0.15.3]
+### Added
+- Add node property `force_stop`
+
 ## [0.15.2]
 ### Added
 - Add node list property tags for vmware / vsphere

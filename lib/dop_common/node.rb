@@ -79,6 +79,7 @@ module DopCommon
       log_validation_method('dns_valid?')
       log_validation_method('data_disks_valid?')
       log_validation_method('tags_valid?')
+      log_validation_method('force_stop_valid?')
       try_validate_obj("Node #{@name}: Can't validate the interfaces part because of a previous error"){interfaces}
       try_validate_obj("Node #{@name}: Can't validate the infrastructure_properties part because of a previous error"){infrastructure_properties}
       try_validate_obj("Node #{@name}: Can't validate the dns part because of a previous error"){dns}
@@ -198,6 +199,11 @@ module DopCommon
     def tags
       @tags ||= tags_valid? ? create_tags : nil
     end
+
+    def force_stop?
+      @force_stop ||= force_stop_valid? ? @hash[:force_stop] : false
+    end
+    alias_method :force_stop, :force_stop?
 
   protected
 
@@ -471,11 +477,17 @@ module DopCommon
       end
     end
 
-
     def create_tags
       [@hash[:tags]].flatten.map do |tag|
         tag.to_s
       end
+    end
+
+    def force_stop_valid?
+      return false if @hash[:force_stop].nil?
+      raise PlanParsingError, "Node #{@node}: The 'force_stop', if defined, must be true or false" unless
+          @hash.has_key?(:force_stop) && (@hash[:force_stop].kind_of?(TrueClass) || @hash[:force_stop].kind_of?(FalseClass))
+      true
     end
   end
 end

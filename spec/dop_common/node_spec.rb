@@ -721,4 +721,37 @@ describe DopCommon::Node do
       expect{node.tags}.to raise_error DopCommon::PlanParsingError
     end
   end
+
+  describe '#force_stop' do
+    it 'will return a boolean value if specified properly' do
+      node = DopCommon::Node.new(
+          'dummy',
+          {'force_stop' => true},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.force_stop).to be true
+
+      node = DopCommon::Node.new(
+          'dummy',
+          {'force_stop' => false},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.force_stop).to be false
+
+      node = DopCommon::Node.new(
+          'dummy',
+          {},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect(node.force_stop).to be false
+    end
+    it 'will raise an error if "force_stop" is of invalid type' do
+      node = DopCommon::Node.new(
+          'dummy',
+          {'force_stop' => :invalid},
+          {:parsed_infrastructures => @infrastructures}
+      )
+      expect{node.force_stop}.to raise_error DopCommon::PlanParsingError
+    end
+  end
 end
