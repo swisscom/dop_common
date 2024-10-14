@@ -1,3 +1,6 @@
+> [!NOTE]
+> DEPRECATED - no longer maintained!
+
 # DopCommon
 
 This gem is part of the Deployment and Orchestration for Puppet
